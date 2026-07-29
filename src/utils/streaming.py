@@ -17,17 +17,21 @@ async def transform_graph_events(
     支持的事件类型：
     - on_chain_start: 节点开始执行
     - on_chain_end: 节点执行完成
-    - on_chat_model_stream: LLM token 片段
-    - on_interrupt: 中断等待用户输入
+    - on_chat_model_stream: LLM token 片段（附带来源节点名）
     - on_chain_error: 节点执行错误
-    - on_graph_end: 图执行完成
+    - on_custom_event: 自定义事件（如 interrupt）
+
+    注意：token 事件会附带 current_node（最近一次 on_chain_start 的节点名），
+    前端可据此判断 token 来自哪个节点（例如 story_driver 产出正文）。
     """
+    current_node = None
     async for event in async_gen:
         event_kind = event.get("event", "")
         name = event.get("name", "")
         data = event.get("data", {})
 
         if event_kind == "on_chain_start":
+            current_node = name
             yield format_sse_event("node_start", {
                 "node": name,
                 "input": data.get("input"),
@@ -52,6 +56,7 @@ async def transform_graph_events(
             chunk = data.get("chunk")
             if chunk and hasattr(chunk, "content") and chunk.content:
                 yield format_sse_event("token", {
+                    "node": current_node,
                     "content": chunk.content,
                 })
 
@@ -66,6 +71,3 @@ async def transform_graph_events(
             yield format_sse_event("interrupt", {
                 "data": data,
             })
-
-    # 流结束
-    yield format_sse_event("done", {"message": "stream complete"})

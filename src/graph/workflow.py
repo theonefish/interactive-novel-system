@@ -4,7 +4,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 from src.graph.state import NovelState
-from src.agents.supervisor import supervisor_node, supervisor_route
+from src.agents.supervisor import supervisor_node, supervisor_route, critic_route
 from src.agents.researcher import world_builder_node
 from src.agents.writer import story_driver_node
 from src.agents.reviewer import critic_node
@@ -39,10 +39,21 @@ def _build_workflow():
         }
     )
 
-    # 固定边
-    workflow.add_edge("world_builder", "supervisor")
+    # 背景设定与剧情生成后都进入审查
+    workflow.add_edge("world_builder", "critic")
     workflow.add_edge("story_driver", "critic")
-    workflow.add_edge("critic", "supervisor")
+
+    # 审查节点条件边：违规打回重写/重生成，通过返回 supervisor
+    workflow.add_conditional_edges(
+        "critic",
+        critic_route,
+        {
+            "world_builder": "world_builder",
+            "story_driver": "story_driver",
+            "supervisor": "supervisor",
+        }
+    )
+
     workflow.add_edge("integrator", "supervisor")
 
     return workflow

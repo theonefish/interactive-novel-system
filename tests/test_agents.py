@@ -306,14 +306,41 @@ class TestCriticNode:
             critic_node(state)
 
     @patch("src.agents.reviewer.llm_call")
-    def test_critic_empty_segment_returns_progressing(self, mock_llm):
+    def test_critic_empty_segment_with_setting_returns_progressing(self, mock_llm):
         from src.agents.reviewer import critic_node
+
+        mock_llm.return_value = '{"score": 8, "passed": true, "issues": [], "risk_warnings": [], "suggestion": "设定良好"}'
 
         state = _make_initial_state()
         state["current_segment"] = ""
 
         result = critic_node(state)
         assert result["current_phase"] == "story_progressing"
+        assert result["setting_confirmed"] is True
+
+    @patch("src.agents.reviewer.llm_call")
+    def test_critic_empty_segment_without_setting_returns_progressing(self, mock_llm):
+        from src.agents.reviewer import critic_node
+
+        state = _make_initial_state()
+        state["current_segment"] = ""
+        state["world_setting"] = ""
+
+        result = critic_node(state)
+        assert result["current_phase"] == "story_progressing"
+
+    @patch("src.agents.reviewer.llm_call")
+    def test_critic_setting_review_low_score(self, mock_llm):
+        from src.agents.reviewer import critic_node
+        from langgraph.types import interrupt
+
+        mock_llm.return_value = '{"score": 3, "passed": false, "issues": ["设定矛盾"], "risk_warnings": [], "suggestion": "需要修改"}'
+
+        state = _make_initial_state()
+        state["current_segment"] = ""
+
+        with pytest.raises(Exception):
+            critic_node(state)
 
     @patch("src.agents.reviewer.llm_call")
     def test_critic_max_iterations_returns_progressing(self, mock_llm):

@@ -115,19 +115,49 @@ class TestStateFlow:
         result = supervisor_node(state)
         assert result["current_phase"] == "world_building"
 
-    def test_world_building_to_story_progressing_flow(self):
-        """world_builder → supervisor → story_driver 的状态流转"""
-        from src.agents.supervisor import supervisor_node, supervisor_route
+    def test_world_building_to_story_driver_through_critic(self):
+        """world_builder → critic → story_driver 的设定审查流转"""
+        from langgraph.graph import END
+        from src.agents.supervisor import critic_route, supervisor_route
 
-        # 1. supervisor 初始 -> world_building
-        state = _make_state("init")
-        result = supervisor_node(state)
-        assert result["current_phase"] == "world_building"
-
-        # 2. world_building 设定已确认 -> 路由到 story_driver
-        state["current_phase"] = "world_building"
+        # 1. critic 完成设定审查并通过 -> story_driver
+        state = _make_state("world_building")
         state["setting_confirmed"] = True
+        state["current_phase"] = "story_progressing"
+        route = critic_route(state)
+        assert route == "story_driver"
+
+        # 2. story_progressing 且 awaiting_user -> supervisor 路由到 END 等待用户
+        state["awaiting_user"] = True
         route = supervisor_route(state)
+        assert route == END
+
+    def test_critic_route_setting_review_failed(self):
+        """设定审查未通过 -> 打回 world_builder"""
+        from src.agents.supervisor import critic_route
+
+        state = _make_state("critic_loop")
+        state["current_segment"] = ""
+        state["world_setting"] = "测试世界观"
+        route = critic_route(state)
+        assert route == "world_builder"
+
+    def test_critic_route_segment_passed(self):
+        """剧情审查通过 -> 返回 supervisor 等待用户"""
+        from src.agents.supervisor import critic_route
+
+        state = _make_state("story_progressing")
+        state["current_segment"] = "一段剧情"
+        route = critic_route(state)
+        assert route == "supervisor"
+
+    def test_critic_route_segment_failed(self):
+        """剧情审查未通过 -> 打回 story_driver 重写"""
+        from src.agents.supervisor import critic_route
+
+        state = _make_state("critic_loop")
+        state["current_segment"] = "一段有问题的剧情"
+        route = critic_route(state)
         assert route == "story_driver"
 
     def test_critic_loop_retry_flow(self):

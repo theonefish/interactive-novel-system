@@ -6,7 +6,7 @@ import asyncio
 from typing import Optional, AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
@@ -16,7 +16,7 @@ from src.graph.workflow import build_graph, build_graph_async
 from src.graph.state import NovelState
 from src.tools.memory import create_initial_memory
 from src.utils.database import is_postgres
-from src.utils.streaming import transform_graph_events
+from src.utils.streaming import transform_graph_events, format_sse_event
 
 
 # ─── 全局应用实例 ──────────────────────────────────
@@ -203,16 +203,20 @@ def get_session(session_id: str):
 
 
 @app.get("/api/sessions/{session_id}/stream")
-async def stream_session(session_id: str, request: Request):
+async def stream_session(session_id: str, request: Request, action: str = Query("")):
     """SSE 流式输出 - 逐节点/逐 token 推送图执行结果
 
     通过 EventSource 消费，事件类型：
     - node_start: 节点开始
-    - node_end: 节点完成（含关键状态字段）
-    - token: LLM token 片段
+    - node_end: 节点完成（含关键状态字段，如 story_driver 的 current_segment）
+    - token: LLM token 片段（附 node 字段标明来源节点）
     - interrupt: 中断等待用户
     - error: 执行错误
+    - final: 流结束后的完整状态快照（前端据此一次性渲染选项/世界观等）
     - done: 流结束
+
+    前端在用户做出选择后调用此接口（action=用户输入），后端用
+    Command(resume=action) 恢复被中断的图并流式执行。
     """
     config = {"configurable": {"thread_id": session_id}}
 
@@ -231,9 +235,9 @@ async def stream_session(session_id: str, request: Request):
 
         from langgraph.types import Command
         try:
-            # 使用 astream_events 流式执行
+            # 使用 astream_events 流式执行，将用户输入恢复给被中断的图
             async_gen = graph.astream_events(
-                Command(resume=""),  # 继续执行
+                Command(resume=action),
                 config,
                 version="v2",
             )
@@ -243,10 +247,15 @@ async def stream_session(session_id: str, request: Request):
                     break
                 yield sse_event
 
+            # 流结束后发送完整状态快照，供前端一次性渲染选项/世界观等
+            state = graph.get_state(config)
+            final_resp = _state_to_response(state.values, session_id)
+            yield format_sse_event("final", final_resp.model_dump())
+
         except Exception as e:
-            yield f"event: error\ndata: {json.dumps({'error': str(e)}, ensure_ascii=False)}\n\n"
+            yield format_sse_event("error", {"error": str(e)})
         finally:
-            yield f"event: done\ndata: {json.dumps({'message': 'stream complete'}, ensure_ascii=False)}\n\n"
+            yield format_sse_event("done", {"message": "stream complete"})
 
     return StreamingResponse(
         event_generator(),
