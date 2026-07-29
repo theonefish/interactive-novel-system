@@ -1,0 +1,9 @@
+.env
+__pycache__/
+.venv/
+*.db
+.idea/
+.vscode/
+.trae/
+node_modules/
+frontend/dist/
