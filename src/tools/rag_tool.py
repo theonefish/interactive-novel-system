@@ -9,6 +9,8 @@
 """
 
 import os
+import hashlib
+import time
 import requests
 from typing import List, Optional
 from pathlib import Path
@@ -31,6 +33,32 @@ CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", "default")
 
 RETRIEVE_K = 20       # 向量检索候选数
 RERANK_TOP_K = 5      # 重排序后保留数
+
+
+# ─── TTL 缓存（减少重复 API 调用）────────────────────
+
+class _TTLCache:
+    """进程内 LRU + TTL 缓存，用于缓存 RAG 检索结果"""
+    def __init__(self, maxsize: int = 128, ttl: int = 300):
+        self._cache = {}
+        self._maxsize = maxsize
+        self._ttl = ttl
+
+    def get(self, key: str):
+        if key in self._cache:
+            val, ts = self._cache[key]
+            if time.time() - ts < self._ttl:
+                return val
+            del self._cache[key]
+        return None
+
+    def set(self, key: str, value: str):
+        if len(self._cache) >= self._maxsize:
+            oldest = min(self._cache, key=lambda k: self._cache[k][1])
+            del self._cache[oldest]
+        self._cache[key] = (value, time.time())
+
+_rag_cache = _TTLCache()
 
 
 # ─── Embedding ─────────────────────────────────────
@@ -87,7 +115,7 @@ def rerank_documents(query: str, documents: List[str], top_k: int = RERANK_TOP_K
 # ─── 检索接口 ──────────────────────────────────────
 
 def retrieve(query: str, top_k: int = RERANK_TOP_K) -> str:
-    """RAG 检索：向量检索 + Reranker 重排序
+    """RAG 检索：向量检索 + Reranker 重排序（带 TTL 缓存）
 
     Args:
         query: 检索问题
@@ -96,6 +124,11 @@ def retrieve(query: str, top_k: int = RERANK_TOP_K) -> str:
     Returns:
         检索到的文档内容文本，失败时返回空字符串
     """
+    cache_key = hashlib.md5(query.encode()).hexdigest()
+    cached = _rag_cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     try:
         vector_store = _get_vector_store()
 
@@ -110,7 +143,10 @@ def retrieve(query: str, top_k: int = RERANK_TOP_K) -> str:
 
         # 3. 取最优片段
         top_chunks = [candidates[i] for i in ranked_indices]
-        return "\n\n---\n\n".join(chunk.page_content for chunk in top_chunks)
+        result = "\n\n---\n\n".join(chunk.page_content for chunk in top_chunks)
+        if result:
+            _rag_cache.set(cache_key, result)
+        return result
 
     except Exception as e:
         print(f"[rag_tool] 检索失败: {e}")

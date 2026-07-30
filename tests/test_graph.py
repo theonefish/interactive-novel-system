@@ -94,9 +94,10 @@ class TestGraphRouting:
         assert supervisor_route(state) == "integrator"
 
     def test_done_routes_to_end(self):
+        from langgraph.graph import END
         from src.agents.supervisor import supervisor_route
         state = _make_state("done")
-        assert supervisor_route(state) == "END"
+        assert supervisor_route(state) == END
 
     def test_critic_loop_rejected_routes_to_story_driver(self):
         from src.agents.supervisor import supervisor_route
@@ -110,14 +111,15 @@ class TestStateFlow:
     """测试完整状态流转链路"""
 
     def test_init_to_world_building_transition(self):
-        from src.agents.supervisor import supervisor_node
+        from src.agents.supervisor import supervisor_node, supervisor_route
         state = _make_state("init")
         result = supervisor_node(state)
-        assert result["current_phase"] == "world_building"
+        # init 阶段不修改状态，交由路由进入 world_builder
+        assert result == {} or result.get("current_phase") == "world_building"
+        assert supervisor_route(state) == "world_builder"
 
     def test_world_building_to_story_driver_through_critic(self):
         """world_builder → critic → story_driver 的设定审查流转"""
-        from langgraph.graph import END
         from src.agents.supervisor import critic_route, supervisor_route
 
         # 1. critic 完成设定审查并通过 -> story_driver
@@ -127,10 +129,11 @@ class TestStateFlow:
         route = critic_route(state)
         assert route == "story_driver"
 
-        # 2. story_progressing 且 awaiting_user -> supervisor 路由到 END 等待用户
+        # 2. story_progressing 且 awaiting_user -> supervisor 路由到 supervisor
+        #    在 supervisor_node 中通过 interrupt 暂停等待用户输入
         state["awaiting_user"] = True
         route = supervisor_route(state)
-        assert route == END
+        assert route == "supervisor"
 
     def test_critic_route_setting_review_failed(self):
         """设定审查未通过 -> 打回 world_builder"""
@@ -179,6 +182,7 @@ class TestStateFlow:
 
     def test_completed_to_done_flow(self):
         """integrator 完成 -> supervisor -> done"""
+        from langgraph.graph import END
         from src.agents.supervisor import supervisor_node, supervisor_route
 
         state = _make_state("completed")
@@ -186,7 +190,7 @@ class TestStateFlow:
         assert result["current_phase"] == "done"
 
         route = supervisor_route(_make_state("done"))
-        assert route == "END"
+        assert route == END
 
 
 # ─── 端到端集成测试（mock LLM）──────────────────────

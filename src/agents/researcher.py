@@ -8,8 +8,9 @@ from src.utils.llm import llm_call
 from src.utils.config import TEMPERATURE_CREATIVE, TEMPERATURE_CRITIC
 from src.prompts.researcher_prompt import WORLD_BUILDER_PROMPT
 from src.tools.search_tool import search_for_world_building
+from src.utils.logger import setup_logger
 
-
+logger = setup_logger("researcher")
 def world_builder_node(state: NovelState) -> dict:
     """世界观构建节点"""
     user_request = state.get("user_request", "")

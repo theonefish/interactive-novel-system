@@ -9,7 +9,9 @@ from src.graph.state import NovelState
 from src.utils.llm import llm_call
 from src.utils.config import TEMPERATURE_CRITIC, PASS_THRESHOLD
 from src.prompts.reviewer_prompt import CRITIC_PROMPT
+from src.utils.logger import setup_logger
 
+logger = setup_logger("reviewer")
 
 def _format_characters(characters: list) -> str:
     """格式化角色信息"""
@@ -32,6 +34,10 @@ def _parse_critic_response(response: str) -> dict:
 
 def _review_setting(state: NovelState) -> dict:
     """审查世界观设定"""
+    iteration_count = state.get("iteration_count", 0)
+    max_iterations = state.get("max_internal_iterations", 3)
+    effective_threshold = max(PASS_THRESHOLD - iteration_count, 4)
+
     characters = state.get("characters", [])
     char_text = _format_characters(characters)
 
@@ -41,7 +47,7 @@ def _review_setting(state: NovelState) -> dict:
         rules=state.get("rules", ""),
         segment="（世界观设定审查：请检查设定是否自洽、合规、有吸引力）",
         options="无",
-        pass_threshold=PASS_THRESHOLD,
+        pass_threshold=effective_threshold,
     )
 
     response = llm_call(
@@ -61,11 +67,8 @@ def _review_setting(state: NovelState) -> dict:
         "risk_warnings": data.get("risk_warnings", []),
     }
 
-    iteration_count = state.get("iteration_count", 0)
-    max_iterations = state.get("max_internal_iterations", 3)
-
     # 低分 -> 人工审核中断（达到最大迭代次数时直接放行）
-    if not passed and score < PASS_THRESHOLD and iteration_count < max_iterations:
+    if not passed and score < effective_threshold and iteration_count < max_iterations:
         review_data = {
             "question": "这个世界观设定质量较低，需要你审核确认。",
             "segment": state.get("world_setting", ""),
@@ -106,6 +109,10 @@ def _review_setting(state: NovelState) -> dict:
 
 def _review_segment(state: NovelState) -> dict:
     """审查剧情片段"""
+    iteration_count = state.get("iteration_count", 0)
+    max_iterations = state.get("max_internal_iterations", 3)
+    effective_threshold = max(PASS_THRESHOLD - iteration_count, 4)
+
     segment = state.get("current_segment", "")
     options = state.get("current_options", [])
     options_text = "\n".join(
@@ -122,7 +129,7 @@ def _review_segment(state: NovelState) -> dict:
         rules=state.get("rules", ""),
         segment=segment,
         options=options_text,
-        pass_threshold=PASS_THRESHOLD,
+        pass_threshold=effective_threshold,
     )
 
     response = llm_call(
@@ -143,11 +150,8 @@ def _review_segment(state: NovelState) -> dict:
         "risk_warnings": risk_warnings,
     }
 
-    iteration_count = state.get("iteration_count", 0)
-    max_iterations = state.get("max_internal_iterations", 3)
-
     # 低分 -> 人工审核中断（但达到最大迭代次数时跳过中断，直接放行）
-    if not passed and score < PASS_THRESHOLD and iteration_count < max_iterations:
+    if not passed and score < effective_threshold and iteration_count < max_iterations:
         review_data = {
             "question": "这段剧情质量评分较低，需要你审核确认。",
             "segment": segment,

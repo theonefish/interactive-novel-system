@@ -11,7 +11,9 @@ from src.graph.state import NovelState
 from src.utils.llm import llm_call
 from src.utils.config import TEMPERATURE_CRITIC, MAX_BACKTRACK_STEPS
 from src.prompts.supervisor_prompt import ROUTE_PROMPT
+from src.utils.logger import setup_logger
 
+logger = setup_logger("supervisor")
 
 def parse_user_input(user_input: str, phase: str) -> dict:
     """解析用户输入"""
@@ -32,6 +34,17 @@ def parse_user_input(user_input: str, phase: str) -> dict:
     # 通用选项选择
     if user_input.upper() in ("A", "B", "C", "D"):
         return {"action": "select_option", "selected_option": user_input.upper()}
+
+    # 关键词规则匹配（优先级高于 LLM 解析）
+    COMMON_RULES = [
+        (r"继续|然后呢|下一步|接着说", {"action": "select_option", "selected_option": "A"}),
+        (r"不行|换一个|重来|不好|不要|算了", {"action": "backtrack", "selected_option": None}),
+        (r"写完整|全部|完本|完结", {"action": "generate_full", "selected_option": None}),
+        (r"确认|可以|就这样|没问题|很好", {"action": "free_input", "selected_option": None}),
+    ]
+    for pattern, result in COMMON_RULES:
+        if re.search(pattern, user_input):
+            return result
 
     # 兜底：LLM 解析
     prompt = ROUTE_PROMPT.format(phase=phase, user_input=user_input)
@@ -131,6 +144,7 @@ def _apply_user_choice(state: NovelState, user_input: str) -> dict:
 def supervisor_node(state: NovelState) -> dict:
     """调度中心节点"""
     phase = state.get("current_phase", "init")
+    logger.info(f"[supervisor_node] 进入 phase={phase} awaiting_user={state.get('awaiting_user')} choices={len(state.get('user_choices', []))}")
 
     # 优先处理已传入的用户输入（直接 state['user_input'] 或 Command(resume=...)）
     direct_input = _get_resume_input(state)
@@ -140,8 +154,9 @@ def supervisor_node(state: NovelState) -> dict:
     updates = {}
 
     if phase == "init":
-        updates["current_phase"] = "world_building"
-        return updates
+        # 交由条件路由进入 world_builder，不在此修改状态
+        logger.info("[supervisor_node] phase=init，移交路由进入 world_builder")
+        return {}
 
     elif phase == "world_building":
         # critic 已通过设定审查，进入剧情推进
@@ -202,6 +217,10 @@ def critic_route(state: NovelState) -> str:
 def supervisor_route(state: NovelState) -> str:
     """条件路由 - 根据当前阶段决定下一个节点"""
     phase = state.get("current_phase", "init")
+    logger.info(f"[supervisor_route] 路由决策 phase={phase} "
+                f"setting_confirmed={state.get('setting_confirmed')} "
+                f"awaiting_user={state.get('awaiting_user')} "
+                f"has_world={bool(state.get('world_setting'))}")
 
     if phase == "init":
         return "world_builder"
@@ -209,12 +228,16 @@ def supervisor_route(state: NovelState) -> str:
     if phase == "world_building":
         if state.get("setting_confirmed", False):
             return "story_driver"
+        # 尚未构建世界观时进入 world_builder；已构建则交回 supervisor 确认
+        if not state.get("world_setting"):
+            return "world_builder"
         return "supervisor"
 
     if phase == "story_progressing":
-        # 已生成剧情并等待用户输入，结束本轮
+        # 已生成剧情并等待用户输入：回到 supervisor，在其 interrupt 处暂停，
+        # 这样 action/stream 端点才能用 Command(resume=...) 恢复。
         if state.get("awaiting_user", False):
-            return END
+            return "supervisor"
         # 已收到用户输入，继续生成剧情
         return "story_driver"
 
@@ -228,6 +251,6 @@ def supervisor_route(state: NovelState) -> str:
         return "integrator"
 
     if phase == "done":
-        return "END"
+        return END
 
     return "supervisor"

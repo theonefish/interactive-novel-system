@@ -4,9 +4,20 @@ import json
 from typing import AsyncGenerator, Dict, Any
 
 
+def _json_safe(obj: Any) -> Any:
+    """将不可 JSON 序列化的对象转为字符串"""
+    if isinstance(obj, (str, int, float, bool, type(None))):
+        return obj
+    if isinstance(obj, (list, tuple)):
+        return [_json_safe(v) for v in obj]
+    if isinstance(obj, dict):
+        return {k: _json_safe(v) for k, v in obj.items()}
+    return str(obj)
+
+
 def format_sse_event(event_type: str, data: Dict[str, Any]) -> str:
-    """格式化 SSE 事件"""
-    return f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+    """格式化 SSE 事件（自动处理不可序列化对象）"""
+    return f"event: {event_type}\ndata: {json.dumps(_json_safe(data), ensure_ascii=False)}\n\n"
 
 
 async def transform_graph_events(
@@ -39,6 +50,8 @@ async def transform_graph_events(
 
         elif event_kind == "on_chain_end":
             output = data.get("output", {})
+            if not isinstance(output, dict):
+                output = {}
             # 过滤掉中间状态，只保留关键字段
             filtered = {
                 k: output.get(k)

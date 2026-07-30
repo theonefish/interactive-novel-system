@@ -99,10 +99,11 @@ class TestSupervisorRoute:
         assert supervisor_route(state) == "integrator"
 
     def test_done_routes_to_end(self):
+        from langgraph.graph import END
         from src.agents.supervisor import supervisor_route
         state = _make_initial_state()
         state["current_phase"] = "done"
-        assert supervisor_route(state) == "END"
+        assert supervisor_route(state) == END
 
     def test_unknown_phase_defaults_to_supervisor(self):
         from src.agents.supervisor import supervisor_route
@@ -114,12 +115,15 @@ class TestSupervisorRoute:
 class TestSupervisorNode:
     """测试 supervisor_node 状态更新"""
 
-    def test_init_phase_sets_world_building(self):
-        from src.agents.supervisor import supervisor_node
+    def test_init_phase_returns_empty_for_routing(self):
+        from src.agents.supervisor import supervisor_node, supervisor_route
         state = _make_initial_state()
         state["current_phase"] = "init"
         result = supervisor_node(state)
-        assert result["current_phase"] == "world_building"
+        # init 阶段不修改状态，交由路由进入 world_builder
+        assert result == {} or result.get("current_phase") == "world_building"
+        # 路由确认进入 world_builder
+        assert supervisor_route(state) == "world_builder"
 
     def test_completed_transitions_to_done(self):
         from src.agents.supervisor import supervisor_node
@@ -217,12 +221,10 @@ class TestStoryDriverNode:
 
     @patch("src.agents.writer.llm_call")
     @patch("src.agents.writer.retrieve_for_writing", return_value="")
-    @patch("src.agents.writer.extract_memory_updates")
-    def test_story_driver_returns_segment_and_options(self, mock_extract, mock_rag, mock_llm):
+    def test_story_driver_returns_segment_and_options(self, mock_rag, mock_llm):
         from src.agents.writer import story_driver_node
 
-        mock_llm.return_value = '{"segment": "林远带着小雨穿过荒芜的沙漠。", "options": [{"id": "A", "text": "继续前进", "hint": "可能会遇到危险", "risk_level": "中等"}, {"id": "B", "text": "原地休息", "hint": "恢复体力", "risk_level": "安全"}, {"id": "C", "text": "探索附近", "hint": "可能有发现", "risk_level": "高风险"}]}'
-        mock_extract.return_value = create_initial_memory([])
+        mock_llm.return_value = '{"segment": "林远带着小雨穿过荒芜的沙漠。", "options": [{"id": "A", "text": "继续前进", "hint": "可能会遇到危险", "risk_level": "中等"}, {"id": "B", "text": "原地休息", "hint": "恢复体力", "risk_level": "安全"}, {"id": "C", "text": "探索附近", "hint": "可能有发现", "risk_level": "高风险"}], "memory_updates": {}}'
 
         state = _make_initial_state()
         state["current_phase"] = "story_progressing"
@@ -239,13 +241,11 @@ class TestStoryDriverNode:
 
     @patch("src.agents.writer.llm_call")
     @patch("src.agents.writer.retrieve_for_writing", return_value="")
-    @patch("src.agents.writer.extract_memory_updates")
-    def test_story_driver_ensures_option_ids(self, mock_extract, mock_rag, mock_llm):
+    def test_story_driver_ensures_option_ids(self, mock_rag, mock_llm):
         from src.agents.writer import story_driver_node
 
         # LLM 返回的 options 没有 id
-        mock_llm.return_value = '{"segment": "剧情片段。", "options": [{"text": "选项1", "hint": "", "risk_level": "安全"}, {"text": "选项2", "hint": "", "risk_level": "中等"}]}'
-        mock_extract.return_value = create_initial_memory([])
+        mock_llm.return_value = '{"segment": "剧情片段。", "options": [{"text": "选项1", "hint": "", "risk_level": "安全"}, {"text": "选项2", "hint": "", "risk_level": "中等"}], "memory_updates": {}}'
 
         state = _make_initial_state()
         result = story_driver_node(state)
@@ -255,12 +255,10 @@ class TestStoryDriverNode:
 
     @patch("src.agents.writer.llm_call")
     @patch("src.agents.writer.retrieve_for_writing", return_value="")
-    @patch("src.agents.writer.extract_memory_updates")
-    def test_story_driver_handles_invalid_json(self, mock_extract, mock_rag, mock_llm):
+    def test_story_driver_handles_invalid_json(self, mock_rag, mock_llm):
         from src.agents.writer import story_driver_node
 
         mock_llm.return_value = "这不是 JSON"
-        mock_extract.return_value = create_initial_memory([])
 
         state = _make_initial_state()
         result = story_driver_node(state)

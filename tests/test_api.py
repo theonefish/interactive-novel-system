@@ -1,7 +1,7 @@
 """API 接口测试 - 测试 FastAPI 服务器端点"""
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 from fastapi.testclient import TestClient
 
 
@@ -14,9 +14,9 @@ def client():
 
 @pytest.fixture
 def mock_graph():
-    """Mock LangGraph 应用实例"""
+    """Mock LangGraph 应用实例（异步接口）"""
     with patch("server.app_graph") as mock:
-        mock.invoke.return_value = {
+        mock_return = {
             "current_phase": "story_progressing",
             "current_turn": 1,
             "current_segment": "剧情片段文本",
@@ -33,7 +33,11 @@ def mock_graph():
             "final_output": "",
             "human_approval": None,
         }
-        mock.get_state.return_value = MagicMock(values=mock.invoke.return_value)
+        # 异步接口：ainvoke / aget_state
+        mock.ainvoke = AsyncMock(return_value=mock_return)
+        mock.aget_state = AsyncMock(return_value=MagicMock(values=mock_return))
+        # 兼容流式接口
+        mock.astream_events = MagicMock(return_value=iter([]))
         yield mock
 
 
@@ -90,7 +94,7 @@ class TestCreateSession:
         assert response.status_code == 422
 
     def test_create_session_graph_error_returns_500(self, client, mock_graph):
-        mock_graph.invoke.side_effect = Exception("LLM 调用失败")
+        mock_graph.ainvoke.side_effect = Exception("LLM 调用失败")
         response = client.post(
             "/api/sessions",
             json={"user_request": "测试需求"},
@@ -137,7 +141,7 @@ class TestSendAction:
         assert response.status_code == 422
 
     def test_send_action_graph_error_returns_500(self, client, mock_graph):
-        mock_graph.invoke.side_effect = Exception("执行失败")
+        mock_graph.ainvoke.side_effect = Exception("执行失败")
         response = client.post(
             "/api/sessions/test-session-005/action",
             json={"action": "A"},
@@ -161,13 +165,13 @@ class TestGetSession:
         assert data["segment"] == "剧情片段文本"
 
     def test_get_session_not_found_returns_404(self, client, mock_graph):
-        mock_graph.get_state.return_value = None
+        mock_graph.aget_state.return_value = None
         response = client.get("/api/sessions/nonexistent-session")
         assert response.status_code == 404
         assert "会话不存在" in response.json()["detail"]
 
     def test_get_session_internal_error_returns_500(self, client, mock_graph):
-        mock_graph.get_state.side_effect = Exception("数据库错误")
+        mock_graph.aget_state.side_effect = Exception("数据库错误")
         response = client.get("/api/sessions/test-session-error")
         assert response.status_code == 500
         assert "获取状态失败" in response.json()["detail"]
@@ -193,12 +197,12 @@ class TestStreamSession:
         assert "text/event-stream" in response.headers.get("content-type", "")
 
     def test_stream_session_not_found_returns_404(self, client, mock_graph):
-        mock_graph.get_state.return_value = None
+        mock_graph.aget_state = AsyncMock(return_value=None)
         response = client.get("/api/sessions/nonexistent/stream")
         assert response.status_code == 404
 
     def test_stream_session_error_returns_500(self, client, mock_graph):
-        mock_graph.get_state.side_effect = Exception("连接错误")
+        mock_graph.aget_state = AsyncMock(side_effect=Exception("连接错误"))
         response = client.get("/api/sessions/error-session/stream")
         assert response.status_code == 500
 
@@ -223,7 +227,7 @@ class TestSessionResponse:
         assert expected_fields.issubset(set(data.keys()))
 
     def test_response_default_values(self, client, mock_graph):
-        mock_graph.invoke.return_value = {
+        mock_graph.ainvoke.return_value = {
             "current_phase": "init",
             "current_turn": 0,
         }
@@ -244,7 +248,7 @@ class TestSessionResponse:
         assert data["error"] == ""
 
     def test_response_with_human_approval(self, client, mock_graph):
-        mock_graph.invoke.return_value = {
+        mock_graph.ainvoke.return_value = {
             "current_phase": "critic_loop",
             "current_turn": 2,
             "current_segment": "需要审核的段落",
@@ -264,7 +268,7 @@ class TestPhaseDisplay:
     """测试不同 phase 在 API 响应中的展示"""
 
     def test_world_building_phase_displayed(self, client, mock_graph):
-        mock_graph.invoke.return_value = {
+        mock_graph.ainvoke.return_value = {
             "current_phase": "world_building",
             "current_turn": 0,
             "world_setting": "奇幻世界",
@@ -276,7 +280,7 @@ class TestPhaseDisplay:
         assert response.json()["phase"] == "world_building"
 
     def test_completed_phase_displayed(self, client, mock_graph):
-        mock_graph.invoke.return_value = {
+        mock_graph.ainvoke.return_value = {
             "current_phase": "completed",
             "current_turn": 5,
             "final_output": "完整小说",
@@ -289,7 +293,7 @@ class TestPhaseDisplay:
         assert response.json()["final_output"] == "完整小说"
 
     def test_done_phase_displayed(self, client, mock_graph):
-        mock_graph.invoke.return_value = {
+        mock_graph.ainvoke.return_value = {
             "current_phase": "done",
             "current_turn": 5,
         }
@@ -300,7 +304,7 @@ class TestPhaseDisplay:
         assert response.json()["phase"] == "done"
 
     def test_unknown_phase_shows_processing(self, client, mock_graph):
-        mock_graph.invoke.return_value = {
+        mock_graph.ainvoke.return_value = {
             "current_phase": "unknown_state",
             "current_turn": 0,
         }

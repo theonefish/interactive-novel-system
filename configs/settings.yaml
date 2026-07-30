@@ -1,2 +1,37 @@
 # 应用配置
-# TODO: 在此文件中定义 YAML 格式的配置项
+# 优先从 YAML 读取配置值，.env 中的同名变量可覆盖
+
+# LLM 配置
+llm:
+  openai_api_key: ""
+  openai_base_url: ""
+  model: ""
+  max_tokens: 2048
+
+# 创作参数
+story:
+  segment_length: 300          # 每轮片段字数
+  options_count: 3             # 选项数量（不含自由输入）
+
+# 质量控制
+quality:
+  max_internal_iterations: 3   # Critic 内部最大循环
+  pass_threshold: 6            # Critic 通过阈值（满分10）
+  temperature_creative: 0.8    # 创作温度
+  temperature_critic: 0.3      # Critic 温度
+
+# RAG 检索
+rag:
+  chroma_host: "localhost"
+  chroma_port: 8081
+  chroma_collection: "default"
+  embedding_model: "BAAI/bge-m3"
+  rerank_model: "BAAI/bge-reranker-v2-m3"
+  retrieve_k: 20
+  rerank_top_k: 5
+  cache_ttl: 300               # RAG 缓存 TTL（秒）
+
+# 其他
+misc:
+  max_backtrack_steps: 5       # 最大回溯步数
+  mcp_bing_enabled: true

@@ -83,14 +83,23 @@ MEMORY_EXTRACT_PROMPT = """你是一位故事分析师，负责从最新的剧�
 # ─── 记忆管理函数 ───────────────────────────────────
 
 
-def build_memory_context(memory: MemoryState) -> str:
-    """构建记忆摘要文本，用于注入 Agent 的 Prompt"""
+def build_memory_context(memory: MemoryState, current_turn: int = None) -> str:
+    """构建记忆摘要文本，用于注入 Agent 的 Prompt
+
+    当提供 current_turn 时，启用滑动窗口裁剪：
+    - 角色：仅保留最近 5 轮内出现过的
+    - 伏笔：仅保留最近 10 条待回收伏笔
+    """
+    MEMORY_WINDOW = 5
+    MAX_FORES = 10
+
     parts = []
 
-    # 角色
+    # 角色（滑动窗口裁剪：仅保留最近 MEMORY_WINDOW 轮内有活动的角色）
     chars = memory.get("characters", [])
+    if current_turn is not None:
+        chars = [c for c in chars if c.get("last_appearance", 0) >= current_turn - MEMORY_WINDOW]
     if chars:
-        char_lines = []
         for c in chars:
             traits = "、".join(c.get("traits", []))
             rels = "；".join(c.get("relationships", []))
@@ -106,8 +115,9 @@ def build_memory_context(memory: MemoryState) -> str:
             parts.append(f"  - {t['description']}")
         parts.append("")
 
-    # 待回收伏笔
+    # 待回收伏笔（仅保留最近 MAX_FORES 条）
     pending = [f for f in memory.get("foreshadowing", []) if f.get("status") == "pending"]
+    pending = pending[-MAX_FORES:] if current_turn is not None else pending
     if pending:
         parts.append("【待回收伏笔】")
         for f in pending:

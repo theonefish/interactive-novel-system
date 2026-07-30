@@ -17,12 +17,17 @@ from src.graph.state import NovelState
 from src.tools.memory import create_initial_memory
 from src.utils.database import is_postgres
 from src.utils.streaming import transform_graph_events, format_sse_event
+from src.utils.logger import setup_logger
+from langgraph.types import Command
+from langgraph.errors import GraphInterrupt
+
+logger = setup_logger("server")
 
 
 # ─── 全局应用实例 ──────────────────────────────────
 
 app_graph = build_graph()
-app_graph_async = None  # 按需初始化
+app_graph_async = None
 
 
 # ─── 请求/响应模型 ──────────────────────────────────
@@ -56,14 +61,26 @@ class SessionResponse(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 启动时
     global app_graph_async
-    if is_postgres():
-        app_graph_async = await build_graph_async()
+
+    # ✅ 修正：无论 SQLite 还是 Postgres，都初始化异步图
+    app_graph_async = await build_graph_async()
+    logger.info("[lifespan] 异步图初始化完成")
+
     yield
-    # 关闭时
-    if hasattr(app_graph.checkpointer, "conn"):
+
+    # ── 关闭时清理 ──
+    # 同步图
+    if hasattr(app_graph, "checkpointer") and hasattr(app_graph.checkpointer, "conn"):
         app_graph.checkpointer.conn.close()
+
+    # 异步图
+    if app_graph_async and hasattr(app_graph_async, "checkpointer"):
+        cp = app_graph_async.checkpointer
+        if hasattr(cp, "conn") and hasattr(cp.conn, "close"):
+            await cp.conn.close()  # aiosqlite 连接需要 await close
+            logger.info("[lifespan] 异步 checkpointer 连接已关闭")
+
 
 
 app = FastAPI(title="交互式小说创作系统", lifespan=lifespan)
@@ -151,7 +168,7 @@ def _state_to_response(state: dict, session_id: str) -> SessionResponse:
 # ─── API 路由 ──────────────────────────────────────
 
 @app.post("/api/sessions", response_model=SessionResponse)
-def create_session(req: CreateSessionRequest):
+async def create_session(req: CreateSessionRequest):
     """创建新会话"""
     if not req.user_request.strip():
         raise HTTPException(status_code=400, detail="创作需求不能为空")
@@ -160,18 +177,29 @@ def create_session(req: CreateSessionRequest):
     config = {"configurable": {"thread_id": session_id}}
 
     initial_state = _build_initial_state(req.user_request)
+    graph = app_graph_async or app_graph
 
     try:
-        result = app_graph.invoke(initial_state, config)
+        logger.info(f"[create_session] 新建会话 {session_id}，user_request={req.user_request!r}")
+        try:
+            result = await graph.ainvoke(initial_state, config)
+        except GraphInterrupt:
+            # 图在 interrupt（等待用户）处暂停，读取已 checkpoint 的状态返回
+            logger.info(f"[create_session] 图在中断处暂停，读取当前状态返回")
+            snap = await graph.aget_state(config)
+            result = snap.values
+        logger.info(f"[create_session] 会话 {session_id} 启动完成，phase={result.get('current_phase')}")
         return _state_to_response(result, session_id)
     except Exception as e:
+        logger.exception(f"[create_session] 会话 {session_id} 启动失败：{e}")
         raise HTTPException(status_code=500, detail=f"启动失败：{str(e)}")
 
 
 @app.post("/api/sessions/{session_id}/action", response_model=SessionResponse)
-def send_action(session_id: str, req: ActionRequest):
+async def send_action(session_id: str, req: ActionRequest):
     """发送用户操作"""
     config = {"configurable": {"thread_id": session_id}}
+    graph = app_graph_async or app_graph
 
     try:
         # 将用户操作转换为输入
@@ -179,26 +207,47 @@ def send_action(session_id: str, req: ActionRequest):
         if req.payload:
             user_input = req.payload
 
-        from langgraph.types import Command
-        result = app_graph.invoke(Command(resume=user_input), config)
+        logger.info(f"[send_action] 会话 {session_id} 收到操作 action={req.action!r} payload={req.payload!r} -> user_input={user_input!r}")
+
+        # 先记录当前图状态，确认是否处于 interrupt 等待
+        try:
+            snap = await graph.aget_state(config)
+            logger.info(f"[send_action] 当前状态 phase={snap.values.get('current_phase')} "
+                        f"awaiting_user={snap.values.get('awaiting_user')} "
+                        f"next={snap.next} tasks={snap.tasks}")
+        except Exception as se:
+            logger.warning(f"[send_action] 读取当前状态失败：{se}")
+
+        try:
+            result = await graph.ainvoke(Command(resume=user_input), config)
+        except GraphInterrupt:
+            # 图在下一轮中断处暂停，读取已 checkpoint 的状态返回
+            logger.info(f"[send_action] 图在中断处暂停，读取当前状态返回")
+            snap = await graph.aget_state(config)
+            result = snap.values
+        logger.info(f"[send_action] 会话 {session_id} 执行完成，phase={result.get('current_phase')}")
         return _state_to_response(result, session_id)
     except Exception as e:
+        logger.exception(f"[send_action] 会话 {session_id} 执行失败：{e}")
         raise HTTPException(status_code=500, detail=f"执行失败：{str(e)}")
 
 
 @app.get("/api/sessions/{session_id}", response_model=SessionResponse)
-def get_session(session_id: str):
+async def get_session(session_id: str):
     """获取会话状态"""
     config = {"configurable": {"thread_id": session_id}}
+    graph = app_graph_async or app_graph
 
     try:
-        state = app_graph.get_state(config)
+        state = await graph.aget_state(config)
         if state is None:
+            logger.warning(f"[get_session] 会话 {session_id} 不存在")
             raise HTTPException(status_code=404, detail="会话不存在")
         return _state_to_response(state.values, session_id)
     except HTTPException:
         raise
     except Exception as e:
+        logger.exception(f"[get_session] 会话 {session_id} 获取状态失败：{e}")
         raise HTTPException(status_code=500, detail=f"获取状态失败：{str(e)}")
 
 
@@ -220,9 +269,11 @@ async def stream_session(session_id: str, request: Request, action: str = Query(
     """
     config = {"configurable": {"thread_id": session_id}}
 
-    # 获取当前状态
+    graph = app_graph_async if app_graph_async else app_graph
+
+    # 获取当前状态（异步）
     try:
-        current_state = app_graph.get_state(config)
+        current_state = await graph.aget_state(config)
         if current_state is None:
             raise HTTPException(status_code=404, detail="会话不存在")
     except HTTPException:
@@ -231,8 +282,6 @@ async def stream_session(session_id: str, request: Request, action: str = Query(
         raise HTTPException(status_code=500, detail=f"获取状态失败：{str(e)}")
 
     async def event_generator():
-        graph = app_graph_async if app_graph_async else app_graph
-
         from langgraph.types import Command
         try:
             # 使用 astream_events 流式执行，将用户输入恢复给被中断的图
@@ -247,12 +296,13 @@ async def stream_session(session_id: str, request: Request, action: str = Query(
                     break
                 yield sse_event
 
-            # 流结束后发送完整状态快照，供前端一次性渲染选项/世界观等
-            state = graph.get_state(config)
+            # 流结束后发送完整状态快照（异步获取）
+            state = await graph.aget_state(config)
             final_resp = _state_to_response(state.values, session_id)
             yield format_sse_event("final", final_resp.model_dump())
 
         except Exception as e:
+            logger.exception(f"[stream_session] 会话 {session_id} 流式执行失败：{e}")
             yield format_sse_event("error", {"error": str(e)})
         finally:
             yield format_sse_event("done", {"message": "stream complete"})

@@ -6,10 +6,12 @@ import re
 from src.graph.state import NovelState
 from src.utils.llm import llm_call
 from src.utils.config import TEMPERATURE_CREATIVE, OPTIONS_COUNT, SEGMENT_LENGTH
-from src.tools.memory import build_memory_context, extract_memory_updates, create_initial_memory
+from src.tools.memory import build_memory_context, _apply_updates, create_initial_memory
 from src.tools.rag_tool import retrieve_for_writing
 from src.prompts.writer_prompt import STORY_DRIVER_PROMPT
+from src.utils.logger import setup_logger
 
+logger = setup_logger("writer")
 
 def story_driver_node(state: NovelState) -> dict:
     """剧情推进节点"""
@@ -33,9 +35,9 @@ def story_driver_node(state: NovelState) -> dict:
         for c in characters
     ) or "无"
 
-    # 记忆上下文
+    # 记忆上下文（带滑动窗口裁剪）
     memory = state.get("memory", {})
-    memory_context = build_memory_context(memory)
+    memory_context = build_memory_context(memory, current_turn=state.get("current_turn", 0))
 
     # RAG 检索参考素材
     rag_context = retrieve_for_writing(
@@ -80,6 +82,7 @@ def story_driver_node(state: NovelState) -> dict:
 
     segment = data.get("segment", "")
     options = data.get("options", [])
+    memory_updates = data.get("memory_updates", {})
 
     # 确保 options 有唯一 id
     for i, opt in enumerate(options):
@@ -100,17 +103,12 @@ def story_driver_node(state: NovelState) -> dict:
             "options": options,
         })
 
-    # 更新记忆
+    # 更新记忆（合并 LLM 已生成的 memory_updates）
     memory = state.get("memory", {})
     if not memory:
         memory = create_initial_memory(state.get("characters", []))
-    if segment:
-        memory = extract_memory_updates(
-            segment=segment,
-            user_input=state.get("user_request", ""),
-            current_memory=memory,
-            current_turn=turn,
-        )
+    if segment and memory_updates:
+        memory = _apply_updates(memory, memory_updates, turn)
 
     return {
         "story_segments": new_segments,

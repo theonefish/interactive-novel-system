@@ -2,6 +2,7 @@
 
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
 from src.graph.state import NovelState
 from src.agents.supervisor import supervisor_node, supervisor_route, critic_route
@@ -10,7 +11,9 @@ from src.agents.writer import story_driver_node
 from src.agents.reviewer import critic_node
 from src.agents.integrator import integrator_node
 from src.utils.database import get_checkpointer, is_postgres
+from src.utils.logger import setup_logger
 
+logger = setup_logger("workflow")
 
 def _build_workflow():
     """构建图结构（不含 checkpointer）"""
@@ -68,16 +71,22 @@ def build_graph():
 
 async def build_graph_async():
     """构建 LangGraph 图（异步版本，支持 SSE 流式输出）"""
+    from src.utils.database import DATABASE_URL
+
     workflow = _build_workflow()
 
     if is_postgres():
-        from langgraph.checkpoint.postgres import PostgresSaver
-        from src.utils.database import DATABASE_URL
+        from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
-        checkpointer = PostgresSaver.from_conn_string(DATABASE_URL)
+        checkpointer = AsyncPostgresSaver.from_conn_string(DATABASE_URL)
         await checkpointer.setup()
     else:
-        # 异步环境下用 SqliteSaver 同步兼容
-        checkpointer = get_checkpointer()
+        # SQLite 异步 checkpointer
+        # 注意：from_conn_string() 返回的是异步上下文管理器，不能直接传给
+        # compile()，必须手动打开连接并持有，使其在应用生命周期内保持存活。
+        import aiosqlite
+
+        conn = await aiosqlite.connect("novel_sessions.db")
+        checkpointer = AsyncSqliteSaver(conn)
 
     return workflow.compile(checkpointer=checkpointer)
