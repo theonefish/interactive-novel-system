@@ -238,7 +238,7 @@ def supervisor_route(state: NovelState) -> str:
         # 这样 action/stream 端点才能用 Command(resume=...) 恢复。
         if state.get("awaiting_user", False):
             return "supervisor"
-        # 已收到用户输入，继续生成剧情
+        # 已收到用户输入，或续写新会话刚启动时继续生成剧情
         return "story_driver"
 
     if phase == "critic_loop":

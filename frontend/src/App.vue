@@ -19,11 +19,33 @@
         </div>
       </div>
       <div class="header-right">
+        <template v-if="sessionId && currentPhase !== 'start'">
+          <el-tag :type="phaseTagType(currentPhase)" effect="dark" round size="small">
+            {{ phaseLabel(currentPhase) }}
+          </el-tag>
+          <el-tag type="info" effect="dark" round size="small">轮次 {{ currentTurn }}</el-tag>
+          <el-tag type="info" effect="dark" round size="small">段落 {{ currentSegmentCount }}</el-tag>
+        </template>
         <el-tag v-if="sessionId" type="info" effect="dark" round size="small">
           会话 {{ sessionId.slice(0, 8) }}
         </el-tag>
+        <el-button class="collapse-btn" text @click="sidebarCollapsed = !sidebarCollapsed">
+          <el-icon><Fold v-if="!sidebarCollapsed" /><Expand v-else /></el-icon>
+        </el-button>
       </div>
     </header>
+
+    <div class="app-body">
+      <SessionSidebar
+        v-show="!sidebarCollapsed"
+        :sessions="sessions"
+        :current-session-id="sessionId"
+        @select="onSelectSession"
+        @create="onCreate"
+        @rename="onRename"
+        @delete="onDelete"
+        @resume="onResume"
+      />
 
     <main class="app-main">
       <!-- 初始输入界面 -->
@@ -99,6 +121,26 @@
                   <span class="rules-label">核心规则</span>
                   <span class="rules-text">{{ worldSetting.rules }}</span>
                 </div>
+              </div>
+            </transition>
+          </div>
+        </transition>
+
+        <!-- 完整小说面板 -->
+        <transition name="slide-down">
+          <div v-if="showFinalOutput" class="final-panel">
+            <div class="panel-header" @click="toggleFinal">
+              <span class="panel-title">
+                <el-icon><DocumentChecked /></el-icon>
+                完整小说
+              </span>
+              <el-icon class="toggle-icon" :class="{ collapsed: !finalExpanded }">
+                <ArrowDown />
+              </el-icon>
+            </div>
+            <transition name="expand">
+              <div v-show="finalExpanded" class="panel-body final-body">
+                <div class="final-text" v-html="escapeHtml(finalOutput)"></div>
               </div>
             </transition>
           </div>
@@ -209,6 +251,7 @@
         </div>
       </div>
     </main>
+    </div>
 
     <footer class="app-footer">
       <span>交互式多 Agent 小说创作系统</span>
@@ -217,13 +260,18 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
   Promotion, Back, Reading, Loading,
   Compass, ArrowDown, Select, Document, CircleClose,
+  Fold, Expand, DocumentChecked,
 } from '@element-plus/icons-vue'
-import { createSession, streamAction } from './api/client.js'
+import {
+  createSession, streamAction, getSession,
+  listSessions, updateSession, deleteSession, resumeSession,
+} from './api/client.js'
+import SessionSidebar from './components/SessionSidebar.vue'
 
 const currentPhase = ref('start')
 const initialRequest = ref('')
@@ -239,6 +287,14 @@ const rejectionFeedback = ref('')
 const worldExpanded = ref(true)
 const chatLog = ref(null)
 
+// ── 多会话管理状态 ──
+const sessions = ref([])
+const sidebarCollapsed = ref(false)
+const currentTurn = ref(0)
+const currentSegmentCount = ref(0)
+const finalOutput = ref('')            // 完整小说全文
+const finalExpanded = ref(true)        // 完整小说面板展开/收起
+
 // ── SSE 流式相关状态 ──
 const streamingMsgIndex = ref(null)   // 当前打字机气泡在 messages 中的索引
 const streamingTarget = ref('')       // 打字机目标完整文本
@@ -246,6 +302,7 @@ const streamStatus = ref('')          // 当前节点进度提示
 let typeTimer = null                  // 打字机定时器
 
 const showInput = computed(() => currentPhase.value !== 'start' && currentPhase.value !== 'done')
+const showFinalOutput = computed(() => currentPhase.value === 'done' && finalOutput.value)
 const canBacktrack = computed(() =>
   currentPhase.value === 'story_progressing' && messages.value.some(m => m.type === 'system')
 )
@@ -254,9 +311,13 @@ function toggleWorld() {
   worldExpanded.value = !worldExpanded.value
 }
 
+function toggleFinal() {
+  finalExpanded.value = !finalExpanded.value
+}
+
 function escapeHtml(text) {
-  if (!text) return ''
-  return text
+  if (text == null) return ''
+  return String(text)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -284,7 +345,10 @@ async function startSession() {
   try {
     const { data } = await createSession(initialRequest.value.trim())
     sessionId.value = data.session_id
+    currentTurn.value = 0
+    currentSegmentCount.value = 0
     applyResponse(data)
+    loadSessions()
   } catch (err) {
     ElMessage.error(err.response?.data?.detail || '启动失败，请检查后端服务')
   } finally {
@@ -349,8 +413,11 @@ function applyFinal(data) {
   if (data.world_setting) worldSetting.value.worldSetting = data.world_setting
   if (data.characters) worldSetting.value.characters = data.characters
   if (data.rules) worldSetting.value.rules = data.rules
+  if (data.turn != null) currentTurn.value = data.turn
+  if (data.segment_count != null) currentSegmentCount.value = data.segment_count
   options.value = data.options?.length ? data.options : []
   if (data.final_output) {
+    finalOutput.value = data.final_output
     messages.value.push({ type: 'final', text: data.final_output })
     currentPhase.value = 'done'
     options.value = []
@@ -467,9 +534,12 @@ function applyResponse(data) {
   if (data.rules) worldSetting.value.rules = data.rules
   if (data.segment) {
     messages.value.push({ type: 'system', turn: data.turn, text: data.segment })
+    currentSegmentCount.value += 1
   }
+  if (data.turn != null) currentTurn.value = data.turn
   options.value = data.options?.length ? data.options : []
   if (data.final_output) {
+    finalOutput.value = data.final_output
     messages.value.push({ type: 'final', text: data.final_output })
     currentPhase.value = 'done'
     options.value = []
@@ -484,6 +554,142 @@ function applyResponse(data) {
 function scrollToBottom() {
   if (chatLog.value) chatLog.value.scrollTop = chatLog.value.scrollHeight
 }
+
+// ── 多会话管理 ──
+function phaseLabel(phase) {
+  if (['done', 'completed', 'finished'].includes(phase)) return '已完成'
+  if (['story_progressing', 'story_driver', 'plotting'].includes(phase)) return '剧情推进'
+  if (['start', ''].includes(phase)) return '世界观构建'
+  return '世界观构建'
+}
+
+function phaseTagType(phase) {
+  if (['done', 'completed', 'finished'].includes(phase)) return 'success'
+  if (['story_progressing', 'story_driver', 'plotting'].includes(phase)) return 'warning'
+  return 'primary'
+}
+
+async function loadSessions() {
+  try {
+    const { data } = await listSessions()
+    sessions.value = Array.isArray(data) ? data : []
+  } catch (_) {
+    sessions.value = []
+  }
+}
+
+function resetWorkspace() {
+  sessionId.value = ''
+  currentPhase.value = 'start'
+  messages.value = []
+  options.value = []
+  worldSetting.value = { worldSetting: '', characters: [], rules: '' }
+  humanApproval.value = null
+  showRejectionInput.value = false
+  rejectionFeedback.value = ''
+  currentTurn.value = 0
+  currentSegmentCount.value = 0
+  finalOutput.value = ''
+  finalExpanded.value = true
+  initialRequest.value = ''
+  if (typeTimer) { clearInterval(typeTimer); typeTimer = null }
+  streamingMsgIndex.value = null
+  streamingTarget.value = ''
+}
+
+async function onSelectSession(id) {
+  if (!id || id === sessionId.value) return
+  isWaiting.value = true
+  try {
+    const { data } = await getSession(id)
+    // 清空旧状态再加载该会话完整状态
+    messages.value = []
+    options.value = []
+    worldSetting.value = { worldSetting: '', characters: [], rules: '' }
+    humanApproval.value = null
+    showRejectionInput.value = false
+    rejectionFeedback.value = ''
+    finalOutput.value = ''
+    finalExpanded.value = true
+    if (typeTimer) { clearInterval(typeTimer); typeTimer = null }
+    streamingMsgIndex.value = null
+    streamingTarget.value = ''
+    sessionId.value = id
+    currentTurn.value = data.turn ?? 0
+    currentSegmentCount.value = data.segment_count ?? 0
+    applyResponse(data)
+  } catch (err) {
+    ElMessage.error(err.response?.data?.detail || '加载会话失败')
+  } finally {
+    isWaiting.value = false
+  }
+}
+
+function onCreate() {
+  resetWorkspace()
+}
+
+async function onRename(id, newTitle) {
+  try {
+    await updateSession(id, newTitle)
+    const s = sessions.value.find(x => x.session_id === id)
+    if (s) s.title = newTitle
+    ElMessage.success('已重命名')
+  } catch (err) {
+    ElMessage.error(err.response?.data?.detail || '重命名失败')
+  }
+}
+
+async function onDelete(id) {
+  try {
+    await deleteSession(id)
+    sessions.value = sessions.value.filter(x => x.session_id !== id)
+    if (id === sessionId.value) {
+      // 删除当前会话：切换到列表第一个或回到初始界面
+      if (sessions.value.length) {
+        onSelectSession(sessions.value[0].session_id)
+      } else {
+        resetWorkspace()
+      }
+    }
+    ElMessage.success('已删除')
+  } catch (err) {
+    ElMessage.error(err.response?.data?.detail || '删除失败')
+  }
+}
+
+async function onResume(id) {
+  if (!id) return
+  isWaiting.value = true
+  try {
+    const { data } = await resumeSession(id)
+    // 清空旧状态，加载续写产生的新会话
+    messages.value = []
+    options.value = []
+    worldSetting.value = { worldSetting: '', characters: [], rules: '' }
+    humanApproval.value = null
+    showRejectionInput.value = false
+    rejectionFeedback.value = ''
+    finalOutput.value = ''
+    finalExpanded.value = true
+    if (typeTimer) { clearInterval(typeTimer); typeTimer = null }
+    streamingMsgIndex.value = null
+    streamingTarget.value = ''
+    sessionId.value = data.session_id
+    currentTurn.value = data.turn ?? 0
+    currentSegmentCount.value = data.segment_count ?? 0
+    applyResponse(data)
+    loadSessions()
+  } catch (err) {
+    ElMessage.error(err.response?.data?.detail || '续写失败')
+  } finally {
+    isWaiting.value = false
+  }
+}
+
+onMounted(() => {
+  loadSessions()
+})
 
 watch(messages, scrollToBottom, { deep: true })
 </script>
@@ -607,14 +813,41 @@ body {
 }
 
 /* ─── 主内容 ─── */
+.app-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+
 .app-main {
   flex: 1;
   position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 32px 20px;
+  min-width: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.collapse-btn {
+  color: #94a3b8;
+  padding: 6px;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.5);
+}
+
+.collapse-btn:hover {
+  color: #c7d2fe;
+  background: rgba(99, 102, 241, 0.12);
 }
 
 /* ─── 初始界面 ─── */
@@ -719,6 +952,52 @@ body {
   border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: 16px;
   overflow: hidden;
+}
+
+/* ─── 完整小说面板 ─── */
+.final-panel {
+  background: rgba(16, 185, 129, 0.08);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.final-panel .panel-header:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.final-body {
+  max-height: 48vh;
+  overflow-y: auto;
+}
+
+.final-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.final-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.final-body::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 10px;
+}
+
+.final-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+.final-text {
+  color: #e2e8f0;
+  font-size: 15px;
+  line-height: 2;
+  white-space: pre-wrap;
+  background: rgba(15, 23, 42, 0.4);
+  padding: 20px;
+  border-radius: 12px;
 }
 
 .panel-header {

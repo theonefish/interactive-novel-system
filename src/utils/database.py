@@ -56,6 +56,20 @@ def get_database_url() -> str:
     return DATABASE_URL or "sqlite:///novel_sessions.db"
 
 
+def get_session_db_path() -> str:
+    """获取会话元数据存储的 SQLite 路径（与 checkpointer 数据库同目录，独立文件）"""
+    checkpointer_db = "novel_sessions.db"
+    db_dir = os.path.dirname(os.path.abspath(checkpointer_db))
+    return os.path.join(db_dir, "novel_sessions_meta.db")
+
+
+def get_long_term_memory_db_path() -> str:
+    """获取长期记忆存储的 SQLite 路径（与会话元数据库同目录，独立文件）"""
+    checkpointer_db = "novel_sessions.db"
+    db_dir = os.path.dirname(os.path.abspath(checkpointer_db))
+    return os.path.join(db_dir, "novel_long_term_memories.db")
+
+
 def is_postgres() -> bool:
     """判断是否使用 PostgreSQL"""
     return bool(DATABASE_URL)

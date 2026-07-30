@@ -14,7 +14,9 @@ from pydantic import BaseModel
 
 from src.graph.workflow import build_graph, build_graph_async
 from src.graph.state import NovelState
+from src.tools import long_term_memory
 from src.tools.memory import create_initial_memory
+from src.utils import session_store
 from src.utils.database import is_postgres
 from src.utils.streaming import transform_graph_events, format_sse_event
 from src.utils.logger import setup_logger
@@ -39,6 +41,10 @@ class CreateSessionRequest(BaseModel):
 class ActionRequest(BaseModel):
     action: str
     payload: Optional[str] = None
+
+
+class UpdateTitleRequest(BaseModel):
+    title: str
 
 
 class SessionResponse(BaseModel):
@@ -93,12 +99,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# 静态文件（生产环境）
-try:
-    app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="frontend")
-except Exception:
-    pass  # 开发模式下无前端构建产物
 
 
 # ─── 辅助函数 ──────────────────────────────────────
@@ -189,6 +189,15 @@ async def create_session(req: CreateSessionRequest):
             snap = await graph.aget_state(config)
             result = snap.values
         logger.info(f"[create_session] 会话 {session_id} 启动完成，phase={result.get('current_phase')}")
+        # 写入会话元数据（title 取 user_request 前 20 字，preview 取 current_segment 前 80 字）
+        session_store.save_session_meta({
+            "session_id": session_id,
+            "title": req.user_request[:20],
+            "current_phase": result.get("current_phase", ""),
+            "current_turn": result.get("current_turn", 0),
+            "segment_count": len(result.get("story_segments", [])),
+            "preview": result.get("current_segment", "")[:80],
+        })
         return _state_to_response(result, session_id)
     except Exception as e:
         logger.exception(f"[create_session] 会话 {session_id} 启动失败：{e}")
@@ -226,6 +235,16 @@ async def send_action(session_id: str, req: ActionRequest):
             snap = await graph.aget_state(config)
             result = snap.values
         logger.info(f"[send_action] 会话 {session_id} 执行完成，phase={result.get('current_phase')}")
+        # 更新会话元数据进度快照
+        session_store.update_session_meta(session_id, {
+            "current_phase": result.get("current_phase", ""),
+            "current_turn": result.get("current_turn", 0),
+            "segment_count": len(result.get("story_segments", [])),
+            "preview": result.get("current_segment", "")[:80],
+        })
+        # 会话完成时保存长期记忆，用于后续续写
+        if result.get("current_phase") == "done":
+            long_term_memory.save_long_term_memory(session_id, result)
         return _state_to_response(result, session_id)
     except Exception as e:
         logger.exception(f"[send_action] 会话 {session_id} 执行失败：{e}")
@@ -249,6 +268,29 @@ async def get_session(session_id: str):
     except Exception as e:
         logger.exception(f"[get_session] 会话 {session_id} 获取状态失败：{e}")
         raise HTTPException(status_code=500, detail=f"获取状态失败：{str(e)}")
+
+
+@app.get("/api/sessions")
+async def list_sessions():
+    """获取所有会话及进度摘要"""
+    return session_store.list_session_metas()
+
+
+@app.patch("/api/sessions/{session_id}")
+async def update_session_title(session_id: str, req: UpdateTitleRequest):
+    """更新会话标题"""
+    existing = session_store.get_session_meta(session_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="会话不存在")
+    session_store.update_session_meta(session_id, {"title": req.title})
+    return session_store.get_session_meta(session_id)
+
+
+@app.delete("/api/sessions/{session_id}", status_code=204)
+async def delete_session(session_id: str):
+    """删除会话元数据"""
+    session_store.delete_session_meta(session_id)
+    return None
 
 
 @app.get("/api/sessions/{session_id}/stream")
@@ -298,6 +340,16 @@ async def stream_session(session_id: str, request: Request, action: str = Query(
 
             # 流结束后发送完整状态快照（异步获取）
             state = await graph.aget_state(config)
+            # 更新会话元数据进度快照
+            session_store.update_session_meta(session_id, {
+                "current_phase": state.values.get("current_phase", ""),
+                "current_turn": state.values.get("current_turn", 0),
+                "segment_count": len(state.values.get("story_segments", [])),
+                "preview": state.values.get("current_segment", "")[:80],
+            })
+            # 会话完成时保存长期记忆，用于后续续写
+            if state.values.get("current_phase") == "done":
+                long_term_memory.save_long_term_memory(session_id, state.values)
             final_resp = _state_to_response(state.values, session_id)
             yield format_sse_event("final", final_resp.model_dump())
 
@@ -316,6 +368,86 @@ async def stream_session(session_id: str, request: Request, action: str = Query(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+@app.post("/api/sessions/{session_id}/resume", response_model=SessionResponse)
+async def resume_session(session_id: str):
+    """基于已完成的长期记忆续写新会话
+
+    从长期记忆恢复世界观、角色、规则、记忆状态，清空剧情进度，
+    生成新 session_id 并以 story_progressing 阶段启动图。
+    """
+    memory = long_term_memory.get_long_term_memory(session_id)
+    if memory is None:
+        raise HTTPException(status_code=404, detail="长期记忆不存在")
+
+    new_session_id = str(uuid.uuid4())
+    config = {"configurable": {"thread_id": new_session_id}}
+
+    user_request = f"【续写】{memory['title']}：请基于已有世界观和剧情继续推进故事"
+    initial_state = _build_initial_state(user_request)
+    # 从长期记忆恢复世界观、角色、规则、记忆状态
+    initial_state["world_setting"] = memory.get("world_setting", "")
+    initial_state["characters"] = memory.get("characters", [])
+    initial_state["rules"] = memory.get("rules", "")
+    initial_state["memory"] = memory.get("memory_state", {})
+    # 清空剧情相关字段，重新开始
+    initial_state["story_segments"] = []
+    initial_state["current_segment"] = ""
+    initial_state["current_options"] = []
+    initial_state["user_choices"] = []
+    initial_state["segment_history"] = []
+    initial_state["current_turn"] = 0
+    initial_state["setting_confirmed"] = True
+    initial_state["current_phase"] = "story_progressing"
+    initial_state["awaiting_user"] = False
+
+    graph = app_graph_async or app_graph
+
+    try:
+        logger.info(f"[resume_session] 从记忆 {session_id} 续写为新会话 {new_session_id}")
+        try:
+            result = await graph.ainvoke(initial_state, config)
+        except GraphInterrupt:
+            logger.info(f"[resume_session] 图在中断处暂停，读取当前状态返回")
+            snap = await graph.aget_state(config)
+            result = snap.values
+        logger.info(f"[resume_session] 会话 {new_session_id} 启动完成，phase={result.get('current_phase')}")
+        session_store.save_session_meta({
+            "session_id": new_session_id,
+            "title": memory.get("title", ""),
+            "current_phase": result.get("current_phase", ""),
+            "current_turn": result.get("current_turn", 0),
+            "segment_count": len(result.get("story_segments", [])),
+            "preview": result.get("current_segment", "")[:80],
+        })
+        return _state_to_response(result, new_session_id)
+    except Exception as e:
+        logger.exception(f"[resume_session] 会话 {new_session_id} 启动失败：{e}")
+        raise HTTPException(status_code=500, detail=f"续写失败：{str(e)}")
+
+
+@app.get("/api/memories")
+async def list_memories():
+    """获取所有长期记忆列表"""
+    return long_term_memory.list_long_term_memories()
+
+
+@app.get("/api/memories/{memory_id}")
+async def get_memory(memory_id: str):
+    """获取单条长期记忆详情"""
+    memory = long_term_memory.get_long_term_memory(memory_id)
+    if memory is None:
+        raise HTTPException(status_code=404, detail="长期记忆不存在")
+    return memory
+
+
+# ─── 静态文件（生产环境，作为 SPA fallback，需在 API 路由之后挂载）──
+
+try:
+    app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="frontend")
+except Exception:
+    pass  # 开发模式下无前端构建产物
 
 
 # ─── 启动入口 ──────────────────────────────────────

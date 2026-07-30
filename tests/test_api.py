@@ -41,6 +41,20 @@ def mock_graph():
         yield mock
 
 
+@pytest.fixture(autouse=True)
+def mock_session_store():
+    """自动 mock session_store，避免测试触碰真实 SQLite"""
+    with patch("server.session_store") as mock:
+        yield mock
+
+
+@pytest.fixture(autouse=True)
+def mock_long_term_memory():
+    """自动 mock long_term_memory，避免测试触碰真实 SQLite"""
+    with patch("server.long_term_memory") as mock:
+        yield mock
+
+
 # ─── 健康检查 & 文档 ───────────────────────────────
 
 class TestAppBasics:
@@ -367,3 +381,290 @@ class TestHelpers:
         assert resp.rules == "规则"
         assert resp.critique == "评审"
         assert resp.risk_warnings == ["警告"]
+
+
+# ─── GET /api/sessions 测试 ───────────────────────
+
+class TestListSessions:
+    """测试获取会话列表"""
+
+    def test_list_returns_sessions_array(self, client, mock_session_store):
+        mock_session_store.list_session_metas.return_value = [
+            {
+                "session_id": "s1",
+                "title": "会话1",
+                "current_phase": "story_progressing",
+                "current_turn": 2,
+                "segment_count": 2,
+                "preview": "预览1",
+            },
+            {
+                "session_id": "s2",
+                "title": "会话2",
+                "current_phase": "world_building",
+                "current_turn": 0,
+                "segment_count": 0,
+                "preview": "",
+            },
+        ]
+        response = client.get("/api/sessions")
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
+        assert len(data) == 2
+        assert data[0]["session_id"] == "s1"
+        assert data[1]["session_id"] == "s2"
+        mock_session_store.list_session_metas.assert_called_once()
+
+    def test_list_empty_returns_empty_array(self, client, mock_session_store):
+        mock_session_store.list_session_metas.return_value = []
+        response = client.get("/api/sessions")
+        assert response.status_code == 200
+        assert response.json() == []
+
+
+# ─── PATCH /api/sessions/{id} 测试 ─────────────────
+
+class TestUpdateSessionTitle:
+    """测试更新会话标题"""
+
+    def test_update_title_success(self, client, mock_session_store):
+        session_id = "patch-001"
+        updated_meta = {
+            "session_id": session_id,
+            "title": "新标题",
+            "current_phase": "story_progressing",
+            "current_turn": 1,
+            "segment_count": 1,
+            "preview": "预览",
+        }
+        mock_session_store.get_session_meta.return_value = updated_meta
+        response = client.patch(
+            f"/api/sessions/{session_id}",
+            json={"title": "新标题"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["session_id"] == session_id
+        assert data["title"] == "新标题"
+        mock_session_store.update_session_meta.assert_called_once_with(
+            session_id, {"title": "新标题"}
+        )
+
+    def test_update_title_session_not_found_returns_404(self, client, mock_session_store):
+        mock_session_store.get_session_meta.return_value = None
+        response = client.patch(
+            "/api/sessions/nonexistent",
+            json={"title": "标题"},
+        )
+        assert response.status_code == 404
+        assert "会话不存在" in response.json()["detail"]
+        mock_session_store.update_session_meta.assert_not_called()
+
+    def test_update_title_missing_field_returns_422(self, client, mock_session_store):
+        response = client.patch(
+            "/api/sessions/some-id",
+            json={},
+        )
+        assert response.status_code == 422
+
+
+# ─── DELETE /api/sessions/{id} 测试 ─────────────────
+
+class TestDeleteSession:
+    """测试删除会话"""
+
+    def test_delete_returns_204(self, client, mock_session_store):
+        response = client.delete("/api/sessions/delete-001")
+        assert response.status_code == 204
+        mock_session_store.delete_session_meta.assert_called_once_with("delete-001")
+
+    def test_delete_nonexistent_returns_204(self, client, mock_session_store):
+        # 删除是幂等的，即使不存在也返回 204
+        response = client.delete("/api/sessions/nonexistent")
+        assert response.status_code == 204
+
+
+# ─── 元数据写入集成测试 ──────────────────────────
+
+class TestSessionMetaIntegration:
+    """测试 create_session / send_action 会调用 session_store"""
+
+    def test_create_session_calls_save_session_meta(self, client, mock_graph, mock_session_store):
+        client.post(
+            "/api/sessions",
+            json={"user_request": "末日废土，主角带着女儿寻找绿洲"},
+        )
+        mock_session_store.save_session_meta.assert_called_once()
+        call_args = mock_session_store.save_session_meta.call_args[0][0]
+        assert call_args["title"] == "末日废土，主角带着女儿寻找绿洲"[:20]
+        assert call_args["current_phase"] == "story_progressing"
+
+    def test_send_action_calls_update_session_meta(self, client, mock_graph, mock_session_store):
+        client.post(
+            "/api/sessions/test-session-action/action",
+            json={"action": "A"},
+        )
+        mock_session_store.update_session_meta.assert_called_once()
+        call_args = mock_session_store.update_session_meta.call_args
+        assert call_args[0][0] == "test-session-action"
+        updates = call_args[0][1]
+        assert updates["current_phase"] == "story_progressing"
+        assert updates["current_turn"] == 1
+
+
+# ─── POST /api/sessions/{id}/resume 测试 ──────────
+
+class TestResumeSession:
+    """测试续写会话"""
+
+    def test_resume_success(self, client, mock_graph, mock_long_term_memory, mock_session_store):
+        mock_long_term_memory.get_long_term_memory.return_value = {
+            "memory_id": "orig-001",
+            "title": "末日废土",
+            "world_setting": "废土世界",
+            "characters": [{"name": "主角", "role": "主角"}],
+            "rules": "规则1",
+            "story_segments": ["段落1", "段落2"],
+            "memory_state": {"characters": [], "plot_threads": []},
+            "final_output": "完整小说",
+            "created_at": "2026-01-01T00:00:00",
+            "completed_at": "2026-01-02T00:00:00",
+        }
+        # mock_graph.ainvoke 已由 mock_graph fixture 配置返回 story_progressing
+        response = client.post("/api/sessions/orig-001/resume")
+        assert response.status_code == 200
+        data = response.json()
+        # 新 session_id 应不同于原 memory_id
+        assert data["session_id"] != "orig-001"
+        assert data["phase"] == "story_progressing"
+        # 验证加载了长期记忆
+        mock_long_term_memory.get_long_term_memory.assert_called_once_with("orig-001")
+        # 验证执行了图
+        mock_graph.ainvoke.assert_called_once()
+        # 验证写入了新会话元数据
+        mock_session_store.save_session_meta.assert_called_once()
+        meta_call = mock_session_store.save_session_meta.call_args[0][0]
+        assert meta_call["session_id"] == data["session_id"]
+        assert meta_call["title"] == "末日废土"
+
+    def test_resume_memory_not_found_returns_404(self, client, mock_long_term_memory):
+        mock_long_term_memory.get_long_term_memory.return_value = None
+        response = client.post("/api/sessions/nonexistent/resume")
+        assert response.status_code == 404
+        assert "长期记忆不存在" in response.json()["detail"]
+        mock_long_term_memory.get_long_term_memory.assert_called_once_with("nonexistent")
+
+
+# ─── GET /api/memories 测试 ───────────────────────
+
+class TestListMemories:
+    """测试获取长期记忆列表"""
+
+    def test_list_returns_memories(self, client, mock_long_term_memory):
+        mock_long_term_memory.list_long_term_memories.return_value = [
+            {
+                "memory_id": "m1",
+                "title": "记忆1",
+                "completed_at": "2026-01-01T00:00:00",
+                "preview": "预览1",
+            },
+            {
+                "memory_id": "m2",
+                "title": "记忆2",
+                "completed_at": "2026-01-02T00:00:00",
+                "preview": "预览2",
+            },
+        ]
+        response = client.get("/api/memories")
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
+        assert len(data) == 2
+        assert data[0]["memory_id"] == "m1"
+        assert data[1]["memory_id"] == "m2"
+        mock_long_term_memory.list_long_term_memories.assert_called_once()
+
+    def test_list_empty_returns_empty_array(self, client, mock_long_term_memory):
+        mock_long_term_memory.list_long_term_memories.return_value = []
+        response = client.get("/api/memories")
+        assert response.status_code == 200
+        assert response.json() == []
+
+
+# ─── GET /api/memories/{id} 测试 ──────────────────
+
+class TestGetMemory:
+    """测试获取单条长期记忆"""
+
+    def test_get_memory_success(self, client, mock_long_term_memory):
+        mock_long_term_memory.get_long_term_memory.return_value = {
+            "memory_id": "m1",
+            "title": "记忆1",
+            "world_setting": "世界",
+            "characters": [{"name": "主角"}],
+            "rules": "规则",
+            "story_segments": ["段落"],
+            "memory_state": {"characters": []},
+            "final_output": "成稿",
+            "created_at": "2026-01-01T00:00:00",
+            "completed_at": "2026-01-02T00:00:00",
+        }
+        response = client.get("/api/memories/m1")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["memory_id"] == "m1"
+        assert data["title"] == "记忆1"
+        assert data["world_setting"] == "世界"
+        assert data["characters"] == [{"name": "主角"}]
+        mock_long_term_memory.get_long_term_memory.assert_called_once_with("m1")
+
+    def test_get_memory_not_found_returns_404(self, client, mock_long_term_memory):
+        mock_long_term_memory.get_long_term_memory.return_value = None
+        response = client.get("/api/memories/nonexistent")
+        assert response.status_code == 404
+        assert "长期记忆不存在" in response.json()["detail"]
+
+
+# ─── 会话完成保存长期记忆测试 ──────────────────────
+
+class TestSaveLongTermMemoryOnDone:
+    """测试 send_action 完成后 phase=done 时保存长期记忆"""
+
+    def test_save_long_term_memory_called_when_done(self, client, mock_graph, mock_long_term_memory):
+        mock_graph.ainvoke.return_value = {
+            "current_phase": "done",
+            "current_turn": 5,
+            "current_segment": "",
+            "story_segments": ["段落1", "段落2"],
+            "final_output": "完整小说",
+            "world_setting": "世界",
+            "characters": [],
+            "rules": "规则",
+            "memory": {"characters": []},
+            "current_options": [],
+            "risk_warnings": [],
+            "critique": "",
+            "critique_score": 0,
+            "human_approval": None,
+        }
+        response = client.post(
+            "/api/sessions/done-session/action",
+            json={"action": "生成全文"},
+        )
+        assert response.status_code == 200
+        assert response.json()["phase"] == "done"
+        mock_long_term_memory.save_long_term_memory.assert_called_once()
+        call_args = mock_long_term_memory.save_long_term_memory.call_args
+        assert call_args[0][0] == "done-session"
+        # 第二个参数为图执行结果
+        assert call_args[0][1]["current_phase"] == "done"
+
+    def test_save_long_term_memory_not_called_when_not_done(self, client, mock_graph, mock_long_term_memory):
+        # mock_graph fixture 默认返回 phase=story_progressing
+        response = client.post(
+            "/api/sessions/progressing-session/action",
+            json={"action": "A"},
+        )
+        assert response.status_code == 200
+        mock_long_term_memory.save_long_term_memory.assert_not_called()
