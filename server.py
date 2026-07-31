@@ -384,20 +384,24 @@ async def resume_session(session_id: str):
     new_session_id = str(uuid.uuid4())
     config = {"configurable": {"thread_id": new_session_id}}
 
-    user_request = f"【续写】{memory['title']}：请基于已有世界观和剧情继续推进故事"
+    # 保留原剧情作为上下文，story_driver 会基于此续写而非重写
+    prev_segments = memory.get("story_segments", []) or []
+    prev_turn = len(prev_segments)
+    user_request = f"【续写】{memory['title']}：请基于已有世界观和已有剧情继续推进故事，不要重复已有内容"
     initial_state = _build_initial_state(user_request)
     # 从长期记忆恢复世界观、角色、规则、记忆状态
     initial_state["world_setting"] = memory.get("world_setting", "")
     initial_state["characters"] = memory.get("characters", [])
     initial_state["rules"] = memory.get("rules", "")
     initial_state["memory"] = memory.get("memory_state", {})
-    # 清空剧情相关字段，重新开始
-    initial_state["story_segments"] = []
-    initial_state["current_segment"] = ""
+    # 保留原有剧情片段作为上下文，续写新内容会追加到其后
+    initial_state["story_segments"] = list(prev_segments)
+    initial_state["current_segment"] = prev_segments[-1] if prev_segments else ""
+    # 重置交互状态：turn 接续原进度，清空用户选择与选项历史
     initial_state["current_options"] = []
     initial_state["user_choices"] = []
     initial_state["segment_history"] = []
-    initial_state["current_turn"] = 0
+    initial_state["current_turn"] = prev_turn
     initial_state["setting_confirmed"] = True
     initial_state["current_phase"] = "story_progressing"
     initial_state["awaiting_user"] = False

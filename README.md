@@ -78,11 +78,21 @@
 ```
 .
 ├── server.py                 # FastAPI 入口：API 路由、生命周期、SSE 流式
-├── config.py                 # 根配置（可能与 utils/config.py 配合，见 §5）
+├── src/app.py                # CLI 入口：终端交互式创作（无需前端）
+├── config.py                 # 根配置占位文件（实际配置见 src/utils/config.py，见 §5）
 ├── configs/
 │   ├── settings.yaml         # YAML 默认配置（LLM / 创作 / 质控 / RAG / misc）
-│   └── .env                  # 环境变量（优先级最高）
+│   └── .env                  # 环境变量（优先级最高，实际存放于项目根目录 .env）
 ├── pyproject.toml            # 依赖清单
+├── exchange_rag_agent/       # RAG 参考实现（独立模块，供 src/tools 下的 RAG 代码参考）
+│   ├── chroma_util.py        # ChromaDB 连接与集合管理
+│   ├── document_util.py      # 文档加载 / 分割 / 入库
+│   ├── rag_agent.py          # RAG Agent 封装
+│   └── rag_tool.py           # 检索工具实现
+├── tools/                    # 根级工具镜像（历史遗留，主逻辑以 src/tools 为准）
+│   └── memory.py
+├── utils/                    # 根级工具镜像（历史遗留，主逻辑以 src/utils 为准）
+│   └── llm.py
 ├── src/
 │   ├── agents/               # 五个专职 Agent
 │   │   ├── supervisor.py     # 调度中心 + 两条条件路由
@@ -92,9 +102,11 @@
 │   │   └── integrator.py     # integrator_node（全文整合）
 │   ├── graph/
 │   │   ├── state.py          # NovelState 全局状态定义
-│   │   └── workflow.py       # 图构建（同步 / 异步）
+│   │   ├── workflow.py       # 图构建（同步 / 异步）
+│   │   ├── edges.py          # 边定义占位（TODO）
+│   │   └── nodes.py          # 节点注册占位（TODO）
 │   ├── prompts/              # 各 Agent 的提示词模板
-│   ├── tools/                # 工具层
+│   ├── tools/                # 工具层（实际生效）
 │   │   ├── memory.py         # 故事记忆（角色 / 线索 / 伏笔 / 时间线）
 │   │   ├── rag_tool.py       # 向量检索 + Reranker
 │   │   ├── search_tool.py    # Bing 搜索（MCP）
@@ -107,8 +119,11 @@
 │       ├── session_store.py  # 会话元数据（SQLite）
 │       └── logger.py         # 日志（控制台 + 轮转文件）
 ├── frontend/                 # Vue 3 + Element Plus + Vite 前端
+│   ├── src/                  # 前端源码（api / components / styles / App.vue / main.js）
+│   └── dist/                 # 生产构建产物（server.py 会挂载此目录）
 ├── knowledge_base/           # RAG 知识库文档目录（需自行准备）
-└── tests/                    # 测试
+└── tests/                    # 测试（test_agents / test_api / test_graph / test_tools /
+                               #        test_long_term_memory / test_session_store）
 ```
 
 ---
@@ -122,11 +137,13 @@
 pip install -e .        # 依据 pyproject.toml 安装全部依赖
 # 或：pip install -r requirements.txt（如存在）
 
-# 配置环境变量
-cp configs/.env.example configs/.env   # 若不存在则手动创建（见 §5）
+# 配置环境变量：项目根目录的 .env（若不存在则手动创建，见 §5.2）
+# 注意：.env 实际位于项目根目录，而非 configs/ 子目录
 ```
 
 核心依赖（节选自 `pyproject.toml`）：`langgraph`、`langgraph-checkpoint-sqlite`、`langgraph-checkpoint-postgres`、`openai`、`fastapi`、`uvicorn`、`sse-starlette`、`langchain-*`、`mcp`、`asyncpg`、`pymupdf`、`docx2txt`。
+
+> 没有 `requirements.txt` 时，直接 `pip install -e .` 即可，依赖全部声明在 `pyproject.toml`。
 
 ### 4.2 前端
 
@@ -148,7 +165,7 @@ npm run dev      # 开发模式，默认 http://localhost:5173
 
 ## 5. 配置说明
 
-配置优先级：**`configs/.env` 环境变量 > `configs/settings.yaml` > 代码默认值**。读取逻辑见 `src/utils/config.py`。
+配置优先级：**项目根目录 `.env` 环境变量 > `configs/settings.yaml` > 代码默认值**。`src/utils/config.py` 会同时 `load_dotenv()` 根目录 `.env` 与 `configs/.env`（若两者都存在，根目录优先）。读取逻辑见 `src/utils/config.py`。
 
 ### 5.1 `configs/settings.yaml`
 
@@ -184,13 +201,15 @@ misc:
   mcp_bing_enabled: true      # 是否启用 Bing MCP 搜索
 ```
 
-### 5.2 `configs/.env`（覆盖优先级最高）
+### 5.2 项目根目录 `.env`（覆盖优先级最高）
+
+> `.env` 实际存放在**项目根目录**（与 `server.py` 同级），不是 `configs/` 下。`src/utils/config.py`、`src/tools/*` 等模块都会 `load_dotenv()` 加载它。
 
 ```env
-# LLM（OpenAI 兼容）
+# LLM（OpenAI 兼容，示例使用 SiliconFlow）
 OPENAI_API_KEY=sk-xxx
 OPENAI_BASE_URL=https://api.siliconflow.cn/v1
-LLM_MODEL=Qwen/Qwen2.5-72B-Instruct
+LLM_MODEL=deepseek-ai/DeepSeek-V4-Flash
 
 # 数据库：设置 DATABASE_URL 则使用 PostgreSQL，否则 SQLite
 DATABASE_URL=
@@ -369,6 +388,16 @@ cd frontend && npm run dev
 
 打开前端地址即可开始创作；若已 `npm run build`，后端会直接托管 `frontend/dist`。
 
+### 13.5 命令行模式（无需前端）
+
+`src/app.py` 提供纯终端交互入口，适合无界面环境快速体验：
+
+```bash
+python -m src.app
+```
+
+启动后按提示输入创作需求，随后每轮根据 `current_phase`（剧情推进 / 世界观构建 / 已完成）在终端输入选项（A/B/C 或自由文本）或「生成全文」「结束」即可。底层复用 `build_graph()` 同步图与 `Command(resume=...)` 恢复机制。
+
 ---
 
 ## 14. 常见问题
@@ -378,3 +407,7 @@ cd frontend && npm run dev
 - **`GraphInterrupt` 导入报错**：在 langgraph 1.x 中应 `from langgraph.errors import GraphInterrupt`，而非 `langgraph.types`。
 - **RAG 检索为空**：确认 ChromaDB 已启动且知识库已通过 §12 入库。
 - **Bing 搜索不生效**：检查 `mcp_bing_config` 格式与网络可达性；未配置时系统会安全跳过搜索。
+- **找不到 `configs/.env`**：`.env` 实际位于**项目根目录**（与 `server.py` 同级）。`configs/settings.yaml` 仅作默认值后备。
+- **根目录 `config.py` 是空的**：它是历史占位文件，真正生效的配置在 `src/utils/config.py`，请勿依赖根目录 `config.py`。
+- **`tools/` 与 `utils/` 根目录文件**：这是历史遗留的镜像目录，主逻辑以 `src/tools/`、`src/utils/` 为准，避免误改。
+- **`exchange_rag_agent/` 目录**：是 RAG 能力的参考实现（独立模块），`src/tools/rag_tool.py` 与 `document_util.py` 的设计参考了它，但运行时以 `src/tools` 下代码为准。

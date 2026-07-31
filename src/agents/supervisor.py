@@ -173,7 +173,15 @@ def supervisor_node(state: NovelState) -> dict:
                 updates["current_phase"] = "completed"
                 return updates
 
-        # 通过 interrupt 等待用户输入
+        # 无选项意味着需要生成新剧情：
+        # - 新会话刚进入此阶段（无 segment 无 options）
+        # - 续写会话（保留了原 segment 作为上下文，但清空了 options）
+        # 两种情况都先路由到 story_driver 生成新剧情和选项
+        if not state.get("current_options"):
+            logger.info("[supervisor_node] story_progressing 无选项，移交 story_driver 生成新剧情")
+            return {}
+
+        # 已有剧情和选项，通过 interrupt 等待用户输入
         options = state.get("current_options", [])
         options_text = "\n".join(
             f"{opt.get('id', '?')}. {opt.get('text', '')}" for opt in options
