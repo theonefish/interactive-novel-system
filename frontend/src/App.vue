@@ -347,8 +347,9 @@ async function startSession() {
     sessionId.value = data.session_id
     currentTurn.value = 0
     currentSegmentCount.value = 0
+    // 先拉取会话列表，确保侧栏及时显示新会话，再更新主区
+    await loadSessions()
     applyResponse(data)
-    loadSessions()
   } catch (err) {
     ElMessage.error(err.response?.data?.detail || '启动失败，请检查后端服务')
   } finally {
@@ -678,8 +679,8 @@ async function onResume(id) {
     sessionId.value = data.session_id
     currentTurn.value = data.turn ?? 0
     currentSegmentCount.value = data.segment_count ?? 0
+    await loadSessions()
     applyResponse(data)
-    loadSessions()
   } catch (err) {
     ElMessage.error(err.response?.data?.detail || '续写失败')
   } finally {
