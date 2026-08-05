@@ -44,33 +44,33 @@ class NovelState(TypedDict):
     # 剧情
     story_segments: List[str]
     current_segment: str
-    plot_version: int
-    segment_history: List[SegmentHistoryItem]
+    plot_version: int # 剧情版本
+    segment_history: List[SegmentHistoryItem] # 剧情片段历史记录
 
     # 交互
-    current_options: List[OptionItem]
-    user_choices: List[UserChoice]
-    current_turn: int
-    awaiting_user: bool
+    current_options: List[OptionItem] # 当前选项
+    user_choices: List[UserChoice] # 用户选择记录
+    current_turn: int # 当前轮次
+    awaiting_user: bool # 是否等待用户输入
 
     # 质控
-    critique: str
-    critique_score: int
-    risk_warnings: List[str]
+    critique: str # 质控内容
+    critique_score: int # 质控分数
+    risk_warnings: List[str] #风险警告
 
     # 输出
     final_output: str
 
     # 记忆
-    memory: MemoryState
+    memory: MemoryState    # 记忆状态
 
     # LangGraph 消息
-    messages: Annotated[list, add_messages]
+    messages: Annotated[list, add_messages] # 消息列表
 
     # 人工审核（Human-in-the-Loop）
-    human_approval: Optional[Literal["pending", "approved", "rejected"]]
+    human_approval: Optional[Literal["pending", "approved", "rejected"]]#记录用户批准/驳回，驱动打回或放行
 
     # 控制
-    current_phase: str
-    iteration_count: int
-    max_internal_iterations: int
+    current_phase: str #
+    iteration_count: int # 当前迭代次数
+    max_internal_iterations: int # 最大迭代次数

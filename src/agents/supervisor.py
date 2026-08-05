@@ -1,5 +1,8 @@
 """调度中心 - 解析用户输入并路由到对应节点"""
-
+# 核心职责是：
+# 解析用户输入（理解意图）、
+# 管理小说生成状态（回溯、生成全文、选项选择）、
+# 以及进行节点路由（决定下一步由哪一个 Agent/节点执行）。
 import json
 import re
 from typing import Optional
@@ -15,8 +18,17 @@ from src.utils.logger import setup_logger
 
 logger = setup_logger("supervisor")
 
+# 全局规则定义与关键词匹配，可以快速决策，节省成本
+COMMON_RULES = [
+    (r"继续|然后呢|下一步|接着说", {"action": "select_option", "selected_option": "A"}),
+    (r"不行|换一个|重来|不好|不要|算了", {"action": "backtrack", "selected_option": None}),
+    (r"写完整|全部|完本|完结", {"action": "generate_full", "selected_option": None}),
+    (r"确认|可以|就这样|没问题|很好", {"action": "free_input", "selected_option": None}),
+]
+
+
 def parse_user_input(user_input: str, phase: str) -> dict:
-    """解析用户输入"""
+    """解析用户输入，采用多级降级策略"""
     user_input = user_input.strip()
 
     # 特殊指令（优先级最高）
@@ -25,23 +37,18 @@ def parse_user_input(user_input: str, phase: str) -> dict:
     if user_input in ("回到上一步", "回溯"):
         return {"action": "backtrack", "selected_option": None}
 
+    # 世界观构建阶段的 A/B 确认
     if phase == "world_building":
         if user_input.upper() == "A":
             return {"action": "confirm_setting", "selected_option": None}
         if user_input.upper() == "B":
             return {"action": "modify_setting", "selected_option": None}
 
-    # 通用选项选择
+    # 通用选项选择（不区分阶段）
     if user_input.upper() in ("A", "B", "C", "D"):
         return {"action": "select_option", "selected_option": user_input.upper()}
 
-    # 关键词规则匹配（优先级高于 LLM 解析）
-    COMMON_RULES = [
-        (r"继续|然后呢|下一步|接着说", {"action": "select_option", "selected_option": "A"}),
-        (r"不行|换一个|重来|不好|不要|算了", {"action": "backtrack", "selected_option": None}),
-        (r"写完整|全部|完本|完结", {"action": "generate_full", "selected_option": None}),
-        (r"确认|可以|就这样|没问题|很好", {"action": "free_input", "selected_option": None}),
-    ]
+    # 关键词规则匹配
     for pattern, result in COMMON_RULES:
         if re.search(pattern, user_input):
             return result
@@ -54,7 +61,7 @@ def parse_user_input(user_input: str, phase: str) -> dict:
         temperature=TEMPERATURE_CRITIC,
         max_tokens=256,
     )
-
+    # 最后一道结构化解析尝试，失败就降级为自由输入，保证函数永远返回一个可用的路由结果，不会崩溃
     try:
         match = re.search(r"\{.*\}", response, re.DOTALL)
         if match:
@@ -68,25 +75,18 @@ def parse_user_input(user_input: str, phase: str) -> dict:
 def handle_backtrack(state: NovelState) -> dict:
     """处理回溯请求"""
     segment_history = state.get("segment_history", [])
-    if not segment_history:
+    # 无历史、首轮、或已达回溯上限时，保持剧情推进、不回溯
+    if (not segment_history
+            or state.get("current_turn", 0) <= 1
+            or len(segment_history) >= MAX_BACKTRACK_STEPS):
         return {"current_phase": "story_progressing"}
 
-    # 只允许在第一轮之后回溯
-    if state.get("current_turn", 0) <= 1:
-        return {"current_phase": "story_progressing"}
-
-    # 限制回溯步数
-    steps_used = len(segment_history)
-    if steps_used >= MAX_BACKTRACK_STEPS:
-        return {"current_phase": "story_progressing"}
-
-    # 弹出最后一段
+    # 弹出最后一段并恢复状态
     segment_history = list(segment_history)
-    last_item = segment_history.pop()
+    segment_history.pop()
 
-    # 恢复状态
-    segments = state.get("story_segments", [])
-    new_segments = list(segments)
+    # 同步回退剧情段列表
+    new_segments = list(state.get("story_segments", []))
     if new_segments:
         new_segments.pop()
 
@@ -103,6 +103,9 @@ def handle_backtrack(state: NovelState) -> dict:
 
 def _get_resume_input(state: NovelState) -> Optional[str]:
     """获取用户输入（支持 Command(resume=...) 或直接 state['user_input']）"""
+    """屏蔽了 LangGraph 中断恢复（__resume__）和自定义字段（user_input / resume）两种来源的差别，
+    按优先级取出并转成字符串；用 is not None 正确保留合法的空字符串输入，
+    取不到则返回 None 让上层改走中断等待。"""
     for key in ("user_input", "__resume__", "resume"):
         value = state.get(key)
         if value is not None:
@@ -112,32 +115,32 @@ def _get_resume_input(state: NovelState) -> Optional[str]:
 
 def _apply_user_choice(state: NovelState, user_input: str) -> dict:
     """解析用户输入并更新选择记录"""
-    phase = state.get("current_phase", "story_progressing")
-    parsed = parse_user_input(user_input, phase)
+    phase = state.get("current_phase", "story_progressing")  # 取出当前所处的阶段，缺省当作剧情推进中
+    parsed = parse_user_input(user_input, phase)  # 把用户输入字符串解析成结构化指令（含 action 等字段）
 
-    choice_type = parsed["action"]
-    selected_option = parsed.get("selected_option")
+    choice_type = parsed["action"]  # 取出解析后的动作类型，用于后续分支判断
+    selected_option = parsed.get("selected_option")  # 取出被选中的选项（A/B/C 等），可能没有则为 None
 
-    if choice_type == "backtrack":
-        return handle_backtrack(state)
+    if choice_type == "backtrack":  # 若用户要求回溯
+        return handle_backtrack(state)  # 交给回溯处理函数，直接回退历史并短路返回
 
-    if choice_type == "generate_full":
-        return {"current_phase": "completed"}
+    if choice_type == "generate_full":  # 若用户要求生成全文（整合输出）
+        return {"current_phase": "completed"}  # 仅把阶段置为已完成，让路由去整合节点，不做普通选择记录
 
-    new_choice = {
-        "turn_id": state.get("current_turn", 0),
-        "choice_type": choice_type,
-        "content": user_input,
-        "selected_option": selected_option,
+    new_choice = {  # 组装一条本轮用户选择记录
+        "turn_id": state.get("current_turn", 0),  # 用当前轮次标记，方便回溯/整合时按轮回放
+        "choice_type": choice_type,  # 记录解析出的动作类型
+        "content": user_input,  # 保留用户原始输入文本
+        "selected_option": selected_option,  # 记录被选中的选项（可能为 None）
     }
 
-    user_choices = list(state.get("user_choices", []))
-    user_choices.append(new_choice)
+    user_choices = list(state.get("user_choices", []))  # 复制原有选择列表，避免修改不可变 state
+    user_choices.append(new_choice)  # 把本轮选择追加进去
 
-    return {
-        "user_choices": user_choices,
-        "awaiting_user": False,
-        "current_phase": "story_progressing",
+    return {  # 返回对 state 的更新
+        "user_choices": user_choices,  # 更新后的选择历史
+        "awaiting_user": False,  # 已收到并处理输入，不再等待用户
+        "current_phase": "story_progressing",  # 保持剧情推进中，路由到 story_driver 生成下一段
     }
 
 
@@ -234,9 +237,9 @@ def supervisor_route(state: NovelState) -> str:
         return "world_builder"
 
     if phase == "world_building":
+        # 设定已确认 → 进入剧情；尚未构建世界观 → 继续构建；已构建未确认 → 交回 supervisor 等待确认
         if state.get("setting_confirmed", False):
             return "story_driver"
-        # 尚未构建世界观时进入 world_builder；已构建则交回 supervisor 确认
         if not state.get("world_setting"):
             return "world_builder"
         return "supervisor"

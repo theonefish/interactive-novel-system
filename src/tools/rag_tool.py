@@ -36,26 +36,33 @@ RERANK_TOP_K = 5      # 重排序后保留数
 
 
 # ─── TTL 缓存（减少重复 API 调用）────────────────────
-
+"""
+它给 RAG 检索加了一层缓存：
+同样的查询在 5 分钟内直接返回上次结果，减少重复调用底层向量库/搜索接口；
+缓存条目超过 128 条时淘汰最旧数据，防止内存无限增长
+"""
 class _TTLCache:
     """进程内 LRU + TTL 缓存，用于缓存 RAG 检索结果"""
     def __init__(self, maxsize: int = 128, ttl: int = 300):
-        self._cache = {}
-        self._maxsize = maxsize
-        self._ttl = ttl
+        self._cache = {}          # 缓存字典：key -> (value, 写入时间戳)
+        self._maxsize = maxsize   # 最大缓存条数（容量上限）
+        self._ttl = ttl           # 单条记录的存活时间（秒），超时失效
 
     def get(self, key: str):
+        # 命中缓存：取出值与写入时间戳，判断是否仍在 TTL 有效期内
         if key in self._cache:
             val, ts = self._cache[key]
             if time.time() - ts < self._ttl:
-                return val
-            del self._cache[key]
-        return None
+                return val        # 未过期 -> 直接返回缓存值
+            del self._cache[key]  # 已过期 -> 主动删除，防止脏数据堆积
+        return None               # 未命中或已过期，返回 None
 
     def set(self, key: str, value: str):
+        # 容量已满：淘汰「写入时间最早」的那条记录（最老优先淘汰）
         if len(self._cache) >= self._maxsize:
             oldest = min(self._cache, key=lambda k: self._cache[k][1])
             del self._cache[oldest]
+        # 写入新值，并记录当前时间戳
         self._cache[key] = (value, time.time())
 
 _rag_cache = _TTLCache()

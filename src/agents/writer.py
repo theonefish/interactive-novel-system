@@ -1,4 +1,6 @@
-"""剧情推进 - 根据用户选择/输入生成下段叙述和选项"""
+"""剧情推进 - 根据用户选择/输入生成下段叙述和选项
+根据上下文、用户输入、角色描述、记忆、参考素材等信息生成下一段叙述和选项
+"""
 
 import json
 import re
@@ -19,7 +21,7 @@ def story_driver_node(state: NovelState) -> dict:
     segments = state.get("story_segments", [])
     user_choices = state.get("user_choices", [])
 
-    # 构建历史摘要
+    # 构建最近3条历史摘要
     story_history = "\n".join(segments[-3:]) if segments else "暂无"
 
     # 当前上下文
@@ -59,10 +61,10 @@ def story_driver_node(state: NovelState) -> dict:
         story_history=story_history,
         current_context=current_context,
         user_input=state.get("user_request", ""),
-        segment_length=SEGMENT_LENGTH,
-        options_count=OPTIONS_COUNT,
+        segment_length=SEGMENT_LENGTH,# 段落长度
+        options_count=OPTIONS_COUNT,# 选项数量
     )
-
+    # 调用 LLM 生成剧情片段
     response = llm_call(
         system_prompt=prompt,
         user_prompt=f"第{turn}轮剧情：继续推进故事。",

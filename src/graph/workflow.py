@@ -1,7 +1,6 @@
 """LangGraph 图定义 - 编排多 Agent 协作流程"""
 
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
 from src.graph.state import NovelState
@@ -10,13 +9,13 @@ from src.agents.researcher import world_builder_node
 from src.agents.writer import story_driver_node
 from src.agents.reviewer import critic_node
 from src.agents.integrator import integrator_node
-from src.utils.database import get_checkpointer, is_postgres
+from src.utils.database import is_postgres
 from src.utils.logger import setup_logger
 
 logger = setup_logger("workflow")
 
 def _build_workflow():
-    """构建图结构（不含 checkpointer）"""
+    """构建图结构"""
     workflow = StateGraph(NovelState)
 
     # 添加节点
@@ -29,7 +28,7 @@ def _build_workflow():
     # 设置入口
     workflow.set_entry_point("supervisor")
 
-    # 条件边 - 从 supervisor 路由
+    # 条件边 - 从 supervisor 路由, 根据当前阶段决定下一个节点
     workflow.add_conditional_edges(
         "supervisor",
         supervisor_route,
@@ -56,17 +55,10 @@ def _build_workflow():
             "supervisor": "supervisor",
         }
     )
-
+    # 审查通过后进入整合节点
     workflow.add_edge("integrator", "supervisor")
 
     return workflow
-
-
-def build_graph():
-    """构建 LangGraph 图（同步版本，SqliteSaver）"""
-    workflow = _build_workflow()
-    checkpointer = get_checkpointer()
-    return workflow.compile(checkpointer=checkpointer)
 
 
 async def build_graph_async():

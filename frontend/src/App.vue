@@ -228,9 +228,9 @@
               class="text-input"
               placeholder="输入 A/B/C 选择选项，或自由输入扮演角色..."
               :disabled="isWaiting"
-              @keydown.enter.prevent="sendUserInput"
+              @keydown.enter.prevent="sendUserInput()"
             />
-            <button class="send-btn" :disabled="isWaiting || !userInput.trim()" @click="sendUserInput">
+            <button class="send-btn" :disabled="isWaiting || !userInput.trim()" @click="sendUserInput()">
               <el-icon><Promotion /></el-icon>
             </button>
           </div>
@@ -502,7 +502,7 @@ function runStream(action, displayText) {
 
 function sendUserInput(input) {
   let action = input
-  if (action === undefined || action === null) {
+  if (typeof action !== 'string' || action === '') {
     action = userInput.value.trim()
     if (!action) return
   }

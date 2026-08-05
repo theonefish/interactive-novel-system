@@ -1,4 +1,6 @@
-"""世界观构建 - 生成设定、角色和开场场景"""
+"""世界观构建 - 生成设定、角色和开场场景
+以用户输入内容为主，调用 Bing 搜索收集背景资料，作为辅助生成设定、角色和开场场景
+"""
 
 import json
 import re
@@ -18,16 +20,17 @@ def world_builder_node(state: NovelState) -> dict:
         return {"current_phase": "done"}
 
     # 调用 Bing 搜索收集背景资料
-    search_results = search_for_world_building(user_request)
+    search_results = search_for_world_building(user_request) # 调用搜索工具
     if search_results:
         search_context = f"【搜索参考资料】\n{search_results}"
     else:
-        search_context = ""
-
+        search_context = ""# 没有搜索结果时，search_context 为空字符串
+    # 调用 LLM 生成设定、角色和开场场景
     prompt = WORLD_BUILDER_PROMPT.format(
         user_request=user_request,
         search_context=search_context,
     )
+    # 调用 LLM 生成设定、角色和开场场景
     response = llm_call(
         system_prompt=prompt,
         user_prompt=f"为用户需求「{user_request}」构建世界观。",

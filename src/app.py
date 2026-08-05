@@ -1,9 +1,10 @@
 """CLI 入口 - 交互式小说创作系统"""
 
+import asyncio
 import uuid
 from langgraph.types import Command
 
-from src.graph.workflow import build_graph
+from src.graph.workflow import build_graph_async
 from src.graph.state import NovelState
 
 
@@ -27,7 +28,7 @@ def get_initial_input() -> str:
     return input("> ").strip()
 
 
-def run_session():
+async def run_session():
     """运行一次交互式小说创作会话"""
     print_banner()
 
@@ -36,8 +37,8 @@ def run_session():
         print("输入不能为空，再见。")
         return
 
-    # 构建图
-    app = build_graph()
+    # 构建异步图
+    app = await build_graph_async()
 
     # 创建会话
     session_id = str(uuid.uuid4())
@@ -79,7 +80,7 @@ def run_session():
 
     # 首次调用
     try:
-        result = app.invoke(initial_state, config)
+        result = await app.ainvoke(initial_state, config)
     except Exception as e:
         print(f"\n❌ 启动失败：{e}")
         return
@@ -103,7 +104,7 @@ def run_session():
 
             # 继续执行
             try:
-                result = app.invoke(Command(resume=user_input), config)
+                result = await app.ainvoke(Command(resume=user_input), config)
             except Exception as e:
                 print(f"\n❌ 执行出错：{e}")
                 break
@@ -115,7 +116,7 @@ def run_session():
                 user_input = "A"
 
             try:
-                result = app.invoke(Command(resume=user_input), config)
+                result = await app.ainvoke(Command(resume=user_input), config)
             except Exception as e:
                 print(f"\n❌ 执行出错：{e}")
                 break
@@ -123,7 +124,7 @@ def run_session():
         elif phase == "completed":
             # 整合完成，展示最终输出
             try:
-                result = app.invoke(Command(resume=""), config)
+                result = await app.ainvoke(Command(resume=""), config)
             except Exception as e:
                 print(f"\n❌ 执行出错：{e}")
                 break
@@ -132,7 +133,7 @@ def run_session():
             # 其他情况
             user_input = input("\n> ").strip()
             try:
-                result = app.invoke(Command(resume=user_input), config)
+                result = await app.ainvoke(Command(resume=user_input), config)
             except Exception as e:
                 print(f"\n❌ 执行出错：{e}")
                 break
@@ -140,7 +141,7 @@ def run_session():
 
 def main():
     try:
-        run_session()
+        asyncio.run(run_session())
     except KeyboardInterrupt:
         print("\n\n已退出。下次再见！")
     except Exception as e:

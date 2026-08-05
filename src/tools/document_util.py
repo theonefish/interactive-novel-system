@@ -26,7 +26,7 @@ LOADER_MAP = {
     ".docx": Docx2txtLoader,
     ".csv": CSVLoader,
 }
-
+# 支持的格式
 SUPPORTED_FORMATS = set(LOADER_MAP.keys())
 
 

@@ -350,9 +350,8 @@ LOG_LEVEL=DEBUG
 
 ### 11.1 Checkpointer（断点续跑）
 由 `src/utils/database.py` 管理：
-- 设置 `DATABASE_URL` → 使用 `PostgresSaver`；否则 → `SqliteSaver`（文件 `novel_sessions.db`）。
-- `src/graph/workflow.py` 提供两个构建函数：
-  - `build_graph()`：同步图（使用 `get_checkpointer()`）。
+- 设置 `DATABASE_URL` → 使用 `PostgresSaver`（同步，用于 `setup_postgres()` 初始化表）；否则 → SQLite（文件 `novel_sessions.db`）。
+- `src/graph/workflow.py` 提供异步构建函数：
   - `build_graph_async()`：异步图（SQLite 用 `AsyncSqliteSaver(aiosqlite.connect(...))`，Postgres 用 `AsyncPostgresSaver`）。**注意 `from_conn_string()` 返回的是异步上下文管理器，必须手动持有连接实例**，否则 `compile()` 会报 `Invalid checkpointer` 错误。
 
 ### 11.2 会话元数据 `utils/session_store.py`
@@ -396,7 +395,7 @@ cd frontend && npm run dev
 python -m src.app
 ```
 
-启动后按提示输入创作需求，随后每轮根据 `current_phase`（剧情推进 / 世界观构建 / 已完成）在终端输入选项（A/B/C 或自由文本）或「生成全文」「结束」即可。底层复用 `build_graph()` 同步图与 `Command(resume=...)` 恢复机制。
+启动后按提示输入创作需求，随后每轮根据 `current_phase`（剧情推进 / 世界观构建 / 已完成）在终端输入选项（A/B/C 或自由文本）或「生成全文」「结束」即可。底层复用 `build_graph_async()` 异步图与 `Command(resume=...)` 恢复机制。
 
 ---
 

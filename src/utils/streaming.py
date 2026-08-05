@@ -1,4 +1,8 @@
-"""流式事件转换工具 - 将 LangGraph astream_events 输出转为 SSE 格式"""
+"""流式事件转换工具 - 将 LangGraph astream_events 输出转为 SSE 格式
+这个文件做了一件事：把框架层的、可能含任意对象的异步事件流，
+安全地映射成前端友好的、带语义类型（node_start/token/node_end/error/interrupt）的 SSE 流，
+并通过 current_node 追踪和字段白名单让前端既能实时显示 token，又能拿到干净的节点结果。
+"""
 
 import json
 from typing import AsyncGenerator, Dict, Any

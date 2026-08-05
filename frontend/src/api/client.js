@@ -13,7 +13,8 @@ const api = axios.create({
  * @param {string} userRequest 用户创作需求
  */
 export function createSession(userRequest) {
-  return api.post('/sessions', { user_request: userRequest })
+  // AI 生成世界观+第一段剧情耗时较长（约3-4分钟），放宽到 5 分钟
+  return api.post('/sessions', { user_request: userRequest }, { timeout: 300000 })
 }
 
 /**
@@ -23,10 +24,11 @@ export function createSession(userRequest) {
  * @param {string} payload 可选自定义输入
  */
 export function sendAction(sessionId, action, payload = null) {
+  // 生成剧情耗时较长，放宽到 5 分钟
   return api.post(`/sessions/${sessionId}/action`, {
     action,
     payload,
-  })
+  }, { timeout: 300000 })
 }
 
 /**
@@ -67,7 +69,8 @@ export function deleteSession(sessionId) {
  * @param {string} sessionId 已完成会话 ID
  */
 export function resumeSession(sessionId) {
-  return api.post(`/sessions/${sessionId}/resume`)
+  // 续写需生成新剧情，放宽到 5 分钟
+  return api.post(`/sessions/${sessionId}/resume`, {}, { timeout: 300000 })
 }
 
 /**

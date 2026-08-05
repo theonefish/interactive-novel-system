@@ -1,8 +1,6 @@
 """数据库连接管理 - 支持 PostgreSQL 和 SQLite 切换"""
 
 import os
-import sqlite3
-from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -10,25 +8,6 @@ load_dotenv()
 
 # 环境变量
 DATABASE_URL = os.getenv("DATABASE_URL", "")
-
-
-def get_checkpointer():
-    """获取 checkpointer 实例，根据环境变量自动切换
-
-    - 如果设置了 DATABASE_URL，使用 PostgresSaver
-    - 否则使用 SqliteSaver（开发环境 fallback）
-    """
-    if DATABASE_URL:
-        return _get_postgres_checkpointer()
-    return _get_sqlite_checkpointer()
-
-
-def _get_sqlite_checkpointer():
-    """创建 SQLite checkpointer"""
-    from langgraph.checkpoint.sqlite import SqliteSaver
-
-    conn = sqlite3.connect("novel_sessions.db", check_same_thread=False)
-    return SqliteSaver(conn)
 
 
 def _get_postgres_checkpointer():

@@ -1,6 +1,6 @@
 """图编排测试 - 测试 LangGraph 图构建、节点注册和边路由"""
 
-import pytest
+
 from unittest.mock import patch, MagicMock
 
 from src.graph.state import NovelState
@@ -42,13 +42,6 @@ def _make_state(phase: str = "init", **kwargs) -> NovelState:
 
 class TestGraphBuild:
     """测试图的构建和编译"""
-
-    def test_build_graph_returns_compiled_app(self):
-        from src.graph.workflow import build_graph
-        app = build_graph()
-        assert app is not None
-        assert hasattr(app, "invoke")
-        assert hasattr(app, "astream_events")
 
     def test_build_workflow_has_all_nodes(self):
         from src.graph.workflow import _build_workflow
