@@ -1,33 +1,14 @@
-"""会话元数据存储 - 基于 SQLite 的同步存储
+"""会话元数据存储 - 基于单一 SQLite 库 (novel.db) 的同步存储
 
 提供会话进度摘要（标题、当前阶段、轮次、片段数、预览等）的增删改查。
-使用标准库 sqlite3，与 checkpointer 的 SqliteSaver 保持同步语义。
+使用标准库 sqlite3，与 checkpointer 同库不同表。
 """
 
 import sqlite3
 from datetime import datetime
 from typing import Optional, List
 
-from src.utils.database import get_session_db_path
-
-
-def _init_db(conn: sqlite3.Connection) -> None:
-    """初始化表结构（如不存在则创建）"""
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS session_metas (
-            session_id TEXT PRIMARY KEY,
-            title TEXT,
-            current_phase TEXT,
-            current_turn INTEGER,
-            segment_count INTEGER,
-            preview TEXT,
-            created_at TEXT,
-            updated_at TEXT
-        )
-        """
-    )
-    conn.commit()
+from src.utils.database import get_conn
 
 
 def save_session_meta(meta: dict) -> None:
@@ -38,8 +19,7 @@ def save_session_meta(meta: dict) -> None:
     now = datetime.utcnow().isoformat()
     session_id = meta["session_id"]
 
-    with sqlite3.connect(get_session_db_path()) as conn:
-        _init_db(conn)
+    with get_conn() as conn:
         existing = conn.execute(
             "SELECT created_at FROM session_metas WHERE session_id = ?", (session_id,)
         ).fetchone()
@@ -63,13 +43,11 @@ def save_session_meta(meta: dict) -> None:
             """,
             record,
         )
-        conn.commit()
 
 
 def get_session_meta(session_id: str) -> Optional[dict]:
     """按 session_id 获取单条会话元数据，不存在返回 None。"""
-    with sqlite3.connect(get_session_db_path()) as conn:
-        _init_db(conn)
+    with get_conn() as conn:
         conn.row_factory = sqlite3.Row
         row = conn.execute(
             "SELECT * FROM session_metas WHERE session_id = ?", (session_id,)
@@ -79,8 +57,7 @@ def get_session_meta(session_id: str) -> Optional[dict]:
 
 def list_session_metas() -> List[dict]:
     """获取所有会话元数据，按 updated_at DESC 排序。"""
-    with sqlite3.connect(get_session_db_path()) as conn:
-        _init_db(conn)
+    with get_conn() as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute(
             "SELECT * FROM session_metas ORDER BY updated_at DESC"
@@ -93,8 +70,7 @@ def update_session_meta(session_id: str, updates: dict) -> None:
     now = datetime.utcnow().isoformat()
     updates_with_ts = {**updates, "updated_at": now}
 
-    with sqlite3.connect(get_session_db_path()) as conn:
-        _init_db(conn)
+    with get_conn() as conn:
         set_clauses = []
         values = []
         for key, value in updates_with_ts.items():
@@ -105,14 +81,11 @@ def update_session_meta(session_id: str, updates: dict) -> None:
             f"UPDATE session_metas SET {', '.join(set_clauses)} WHERE session_id = ?",
             values,
         )
-        conn.commit()
 
 
 def delete_session_meta(session_id: str) -> None:
     """按 session_id 删除一条会话元数据。"""
-    with sqlite3.connect(get_session_db_path()) as conn:
-        _init_db(conn)
+    with get_conn() as conn:
         conn.execute(
             "DELETE FROM session_metas WHERE session_id = ?", (session_id,)
         )
-        conn.commit()

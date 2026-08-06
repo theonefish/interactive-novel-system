@@ -1,54 +1,59 @@
-"""数据库连接管理 - 支持 PostgreSQL 和 SQLite 切换"""
+"""数据库连接管理 - 单一 SQLite 库 (novel.db)
+
+所有持久化存储（LangGraph checkpointer、会话元数据、长期记忆）共用同一个
+SQLite 文件，集中管理路径与表初始化，避免多文件分散维护。
+"""
 
 import os
+import sqlite3
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-# 环境变量
-DATABASE_URL = os.getenv("DATABASE_URL", "")
+# 单一数据库文件，位于项目根目录下
+DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "novel.db")
 
 
-def _get_postgres_checkpointer():
-    """创建 PostgreSQL checkpointer"""
-    from langgraph.checkpoint.postgres import PostgresSaver
-
-    checkpointer = PostgresSaver.from_conn_string(DATABASE_URL)
-    return checkpointer
+def get_db_path() -> str:
+    """获取统一数据库文件路径"""
+    return DB_PATH
 
 
-async def setup_postgres():
-    """初始化 PostgreSQL 数据库表（首次使用时调用）"""
-    if not DATABASE_URL:
-        return
-
-    from langgraph.checkpoint.postgres import PostgresSaver
-
-    checkpointer = PostgresSaver.from_conn_string(DATABASE_URL)
-    await checkpointer.setup()
-    return checkpointer
+def get_conn() -> sqlite3.Connection:
+    """打开数据库连接（启用外键、行工厂为字典）并自动建表"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA foreign_keys = ON")
+    _init_tables(conn)
+    return conn
 
 
-def get_database_url() -> str:
-    """获取当前数据库 URL"""
-    return DATABASE_URL or "sqlite:///novel_sessions.db"
-
-
-def get_session_db_path() -> str:
-    """获取会话元数据存储的 SQLite 路径（与 checkpointer 数据库同目录，独立文件）"""
-    checkpointer_db = "novel_sessions.db"
-    db_dir = os.path.dirname(os.path.abspath(checkpointer_db))
-    return os.path.join(db_dir, "novel_sessions_meta.db")
-
-
-def get_long_term_memory_db_path() -> str:
-    """获取长期记忆存储的 SQLite 路径（与会话元数据库同目录，独立文件）"""
-    checkpointer_db = "novel_sessions.db"
-    db_dir = os.path.dirname(os.path.abspath(checkpointer_db))
-    return os.path.join(db_dir, "novel_long_term_memories.db")
-
-
-def is_postgres() -> bool:
-    """判断是否使用 PostgreSQL"""
-    return bool(DATABASE_URL)
+def _init_tables(conn: sqlite3.Connection) -> None:
+    """初始化业务表结构（checkpointer 表由 LangGraph 自行管理，不在此创建）"""
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS session_metas (
+            session_id TEXT PRIMARY KEY,
+            title TEXT,
+            current_phase TEXT,
+            current_turn INTEGER,
+            segment_count INTEGER,
+            preview TEXT,
+            created_at TEXT,
+            updated_at TEXT
+        )
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS long_term_memories (
+            memory_id TEXT PRIMARY KEY,
+            title TEXT,
+            world_setting TEXT,
+            characters TEXT,
+            rules TEXT,
+            story_segments TEXT,
+            memory_state TEXT,
+            final_output TEXT,
+            created_at TEXT,
+            completed_at TEXT
+        )
+        """
+    )
+    conn.commit()

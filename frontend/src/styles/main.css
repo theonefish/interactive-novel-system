@@ -1,0 +1,300 @@
+/* ─── 会话侧边栏基础 ─── */
+.session-sidebar {
+  width: 260px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(15, 23, 42, 0.7); /* 稍微加深一点背景，提升文字对比度 */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(99, 102, 241, 0.12);
+  overflow: hidden;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2); /* 增加右侧轻微阴影产生立体感 */
+}
+
+.sidebar-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.08);
+}
+
+/* ─── 新建按钮 ─── */
+.create-btn {
+  width: 100%;
+  height: 44px; /* 稍微增加高度，提升点击体验 */
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15); /* 增加内发光质感 */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(139, 92, 246, 0.5);
+  filter: brightness(1.1);
+}
+
+.create-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+}
+
+/* ─── 滚动区域 & 优雅滚动条 ─── */
+.session-list-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Webkit 滚动条美化 */
+.session-list-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.session-list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.session-list-scroll::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 4px;
+}
+.session-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+.session-list {
+  padding: 16px 12px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ─── 会话卡片 ─── */
+.session-card {
+  position: relative;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.session-card:hover {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(99, 102, 241, 0.1) inset;
+}
+
+/* 激活状态 */
+.session-card.active {
+  background: linear-gradient(145deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border-color: rgba(129, 140, 248, 0.5);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.2), 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 卡片内部结构 */
+.card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+.session-card:hover .card-title {
+  color: #f1f5f9;
+}
+
+.session-card.active .card-title {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.card-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.mini-tag {
+  font-size: 10px;
+  font-weight: 500;
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.1);
+  padding: 3px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  letter-spacing: 0.3px;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+}
+
+.card-time {
+  font-size: 12px;
+  color: #475569;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ─── 更多操作按钮 ─── */
+.card-more {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0.3; /* 默认半透明，降低视觉干扰 */
+  transition: opacity 0.3s ease;
+}
+
+.session-card:hover .card-more,
+.session-card.active .card-more {
+  opacity: 1;
+}
+
+.more-icon {
+  font-size: 16px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.more-icon:hover {
+  color: #fff;
+  background: rgba(99, 102, 241, 0.25);
+  transform: scale(1.05);
+}
+
+.rename-anchor,
+.delete-anchor {
+  position: absolute;
+  top: 16px;
+  right: 40px;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* ─── 重命名弹层 ─── */
+.rename-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rename-box :deep(.el-input__wrapper) {
+  background: rgba(15, 23, 42, 0.8) !important;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4) inset !important;
+  border-radius: 8px;
+}
+
+.rename-box :deep(.el-input__inner) {
+  color: #f1f5f9;
+}
+
+.rename-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ─── 空状态 ─── */
+.empty-tip {
+  text-align: center;
+  font-size: 13px;
+  color: #475569;
+  padding: 60px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Element Plus 暗色深度适配 ─── */
+/* 下拉菜单 */
+.el-dropdown-menu {
+  background: rgba(30, 41, 59, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  padding: 6px !important;
+}
+
+.el-dropdown-menu .el-dropdown-menu__item {
+  color: #cbd5e1 !important;
+  border-radius: 6px;
+  margin: 2px 0;
+  transition: all 0.2s ease;
+}
+
+.el-dropdown-menu .el-dropdown-menu__item:hover {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #fff !important;
+}
+
+.el-dropdown-menu .el-dropdown-menu__item .el-icon {
+  margin-right: 8px;
+}
+
+/* 阶段标签颜色覆盖 (自带呼吸感) */
+.el-tag.el-tag--primary.el-tag--dark {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.el-tag.el-tag--warning.el-tag--dark {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  border: none;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.el-tag.el-tag--success.el-tag--dark {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: none;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* popconfirm / popover 适配 */
+.el-popconfirm,
+.el-popover.el-popper {
+  background: rgba(30, 41, 59, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  border-radius: 12px !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+.el-popper.is-dark .el-popconfirm__message {
+  color: #f1f5f9;
+  font-weight: 500;
+}

@@ -1,0 +1,1121 @@
+[2026-07-29 20:06:10] [ERROR] [server] [server.py:277] [stream_session] 会话 6dc74076-3778-4c70-a847-7a3d0bb9ede6 流式执行失败：Object of type Command is not JSON serializable
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 266, in event_generator
+    async for sse_event in transform_graph_events(async_gen):
+  File "E:\code\I don't write novels\src\utils\streaming.py", line 35, in transform_graph_events
+    yield format_sse_event("node_start", {
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\code\I don't write novels\src\utils\streaming.py", line 9, in format_sse_event
+    return f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\json\encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\json\encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\json\encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type Command is not JSON serializable
+[2026-07-29 20:07:45] [INFO] [server] [server.py:168] [create_session] 新建会话 c56bd027-a4aa-48c0-9421-55d3b0f5d647，user_request='末日丧尸，主角是个高中生，喜欢的女生变成了丧尸'
+[2026-07-29 20:09:30] [INFO] [server] [server.py:170] [create_session] 会话 c56bd027-a4aa-48c0-9421-55d3b0f5d647 启动完成，phase=story_progressing
+[2026-07-29 20:10:13] [ERROR] [server] [server.py:277] [stream_session] 会话 c56bd027-a4aa-48c0-9421-55d3b0f5d647 流式执行失败：Object of type Command is not JSON serializable
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 266, in event_generator
+    async def event_generator():
+            ^^^^^^^^^^^^^^^^^^^^
+  File "E:\code\I don't write novels\src\utils\streaming.py", line 35, in transform_graph_events
+    yield format_sse_event("node_start", {
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\code\I don't write novels\src\utils\streaming.py", line 9, in format_sse_event
+    return f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\json\encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\json\encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\json\encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type Command is not JSON serializable
+[2026-07-29 20:16:59] [ERROR] [server] [server.py:289] [stream_session] 会话 c56bd027-a4aa-48c0-9421-55d3b0f5d647 流式执行失败：The SqliteSaver does not support async methods. Consider using AsyncSqliteSaver instead.
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+Note: AsyncSqliteSaver requires the aiosqlite package to use.
+Install with:
+`pip install aiosqlite`
+See https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.sqlite.aio.AsyncSqliteSaverfor more information.
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 278, in event_generator
+    async for sse_event in transform_graph_events(async_gen):
+  File "E:\code\I don't write novels\src\utils\streaming.py", line 39, in transform_graph_events
+    async for event in async_gen:
+  File "E:\conda\envs\agent_env\Lib\site-packages\langchain_core\runnables\base.py", line 1658, in _astream_events_v1_v2
+    async for event in event_stream:
+  File "E:\conda\envs\agent_env\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1105, in _astream_events_implementation_v2
+    await task
+  File "E:\conda\envs\agent_env\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1060, in consume_astream
+    async for _ in event_streamer.tap_output_aiter(run_id, stream):
+  File "E:\conda\envs\agent_env\Lib\site-packages\langchain_core\tracers\event_stream.py", line 201, in tap_output_aiter
+    first = await anext(output, sentinel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\site-packages\langgraph\pregel\main.py", line 3368, in astream
+    async with AsyncPregelLoop(
+               ^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\site-packages\langgraph\pregel\_loop.py", line 1888, in __aenter__
+    saved = await self.checkpointer.aget_tuple(self.checkpoint_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\site-packages\langgraph\checkpoint\sqlite\__init__.py", line 592, in aget_tuple
+    raise NotImplementedError(_AIO_ERROR_MSG)
+NotImplementedError: The SqliteSaver does not support async methods. Consider using AsyncSqliteSaver instead.
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+Note: AsyncSqliteSaver requires the aiosqlite package to use.
+Install with:
+`pip install aiosqlite`
+See https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.sqlite.aio.AsyncSqliteSaverfor more information.
+[2026-07-29 20:30:23] [INFO] [server] [server.py:68] [lifespan] 异步图初始化完成
+[2026-07-29 20:30:39] [INFO] [server] [server.py:82] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-30 08:25:01] [INFO] [server] [server.py:68] [lifespan] 异步图初始化完成
+[2026-07-30 08:27:51] [INFO] [server] [server.py:182] [create_session] 新建会话 87f6bcc4-2a4d-45af-b468-f6c54ed22386，user_request='末日废土'
+[2026-07-30 08:29:57] [INFO] [server] [server.py:190] [create_session] 会话 87f6bcc4-2a4d-45af-b468-f6c54ed22386 启动完成，phase=story_progressing
+[2026-07-30 08:35:28] [INFO] [server] [server.py:182] [create_session] 新建会话 2619ecfb-b1bd-4783-a37d-07c4f2c24b8a，user_request='末日废土'
+[2026-07-30 08:37:25] [INFO] [server] [server.py:190] [create_session] 会话 2619ecfb-b1bd-4783-a37d-07c4f2c24b8a 启动完成，phase=story_progressing
+[2026-07-30 08:39:23] [ERROR] [server] [server.py:302] [stream_session] 会话 2619ecfb-b1bd-4783-a37d-07c4f2c24b8a 流式执行失败：Synchronous calls to AsyncSqliteSaver are only allowed from a different thread. From the main thread, use the async interface. For example, use `await checkpointer.aget_tuple(...)` or `await graph.ainvoke(...)`.
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 297, in event_generator
+    state = graph.get_state(config)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\site-packages\langgraph\pregel\main.py", line 1427, in get_state
+    saved = checkpointer.get_tuple(config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\agent_env\Lib\site-packages\langgraph\checkpoint\sqlite\aio.py", line 165, in get_tuple
+    raise asyncio.InvalidStateError(
+asyncio.exceptions.InvalidStateError: Synchronous calls to AsyncSqliteSaver are only allowed from a different thread. From the main thread, use the async interface. For example, use `await checkpointer.aget_tuple(...)` or `await graph.ainvoke(...)`.
+[2026-07-30 08:43:13] [INFO] [server] [server.py:183] [create_session] 新建会话 27bc6d03-1819-4d31-ad17-66797745e136，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 08:43:13] [ERROR] [server] [server.py:194] [create_session] 会话 27bc6d03-1819-4d31-ad17-66797745e136 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [INFO] [server] [server.py:183] [create_session] 新建会话 5f558a35-21a0-4b90-9f1a-cfff7f799ea0，user_request='测试需求'
+[2026-07-30 08:43:26] [ERROR] [server] [server.py:194] [create_session] 会话 5f558a35-21a0-4b90-9f1a-cfff7f799ea0 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [INFO] [server] [server.py:210] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:43:26] [WARNING] [server] [server.py:219] [send_action] 读取当前状态失败：object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [ERROR] [server] [server.py:231] [send_action] 会话 test-session-001 执行失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 222, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [INFO] [server] [server.py:210] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 08:43:26] [WARNING] [server] [server.py:219] [send_action] 读取当前状态失败：object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [ERROR] [server] [server.py:231] [send_action] 会话 test-session-002 执行失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 222, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [INFO] [server] [server.py:210] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 08:43:26] [WARNING] [server] [server.py:219] [send_action] 读取当前状态失败：object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [ERROR] [server] [server.py:231] [send_action] 会话 test-session-003 执行失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 222, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [INFO] [server] [server.py:210] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:43:26] [WARNING] [server] [server.py:219] [send_action] 读取当前状态失败：object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [ERROR] [server] [server.py:231] [send_action] 会话 test-session-005 执行失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 222, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:26] [ERROR] [server] [server.py:250] [get_session] 会话 test-session-001 获取状态失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 242, in get_session
+    state = await graph.aget_state(config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:250] [get_session] 会话 nonexistent-session 获取状态失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 242, in get_session
+    state = await graph.aget_state(config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:250] [get_session] 会话 test-session-error 获取状态失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 242, in get_session
+    state = await graph.aget_state(config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [INFO] [server] [server.py:183] [create_session] 新建会话 79d73d33-4b3c-4b93-a97d-acda80dbcfde，user_request='测试需求'
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:194] [create_session] 会话 79d73d33-4b3c-4b93-a97d-acda80dbcfde 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [INFO] [server] [server.py:183] [create_session] 新建会话 f51aed99-fca3-4495-b51b-1e18d21d0bcf，user_request='测试'
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:194] [create_session] 会话 f51aed99-fca3-4495-b51b-1e18d21d0bcf 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [INFO] [server] [server.py:183] [create_session] 新建会话 075f2437-2329-4fdb-a587-46a722d686ab，user_request='测试'
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:194] [create_session] 会话 075f2437-2329-4fdb-a587-46a722d686ab 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [INFO] [server] [server.py:183] [create_session] 新建会话 1fdd0c2d-5637-4a6b-8c27-daa09734dd88，user_request='测试'
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:194] [create_session] 会话 1fdd0c2d-5637-4a6b-8c27-daa09734dd88 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [INFO] [server] [server.py:183] [create_session] 新建会话 5f2a18f2-e4c4-424a-89d7-45ccef5d3d7d，user_request='测试'
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:194] [create_session] 会话 5f2a18f2-e4c4-424a-89d7-45ccef5d3d7d 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [INFO] [server] [server.py:183] [create_session] 新建会话 4f196ca8-809b-40eb-ae45-e06d502f5673，user_request='测试'
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:194] [create_session] 会话 4f196ca8-809b-40eb-ae45-e06d502f5673 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:43:27] [INFO] [server] [server.py:183] [create_session] 新建会话 2782da0c-06a0-4479-94b8-c52d2f69054b，user_request='测试'
+[2026-07-30 08:43:27] [ERROR] [server] [server.py:194] [create_session] 会话 2782da0c-06a0-4479-94b8-c52d2f69054b 启动失败：object MagicMock can't be used in 'await' expression
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+TypeError: object MagicMock can't be used in 'await' expression
+[2026-07-30 08:44:34] [INFO] [server] [server.py:183] [create_session] 新建会话 2f6ef7c8-6bbd-4f97-b58f-19a21da5e35c，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 08:44:34] [INFO] [server] [server.py:191] [create_session] 会话 2f6ef7c8-6bbd-4f97-b58f-19a21da5e35c 启动完成，phase=story_progressing
+[2026-07-30 08:44:34] [INFO] [server] [server.py:183] [create_session] 新建会话 c87ec9b0-07da-4053-9a88-1e81ec9c5775，user_request='测试需求'
+[2026-07-30 08:44:34] [INFO] [server] [server.py:191] [create_session] 会话 c87ec9b0-07da-4053-9a88-1e81ec9c5775 启动完成，phase=story_progressing
+[2026-07-30 08:44:46] [INFO] [server] [server.py:210] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:44:46] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2418619737440'> tasks=<MagicMock name='mock.tasks' id='2418619818496'>
+[2026-07-30 08:44:46] [INFO] [server] [server.py:228] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 08:44:46] [INFO] [server] [server.py:210] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 08:44:46] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2418619659216'> tasks=<MagicMock name='mock.tasks' id='2418619873936'>
+[2026-07-30 08:44:46] [INFO] [server] [server.py:228] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:210] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2418619736384'> tasks=<MagicMock name='mock.tasks' id='2418619565680'>
+[2026-07-30 08:44:47] [INFO] [server] [server.py:228] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:210] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2418617970752'> tasks=<MagicMock name='mock.tasks' id='2418618002944'>
+[2026-07-30 08:44:47] [INFO] [server] [server.py:228] [send_action] 会话 test-session-005 执行完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:183] [create_session] 新建会话 5ac01445-7885-4a59-b7dc-31d7162398b5，user_request='测试需求'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:191] [create_session] 会话 5ac01445-7885-4a59-b7dc-31d7162398b5 启动完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:183] [create_session] 新建会话 373abe73-f893-480e-a424-0b6e1adb089f，user_request='测试'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:191] [create_session] 会话 373abe73-f893-480e-a424-0b6e1adb089f 启动完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:183] [create_session] 新建会话 ea97208a-67f6-4afc-a435-f80ad6ea0c40，user_request='测试'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:191] [create_session] 会话 ea97208a-67f6-4afc-a435-f80ad6ea0c40 启动完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:183] [create_session] 新建会话 09e988b7-dfb3-48e4-927e-4ce3558cb921，user_request='测试'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:191] [create_session] 会话 09e988b7-dfb3-48e4-927e-4ce3558cb921 启动完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:183] [create_session] 新建会话 8566420e-3ba9-42ac-86cf-4e0e8df72166，user_request='测试'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:191] [create_session] 会话 8566420e-3ba9-42ac-86cf-4e0e8df72166 启动完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:183] [create_session] 新建会话 6ad0272a-4cc0-4cc0-b5fb-3ee285851310，user_request='测试'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:191] [create_session] 会话 6ad0272a-4cc0-4cc0-b5fb-3ee285851310 启动完成，phase=story_progressing
+[2026-07-30 08:44:47] [INFO] [server] [server.py:183] [create_session] 新建会话 d3710bd4-e8c5-44e5-ac13-96820a79dd5b，user_request='测试'
+[2026-07-30 08:44:47] [INFO] [server] [server.py:191] [create_session] 会话 d3710bd4-e8c5-44e5-ac13-96820a79dd5b 启动完成，phase=story_progressing
+[2026-07-30 08:47:07] [INFO] [server] [server.py:183] [create_session] 新建会话 b6a8bfb0-dbe3-4057-9b8d-59ea48b59025，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:191] [create_session] 会话 b6a8bfb0-dbe3-4057-9b8d-59ea48b59025 启动完成，phase=story_progressing
+[2026-07-30 08:47:07] [INFO] [server] [server.py:183] [create_session] 新建会话 563c5de7-c7c5-461c-abdc-494a020e51b6，user_request='测试需求'
+[2026-07-30 08:47:07] [ERROR] [server] [server.py:194] [create_session] 会话 563c5de7-c7c5-461c-abdc-494a020e51b6 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 08:47:07] [INFO] [server] [server.py:210] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2871582783136'> tasks=<MagicMock name='mock.tasks' id='2871582815040'>
+[2026-07-30 08:47:07] [INFO] [server] [server.py:228] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 08:47:07] [INFO] [server] [server.py:210] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2871582917968'> tasks=<MagicMock name='mock.tasks' id='2871582952464'>
+[2026-07-30 08:47:07] [INFO] [server] [server.py:228] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 08:47:07] [INFO] [server] [server.py:210] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2871583041872'> tasks=<MagicMock name='mock.tasks' id='2871583122976'>
+[2026-07-30 08:47:07] [INFO] [server] [server.py:228] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 08:47:07] [INFO] [server] [server.py:210] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2871583040912'> tasks=<MagicMock name='mock.tasks' id='2871582495824'>
+[2026-07-30 08:47:07] [ERROR] [server] [server.py:231] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 222, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 08:47:07] [WARNING] [server] [server.py:244] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 08:47:07] [ERROR] [server] [server.py:250] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 242, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 08:47:07] [INFO] [server] [server.py:183] [create_session] 新建会话 ebd68e6a-aacc-419a-827d-6d8e52ed7e73，user_request='测试需求'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:191] [create_session] 会话 ebd68e6a-aacc-419a-827d-6d8e52ed7e73 启动完成，phase=story_progressing
+[2026-07-30 08:47:07] [INFO] [server] [server.py:183] [create_session] 新建会话 dea27fbd-d86d-4ee3-aff4-0a10fd54169b，user_request='测试'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:191] [create_session] 会话 dea27fbd-d86d-4ee3-aff4-0a10fd54169b 启动完成，phase=init
+[2026-07-30 08:47:07] [INFO] [server] [server.py:183] [create_session] 新建会话 a596e03b-7b51-4954-8b21-d8a5107ee17c，user_request='测试'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:191] [create_session] 会话 a596e03b-7b51-4954-8b21-d8a5107ee17c 启动完成，phase=critic_loop
+[2026-07-30 08:47:07] [INFO] [server] [server.py:183] [create_session] 新建会话 a09cefca-d15f-48a3-9491-075565e06084，user_request='测试'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:191] [create_session] 会话 a09cefca-d15f-48a3-9491-075565e06084 启动完成，phase=world_building
+[2026-07-30 08:47:07] [INFO] [server] [server.py:183] [create_session] 新建会话 335ea84d-c979-4843-9830-4326d3333110，user_request='测试'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:191] [create_session] 会话 335ea84d-c979-4843-9830-4326d3333110 启动完成，phase=completed
+[2026-07-30 08:47:07] [INFO] [server] [server.py:183] [create_session] 新建会话 5978aeb7-26c9-41d6-900d-54afe619bf36，user_request='测试'
+[2026-07-30 08:47:07] [INFO] [server] [server.py:191] [create_session] 会话 5978aeb7-26c9-41d6-900d-54afe619bf36 启动完成，phase=done
+[2026-07-30 08:47:08] [INFO] [server] [server.py:183] [create_session] 新建会话 d444d1f7-be5e-42ae-8f1a-4b6fbf1261fc，user_request='测试'
+[2026-07-30 08:47:08] [INFO] [server] [server.py:191] [create_session] 会话 d444d1f7-be5e-42ae-8f1a-4b6fbf1261fc 启动完成，phase=unknown_state
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 de187039-1287-490c-a9a2-527d879b605a，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:191] [create_session] 会话 de187039-1287-490c-a9a2-527d879b605a 启动完成，phase=story_progressing
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 8d3c95e5-312b-4ff5-a298-6f7d16005e5b，user_request='测试需求'
+[2026-07-30 08:47:42] [ERROR] [server] [server.py:194] [create_session] 会话 8d3c95e5-312b-4ff5-a298-6f7d16005e5b 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 08:47:42] [INFO] [server] [server.py:210] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1594060425584'> tasks=<MagicMock name='mock.tasks' id='1594060338896'>
+[2026-07-30 08:47:42] [INFO] [server] [server.py:228] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 08:47:42] [INFO] [server] [server.py:210] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1594060065904'> tasks=<MagicMock name='mock.tasks' id='1594057191776'>
+[2026-07-30 08:47:42] [INFO] [server] [server.py:228] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 08:47:42] [INFO] [server] [server.py:210] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1594060244592'> tasks=<MagicMock name='mock.tasks' id='1594060366960'>
+[2026-07-30 08:47:42] [INFO] [server] [server.py:228] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 08:47:42] [INFO] [server] [server.py:210] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1594060606480'> tasks=<MagicMock name='mock.tasks' id='1594060638432'>
+[2026-07-30 08:47:42] [ERROR] [server] [server.py:231] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 222, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 08:47:42] [WARNING] [server] [server.py:244] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 08:47:42] [ERROR] [server] [server.py:250] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 242, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 2bfe9c93-e0ca-45c8-ac97-cf726b1d449d，user_request='测试需求'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:191] [create_session] 会话 2bfe9c93-e0ca-45c8-ac97-cf726b1d449d 启动完成，phase=story_progressing
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 f34008bc-69df-44e4-ab81-f6c6bd09ca7a，user_request='测试'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:191] [create_session] 会话 f34008bc-69df-44e4-ab81-f6c6bd09ca7a 启动完成，phase=init
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 621efec4-a495-4d2d-a3ab-a5fb5a4a6043，user_request='测试'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:191] [create_session] 会话 621efec4-a495-4d2d-a3ab-a5fb5a4a6043 启动完成，phase=critic_loop
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 afd2d3d5-74cb-419a-a249-f993f010bce1，user_request='测试'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:191] [create_session] 会话 afd2d3d5-74cb-419a-a249-f993f010bce1 启动完成，phase=world_building
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 01921bc2-0201-4d2b-b66e-cd77ff4c2746，user_request='测试'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:191] [create_session] 会话 01921bc2-0201-4d2b-b66e-cd77ff4c2746 启动完成，phase=completed
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 c19efcc4-cff1-4a23-92a8-8381dcaa9ea2，user_request='测试'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:191] [create_session] 会话 c19efcc4-cff1-4a23-92a8-8381dcaa9ea2 启动完成，phase=done
+[2026-07-30 08:47:42] [INFO] [server] [server.py:183] [create_session] 新建会话 fe0d4709-5416-49bd-872b-4b149ac6d67f，user_request='测试'
+[2026-07-30 08:47:42] [INFO] [server] [server.py:191] [create_session] 会话 fe0d4709-5416-49bd-872b-4b149ac6d67f 启动完成，phase=unknown_state
+[2026-07-30 08:49:46] [INFO] [server] [server.py:183] [create_session] 新建会话 b29e05cd-30de-4e85-bd5f-7884f5d5b076，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 08:49:46] [INFO] [server] [server.py:191] [create_session] 会话 b29e05cd-30de-4e85-bd5f-7884f5d5b076 启动完成，phase=story_progressing
+[2026-07-30 08:49:46] [INFO] [server] [server.py:183] [create_session] 新建会话 21ab1337-8234-4b16-967a-0fd041c069b5，user_request='测试需求'
+[2026-07-30 08:49:46] [ERROR] [server] [server.py:194] [create_session] 会话 21ab1337-8234-4b16-967a-0fd041c069b5 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 08:49:46] [INFO] [server] [server.py:210] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:49:46] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2733099349808'> tasks=<MagicMock name='mock.tasks' id='2733100856176'>
+[2026-07-30 08:49:46] [INFO] [server] [server.py:228] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 08:49:47] [INFO] [server] [server.py:210] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2733100933728'> tasks=<MagicMock name='mock.tasks' id='2733101174544'>
+[2026-07-30 08:49:47] [INFO] [server] [server.py:228] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 08:49:47] [INFO] [server] [server.py:210] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2733101247904'> tasks=<MagicMock name='mock.tasks' id='2733101296240'>
+[2026-07-30 08:49:47] [INFO] [server] [server.py:228] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 08:49:47] [INFO] [server] [server.py:210] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:215] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2733101475792'> tasks=<MagicMock name='mock.tasks' id='2733101507744'>
+[2026-07-30 08:49:47] [ERROR] [server] [server.py:231] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 222, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 08:49:47] [WARNING] [server] [server.py:244] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 08:49:47] [ERROR] [server] [server.py:250] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 242, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 08:49:47] [INFO] [server] [server.py:183] [create_session] 新建会话 85cd3971-d31d-4e6e-8f54-e581e3f80b49，user_request='测试需求'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:191] [create_session] 会话 85cd3971-d31d-4e6e-8f54-e581e3f80b49 启动完成，phase=story_progressing
+[2026-07-30 08:49:47] [INFO] [server] [server.py:183] [create_session] 新建会话 6926163a-7871-452c-ad1b-e3ad689b8a46，user_request='测试'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:191] [create_session] 会话 6926163a-7871-452c-ad1b-e3ad689b8a46 启动完成，phase=init
+[2026-07-30 08:49:47] [INFO] [server] [server.py:183] [create_session] 新建会话 4856d8db-d124-4d3a-b1e8-1456452095a4，user_request='测试'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:191] [create_session] 会话 4856d8db-d124-4d3a-b1e8-1456452095a4 启动完成，phase=critic_loop
+[2026-07-30 08:49:47] [INFO] [server] [server.py:183] [create_session] 新建会话 cee9189b-cad6-49b2-9b09-8704c6fd41b3，user_request='测试'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:191] [create_session] 会话 cee9189b-cad6-49b2-9b09-8704c6fd41b3 启动完成，phase=world_building
+[2026-07-30 08:49:47] [INFO] [server] [server.py:183] [create_session] 新建会话 2de03235-79bd-4706-9d8a-b21fa3d3fa42，user_request='测试'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:191] [create_session] 会话 2de03235-79bd-4706-9d8a-b21fa3d3fa42 启动完成，phase=completed
+[2026-07-30 08:49:47] [INFO] [server] [server.py:183] [create_session] 新建会话 9dd20110-b7ba-4c16-afc6-66436fc3145a，user_request='测试'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:191] [create_session] 会话 9dd20110-b7ba-4c16-afc6-66436fc3145a 启动完成，phase=done
+[2026-07-30 08:49:47] [INFO] [server] [server.py:183] [create_session] 新建会话 309b6a22-a4a7-4fff-bf7b-0b1eb31f5a50，user_request='测试'
+[2026-07-30 08:49:47] [INFO] [server] [server.py:191] [create_session] 会话 309b6a22-a4a7-4fff-bf7b-0b1eb31f5a50 启动完成，phase=unknown_state
+[2026-07-30 08:50:25] [INFO] [server] [server.py:82] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-30 08:50:38] [INFO] [server] [server.py:68] [lifespan] 异步图初始化完成
+[2026-07-30 08:56:05] [INFO] [server] [server.py:82] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-30 09:16:27] [INFO] [server] [server.py:182] [create_session] 新建会话 691580b1-83b0-479f-81d2-a6929c86dcd8，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:190] [create_session] 会话 691580b1-83b0-479f-81d2-a6929c86dcd8 启动完成，phase=story_progressing
+[2026-07-30 09:16:27] [INFO] [server] [server.py:182] [create_session] 新建会话 f196473d-ca2d-49ce-87aa-0e187fb92aa6，user_request='测试需求'
+[2026-07-30 09:16:27] [ERROR] [server] [server.py:202] [create_session] 会话 f196473d-ca2d-49ce-87aa-0e187fb92aa6 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 184, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 09:16:27] [INFO] [server] [server.py:218] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2904814537072'> tasks=<MagicMock name='mock.tasks' id='2904814552784'>
+[2026-07-30 09:16:27] [INFO] [server] [server.py:236] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 09:16:27] [INFO] [server] [server.py:218] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2904814599328'> tasks=<MagicMock name='mock.tasks' id='2904814400944'>
+[2026-07-30 09:16:27] [INFO] [server] [server.py:236] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 09:16:27] [INFO] [server] [server.py:218] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2904814081104'> tasks=<MagicMock name='mock.tasks' id='2904814636576'>
+[2026-07-30 09:16:27] [INFO] [server] [server.py:236] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 09:16:27] [INFO] [server] [server.py:218] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2904814206640'> tasks=<MagicMock name='mock.tasks' id='2904814190848'>
+[2026-07-30 09:16:27] [ERROR] [server] [server.py:246] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 230, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 09:16:27] [WARNING] [server] [server.py:259] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 09:16:27] [ERROR] [server] [server.py:265] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 257, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 09:16:27] [INFO] [server] [server.py:182] [create_session] 新建会话 62024b89-e9dc-467c-8922-ee3cbb729f7a，user_request='测试需求'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:190] [create_session] 会话 62024b89-e9dc-467c-8922-ee3cbb729f7a 启动完成，phase=story_progressing
+[2026-07-30 09:16:27] [INFO] [server] [server.py:182] [create_session] 新建会话 db4b8a16-5fe3-48a9-ba96-1036f42a17f6，user_request='测试'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:190] [create_session] 会话 db4b8a16-5fe3-48a9-ba96-1036f42a17f6 启动完成，phase=init
+[2026-07-30 09:16:27] [INFO] [server] [server.py:182] [create_session] 新建会话 09adda38-bd7b-4133-8411-c01205cdfcfe，user_request='测试'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:190] [create_session] 会话 09adda38-bd7b-4133-8411-c01205cdfcfe 启动完成，phase=critic_loop
+[2026-07-30 09:16:27] [INFO] [server] [server.py:182] [create_session] 新建会话 a904a5a6-d41c-40b5-ac94-1b762b13e55f，user_request='测试'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:190] [create_session] 会话 a904a5a6-d41c-40b5-ac94-1b762b13e55f 启动完成，phase=world_building
+[2026-07-30 09:16:27] [INFO] [server] [server.py:182] [create_session] 新建会话 e79f09e3-3885-48f8-a6de-8bda4ae650ff，user_request='测试'
+[2026-07-30 09:16:27] [INFO] [server] [server.py:190] [create_session] 会话 e79f09e3-3885-48f8-a6de-8bda4ae650ff 启动完成，phase=completed
+[2026-07-30 09:16:28] [INFO] [server] [server.py:182] [create_session] 新建会话 c9192020-2c64-46ec-8dda-5f41bb77b8d0，user_request='测试'
+[2026-07-30 09:16:28] [INFO] [server] [server.py:190] [create_session] 会话 c9192020-2c64-46ec-8dda-5f41bb77b8d0 启动完成，phase=done
+[2026-07-30 09:16:28] [INFO] [server] [server.py:182] [create_session] 新建会话 c06bd949-bce0-404d-bdeb-e9875b26dab1，user_request='测试'
+[2026-07-30 09:16:28] [INFO] [server] [server.py:190] [create_session] 会话 c06bd949-bce0-404d-bdeb-e9875b26dab1 启动完成，phase=unknown_state
+[2026-07-30 09:16:28] [INFO] [server] [server.py:182] [create_session] 新建会话 beb9a472-5524-4f8e-9968-c627a8f73dec，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 09:16:28] [INFO] [server] [server.py:190] [create_session] 会话 beb9a472-5524-4f8e-9968-c627a8f73dec 启动完成，phase=story_progressing
+[2026-07-30 09:16:28] [INFO] [server] [server.py:218] [send_action] 会话 test-session-action 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:16:28] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2904814387600'> tasks=<MagicMock name='mock.tasks' id='2904814766064'>
+[2026-07-30 09:16:28] [INFO] [server] [server.py:236] [send_action] 会话 test-session-action 执行完成，phase=story_progressing
+[2026-07-30 09:17:22] [INFO] [server] [server.py:182] [create_session] 新建会话 6dce00e0-a0bf-4a3e-8c80-2d8ad3f5dba0，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 09:17:22] [INFO] [server] [server.py:190] [create_session] 会话 6dce00e0-a0bf-4a3e-8c80-2d8ad3f5dba0 启动完成，phase=story_progressing
+[2026-07-30 09:17:22] [INFO] [server] [server.py:182] [create_session] 新建会话 d53828d6-a15b-44c8-b84d-104de23d7339，user_request='测试需求'
+[2026-07-30 09:17:22] [ERROR] [server] [server.py:202] [create_session] 会话 d53828d6-a15b-44c8-b84d-104de23d7339 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 184, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 09:17:22] [INFO] [server] [server.py:218] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:17:22] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1986953038960'> tasks=<MagicMock name='mock.tasks' id='1986953087440'>
+[2026-07-30 09:17:22] [INFO] [server] [server.py:236] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 09:17:22] [INFO] [server] [server.py:218] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 09:17:22] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1986953232592'> tasks=<MagicMock name='mock.tasks' id='1986953248240'>
+[2026-07-30 09:17:22] [INFO] [server] [server.py:236] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 09:17:22] [INFO] [server] [server.py:218] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 09:17:22] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1986953271840'> tasks=<MagicMock name='mock.tasks' id='1986953139424'>
+[2026-07-30 09:17:22] [INFO] [server] [server.py:236] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 09:17:22] [INFO] [server] [server.py:218] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:17:22] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1986952838352'> tasks=<MagicMock name='mock.tasks' id='1986952879344'>
+[2026-07-30 09:17:22] [ERROR] [server] [server.py:246] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 230, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 09:17:22] [WARNING] [server] [server.py:259] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 09:17:22] [ERROR] [server] [server.py:265] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 257, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 09:17:23] [INFO] [server] [server.py:182] [create_session] 新建会话 3a05d508-eecb-4d45-8a45-c2d06456fda4，user_request='测试需求'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:190] [create_session] 会话 3a05d508-eecb-4d45-8a45-c2d06456fda4 启动完成，phase=story_progressing
+[2026-07-30 09:17:23] [INFO] [server] [server.py:182] [create_session] 新建会话 dec60ab3-a8ac-4090-9b11-335a77bfce0f，user_request='测试'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:190] [create_session] 会话 dec60ab3-a8ac-4090-9b11-335a77bfce0f 启动完成，phase=init
+[2026-07-30 09:17:23] [INFO] [server] [server.py:182] [create_session] 新建会话 35dc11b6-f5a0-446e-9736-8a2eb10686d1，user_request='测试'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:190] [create_session] 会话 35dc11b6-f5a0-446e-9736-8a2eb10686d1 启动完成，phase=critic_loop
+[2026-07-30 09:17:23] [INFO] [server] [server.py:182] [create_session] 新建会话 274f2311-9421-4cad-9de5-07b76ba61538，user_request='测试'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:190] [create_session] 会话 274f2311-9421-4cad-9de5-07b76ba61538 启动完成，phase=world_building
+[2026-07-30 09:17:23] [INFO] [server] [server.py:182] [create_session] 新建会话 d495dfb0-9f90-4fdf-89bc-f69ae39c7fe5，user_request='测试'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:190] [create_session] 会话 d495dfb0-9f90-4fdf-89bc-f69ae39c7fe5 启动完成，phase=completed
+[2026-07-30 09:17:23] [INFO] [server] [server.py:182] [create_session] 新建会话 7ff4c30b-7838-46ff-9e9c-4bbbdda3144a，user_request='测试'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:190] [create_session] 会话 7ff4c30b-7838-46ff-9e9c-4bbbdda3144a 启动完成，phase=done
+[2026-07-30 09:17:23] [INFO] [server] [server.py:182] [create_session] 新建会话 e76ac0c4-67f5-4cb0-9762-73d83769e9d1，user_request='测试'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:190] [create_session] 会话 e76ac0c4-67f5-4cb0-9762-73d83769e9d1 启动完成，phase=unknown_state
+[2026-07-30 09:17:23] [INFO] [server] [server.py:182] [create_session] 新建会话 1e11eaf3-c2b4-4a8e-95b9-cd61594b63f6，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:190] [create_session] 会话 1e11eaf3-c2b4-4a8e-95b9-cd61594b63f6 启动完成，phase=story_progressing
+[2026-07-30 09:17:23] [INFO] [server] [server.py:218] [send_action] 会话 test-session-action 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:17:23] [INFO] [server] [server.py:223] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1986952995040'> tasks=<MagicMock name='mock.tasks' id='1986953188816'>
+[2026-07-30 09:17:23] [INFO] [server] [server.py:236] [send_action] 会话 test-session-action 执行完成，phase=story_progressing
+[2026-07-30 09:24:01] [INFO] [server] [server.py:73] [lifespan] 异步图初始化完成
+[2026-07-30 09:24:14] [INFO] [server] [server.py:182] [create_session] 新建会话 cda51906-a01c-460c-bc9e-b153db6c45eb，user_request='2031年，"大寂静"电磁灾难摧毁了全球90%电子设备。\n三年后文明崩塌，幸存者以小型聚落挣扎求生。\n辐射区扩张，"灰潮"变异生物夜间出没...'
+[2026-07-30 09:26:36] [INFO] [server] [server.py:190] [create_session] 会话 cda51906-a01c-460c-bc9e-b153db6c45eb 启动完成，phase=story_progressing
+[2026-07-30 09:45:42] [INFO] [server] [server.py:87] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-30 09:46:02] [INFO] [server] [server.py:183] [create_session] 新建会话 4af375c7-6344-4e39-8c0d-367b63c81894，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 09:46:02] [INFO] [server] [server.py:191] [create_session] 会话 4af375c7-6344-4e39-8c0d-367b63c81894 启动完成，phase=story_progressing
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 39bdd653-f9f9-400d-bc53-2f1948b28e47，user_request='测试需求'
+[2026-07-30 09:46:03] [ERROR] [server] [server.py:203] [create_session] 会话 39bdd653-f9f9-400d-bc53-2f1948b28e47 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 09:46:03] [INFO] [server] [server.py:219] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1872793915296'> tasks=<MagicMock name='mock.tasks' id='1872793931008'>
+[2026-07-30 09:46:03] [INFO] [server] [server.py:237] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 09:46:03] [INFO] [server] [server.py:219] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1872794084080'> tasks=<MagicMock name='mock.tasks' id='1872794132368'>
+[2026-07-30 09:46:03] [INFO] [server] [server.py:237] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 09:46:03] [INFO] [server] [server.py:219] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1872794078512'> tasks=<MagicMock name='mock.tasks' id='1872794012352'>
+[2026-07-30 09:46:03] [INFO] [server] [server.py:237] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 09:46:03] [INFO] [server] [server.py:219] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1872793732576'> tasks=<MagicMock name='mock.tasks' id='1872793707344'>
+[2026-07-30 09:46:03] [ERROR] [server] [server.py:250] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 231, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 09:46:03] [WARNING] [server] [server.py:263] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 09:46:03] [ERROR] [server] [server.py:269] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 261, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 5320952d-2959-4038-884e-6fed26152468，user_request='测试需求'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:191] [create_session] 会话 5320952d-2959-4038-884e-6fed26152468 启动完成，phase=story_progressing
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 93355012-e97c-459b-ae92-1000ab8e352c，user_request='测试'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:191] [create_session] 会话 93355012-e97c-459b-ae92-1000ab8e352c 启动完成，phase=init
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 74fb0e2d-ce56-4465-8083-9348b37cef53，user_request='测试'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:191] [create_session] 会话 74fb0e2d-ce56-4465-8083-9348b37cef53 启动完成，phase=critic_loop
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 e3b550d2-c36c-4eff-aa5b-c92f7c9ffe44，user_request='测试'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:191] [create_session] 会话 e3b550d2-c36c-4eff-aa5b-c92f7c9ffe44 启动完成，phase=world_building
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 3a4056c8-388c-4c5f-a6cb-fd4f9185312c，user_request='测试'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:191] [create_session] 会话 3a4056c8-388c-4c5f-a6cb-fd4f9185312c 启动完成，phase=completed
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 798f802f-1ac8-40dd-9cbd-b3db56ae0385，user_request='测试'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:191] [create_session] 会话 798f802f-1ac8-40dd-9cbd-b3db56ae0385 启动完成，phase=done
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 7c506d29-c676-4fe1-93b3-7c64ead82392，user_request='测试'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:191] [create_session] 会话 7c506d29-c676-4fe1-93b3-7c64ead82392 启动完成，phase=unknown_state
+[2026-07-30 09:46:03] [INFO] [server] [server.py:183] [create_session] 新建会话 2effbe77-eff1-4f8f-9218-3b2837d408d7，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:191] [create_session] 会话 2effbe77-eff1-4f8f-9218-3b2837d408d7 启动完成，phase=story_progressing
+[2026-07-30 09:46:03] [INFO] [server] [server.py:219] [send_action] 会话 test-session-action 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1872793023152'> tasks=<MagicMock name='mock.tasks' id='1872793579776'>
+[2026-07-30 09:46:03] [INFO] [server] [server.py:237] [send_action] 会话 test-session-action 执行完成，phase=story_progressing
+[2026-07-30 09:46:03] [INFO] [server] [server.py:408] [resume_session] 从记忆 orig-001 续写为新会话 6cad4c8d-53b1-470b-8028-fde2365ed48a
+[2026-07-30 09:46:03] [INFO] [server] [server.py:415] [resume_session] 会话 6cad4c8d-53b1-470b-8028-fde2365ed48a 启动完成，phase=story_progressing
+[2026-07-30 09:46:03] [INFO] [server] [server.py:219] [send_action] 会话 done-session 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 09:46:03] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1872794260176'> tasks=<MagicMock name='mock.tasks' id='1872793732096'>
+[2026-07-30 09:46:03] [INFO] [server] [server.py:237] [send_action] 会话 done-session 执行完成，phase=done
+[2026-07-30 09:46:04] [INFO] [server] [server.py:219] [send_action] 会话 progressing-session 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:46:04] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1872793966896'> tasks=<MagicMock name='mock.tasks' id='1872793013456'>
+[2026-07-30 09:46:04] [INFO] [server] [server.py:237] [send_action] 会话 progressing-session 执行完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 bb9a9847-e4de-4297-89ad-cb87501ea0d9，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 bb9a9847-e4de-4297-89ad-cb87501ea0d9 启动完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 e0e48b42-d86f-4435-9d44-1bea264a8a34，user_request='测试需求'
+[2026-07-30 09:46:53] [ERROR] [server] [server.py:203] [create_session] 会话 e0e48b42-d86f-4435-9d44-1bea264a8a34 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 09:46:53] [INFO] [server] [server.py:219] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2838244954400'> tasks=<MagicMock name='mock.tasks' id='2838244901744'>
+[2026-07-30 09:46:53] [INFO] [server] [server.py:237] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:219] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2838243407472'> tasks=<MagicMock name='mock.tasks' id='2838244530096'>
+[2026-07-30 09:46:53] [INFO] [server] [server.py:237] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:219] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2838244926624'> tasks=<MagicMock name='mock.tasks' id='2838244840624'>
+[2026-07-30 09:46:53] [INFO] [server] [server.py:237] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:219] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2838244630272'> tasks=<MagicMock name='mock.tasks' id='2838244884384'>
+[2026-07-30 09:46:53] [ERROR] [server] [server.py:250] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 231, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 09:46:53] [WARNING] [server] [server.py:263] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 09:46:53] [ERROR] [server] [server.py:269] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 261, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 5032eba5-5454-4ef5-804f-11682a9c43fc，user_request='测试需求'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 5032eba5-5454-4ef5-804f-11682a9c43fc 启动完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 9ae88d0f-bf97-47a8-9663-1788553f81df，user_request='测试'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 9ae88d0f-bf97-47a8-9663-1788553f81df 启动完成，phase=init
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 0f4cb8f8-6fe7-4d6f-bd54-3104052a7f5c，user_request='测试'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 0f4cb8f8-6fe7-4d6f-bd54-3104052a7f5c 启动完成，phase=critic_loop
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 d697575e-5cb9-4cbe-8106-c1f739c722b4，user_request='测试'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 d697575e-5cb9-4cbe-8106-c1f739c722b4 启动完成，phase=world_building
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 2c75c674-14bd-41d3-8f06-68369b59800d，user_request='测试'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 2c75c674-14bd-41d3-8f06-68369b59800d 启动完成，phase=completed
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 407ea39d-c784-4f86-9f29-85c2f3ea7130，user_request='测试'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 407ea39d-c784-4f86-9f29-85c2f3ea7130 启动完成，phase=done
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 3f13c22b-a079-42d6-a44f-ff9f7b059520，user_request='测试'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 3f13c22b-a079-42d6-a44f-ff9f7b059520 启动完成，phase=unknown_state
+[2026-07-30 09:46:53] [INFO] [server] [server.py:183] [create_session] 新建会话 81c96b95-fe5b-45d8-bcae-10e5b78e09e7，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:191] [create_session] 会话 81c96b95-fe5b-45d8-bcae-10e5b78e09e7 启动完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:219] [send_action] 会话 test-session-action 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2838244570208'> tasks=<MagicMock name='mock.tasks' id='2838245568240'>
+[2026-07-30 09:46:53] [INFO] [server] [server.py:237] [send_action] 会话 test-session-action 执行完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:408] [resume_session] 从记忆 orig-001 续写为新会话 1a227b93-3745-4c7f-b88c-70d88e5fc48a
+[2026-07-30 09:46:53] [INFO] [server] [server.py:415] [resume_session] 会话 1a227b93-3745-4c7f-b88c-70d88e5fc48a 启动完成，phase=story_progressing
+[2026-07-30 09:46:53] [INFO] [server] [server.py:219] [send_action] 会话 done-session 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2838243270304'> tasks=<MagicMock name='mock.tasks' id='2838245099888'>
+[2026-07-30 09:46:53] [INFO] [server] [server.py:237] [send_action] 会话 done-session 执行完成，phase=done
+[2026-07-30 09:46:53] [INFO] [server] [server.py:219] [send_action] 会话 progressing-session 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 09:46:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2838244671888'> tasks=<MagicMock name='mock.tasks' id='2838245104496'>
+[2026-07-30 09:46:53] [INFO] [server] [server.py:237] [send_action] 会话 progressing-session 执行完成，phase=story_progressing
+[2026-07-30 09:48:59] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-30 09:49:55] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-30 09:51:06] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-30 09:52:13] [INFO] [server] [server.py:183] [create_session] 新建会话 0b0f0027-95e1-4395-9030-659a191d5635，user_request='明天太阳依旧升起，刘慈欣样式科幻'
+[2026-07-30 09:54:12] [INFO] [server] [server.py:191] [create_session] 会话 0b0f0027-95e1-4395-9030-659a191d5635 启动完成，phase=story_progressing
+[2026-07-30 10:04:28] [INFO] [server] [server.py:408] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 b4bd28dd-3d89-4c3a-8988-7b9b154e3ed7
+[2026-07-30 10:04:28] [INFO] [server] [server.py:415] [resume_session] 会话 b4bd28dd-3d89-4c3a-8988-7b9b154e3ed7 启动完成，phase=story_progressing
+[2026-07-30 10:07:53] [INFO] [server] [server.py:183] [create_session] 新建会话 f0c01d4b-adc8-41c9-b234-28771fff1297，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 10:07:53] [INFO] [server] [server.py:191] [create_session] 会话 f0c01d4b-adc8-41c9-b234-28771fff1297 启动完成，phase=story_progressing
+[2026-07-30 10:07:53] [INFO] [server] [server.py:183] [create_session] 新建会话 9831b2e8-7563-4949-a4a7-c4b6324f5dba，user_request='测试需求'
+[2026-07-30 10:07:53] [ERROR] [server] [server.py:203] [create_session] 会话 9831b2e8-7563-4949-a4a7-c4b6324f5dba 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 10:07:53] [INFO] [server] [server.py:219] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 10:07:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2284649542176'> tasks=<MagicMock name='mock.tasks' id='2284649574272'>
+[2026-07-30 10:07:53] [INFO] [server] [server.py:237] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 10:07:53] [INFO] [server] [server.py:219] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 10:07:53] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2284649544960'> tasks=<MagicMock name='mock.tasks' id='2284649483808'>
+[2026-07-30 10:07:53] [INFO] [server] [server.py:237] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 10:07:54] [INFO] [server] [server.py:219] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2284649266672'> tasks=<MagicMock name='mock.tasks' id='2284648312224'>
+[2026-07-30 10:07:54] [INFO] [server] [server.py:237] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 10:07:54] [INFO] [server] [server.py:219] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2284649765840'> tasks=<MagicMock name='mock.tasks' id='2284649816720'>
+[2026-07-30 10:07:54] [ERROR] [server] [server.py:250] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 231, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 10:07:54] [WARNING] [server] [server.py:263] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 10:07:54] [ERROR] [server] [server.py:269] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 261, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 10:07:54] [INFO] [server] [server.py:183] [create_session] 新建会话 bfa9de3b-69a7-4a8d-9f34-310ea883ba31，user_request='测试需求'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:191] [create_session] 会话 bfa9de3b-69a7-4a8d-9f34-310ea883ba31 启动完成，phase=story_progressing
+[2026-07-30 10:07:54] [INFO] [server] [server.py:183] [create_session] 新建会话 4bb7deae-de5d-4567-99b6-6eeeb79d977e，user_request='测试'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:191] [create_session] 会话 4bb7deae-de5d-4567-99b6-6eeeb79d977e 启动完成，phase=init
+[2026-07-30 10:07:54] [INFO] [server] [server.py:183] [create_session] 新建会话 deb11cd0-33dd-4575-a33e-f04761c9ef38，user_request='测试'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:191] [create_session] 会话 deb11cd0-33dd-4575-a33e-f04761c9ef38 启动完成，phase=critic_loop
+[2026-07-30 10:07:54] [INFO] [server] [server.py:183] [create_session] 新建会话 0e30376a-3a4a-48cb-8f52-541c9da4e221，user_request='测试'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:191] [create_session] 会话 0e30376a-3a4a-48cb-8f52-541c9da4e221 启动完成，phase=world_building
+[2026-07-30 10:07:54] [INFO] [server] [server.py:183] [create_session] 新建会话 63ef49b7-6940-4eda-897e-a33a98acf259，user_request='测试'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:191] [create_session] 会话 63ef49b7-6940-4eda-897e-a33a98acf259 启动完成，phase=completed
+[2026-07-30 10:07:54] [INFO] [server] [server.py:183] [create_session] 新建会话 ded76c2f-5f56-452b-81f4-4d470575de71，user_request='测试'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:191] [create_session] 会话 ded76c2f-5f56-452b-81f4-4d470575de71 启动完成，phase=done
+[2026-07-30 10:07:54] [INFO] [server] [server.py:183] [create_session] 新建会话 1ec4407f-9c12-4a58-8cdd-4deb8343f931，user_request='测试'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:191] [create_session] 会话 1ec4407f-9c12-4a58-8cdd-4deb8343f931 启动完成，phase=unknown_state
+[2026-07-30 10:07:54] [INFO] [server] [server.py:183] [create_session] 新建会话 d2fb1c31-907a-4bb9-83cb-20899ef0cd6e，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:191] [create_session] 会话 d2fb1c31-907a-4bb9-83cb-20899ef0cd6e 启动完成，phase=story_progressing
+[2026-07-30 10:07:54] [INFO] [server] [server.py:219] [send_action] 会话 test-session-action 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2284649520704'> tasks=<MagicMock name='mock.tasks' id='2284649042976'>
+[2026-07-30 10:07:54] [INFO] [server] [server.py:237] [send_action] 会话 test-session-action 执行完成，phase=story_progressing
+[2026-07-30 10:07:54] [INFO] [server] [server.py:408] [resume_session] 从记忆 orig-001 续写为新会话 9e6e1381-3a8b-4b01-942f-c54bbeb12bbf
+[2026-07-30 10:07:54] [INFO] [server] [server.py:415] [resume_session] 会话 9e6e1381-3a8b-4b01-942f-c54bbeb12bbf 启动完成，phase=story_progressing
+[2026-07-30 10:07:54] [INFO] [server] [server.py:219] [send_action] 会话 done-session 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2284647386656'> tasks=<MagicMock name='mock.tasks' id='2284649521040'>
+[2026-07-30 10:07:54] [INFO] [server] [server.py:237] [send_action] 会话 done-session 执行完成，phase=done
+[2026-07-30 10:07:54] [INFO] [server] [server.py:219] [send_action] 会话 progressing-session 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 10:07:54] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='2284649253088'> tasks=<MagicMock name='mock.tasks' id='2284647604976'>
+[2026-07-30 10:07:54] [INFO] [server] [server.py:237] [send_action] 会话 progressing-session 执行完成，phase=story_progressing
+[2026-07-30 10:07:59] [INFO] [server] [server.py:408] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 33c72af1-52a6-41ba-a90a-7e9b3d2fca20
+[2026-07-30 10:07:59] [INFO] [server] [server.py:415] [resume_session] 会话 33c72af1-52a6-41ba-a90a-7e9b3d2fca20 启动完成，phase=story_progressing
+[2026-07-30 10:08:05] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-30 10:09:01] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-30 10:09:39] [INFO] [server] [server.py:408] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 8d502f6d-fe15-4f02-8718-0a0a52057752
+[2026-07-30 10:09:40] [INFO] [server] [server.py:415] [resume_session] 会话 8d502f6d-fe15-4f02-8718-0a0a52057752 启动完成，phase=story_progressing
+[2026-07-30 10:15:49] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-30 10:19:57] [INFO] [server] [server.py:183] [create_session] 新建会话 93c3ab28-5e62-40af-9923-2470fcf085ff，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 10:19:57] [INFO] [server] [server.py:191] [create_session] 会话 93c3ab28-5e62-40af-9923-2470fcf085ff 启动完成，phase=story_progressing
+[2026-07-30 10:19:57] [INFO] [server] [server.py:183] [create_session] 新建会话 762b6bce-6736-4f15-a987-02f7e591c57d，user_request='测试需求'
+[2026-07-30 10:19:57] [ERROR] [server] [server.py:203] [create_session] 会话 762b6bce-6736-4f15-a987-02f7e591c57d 启动失败：LLM 调用失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: LLM 调用失败
+[2026-07-30 10:19:57] [INFO] [server] [server.py:219] [send_action] 会话 test-session-001 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 10:19:57] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1668166013120'> tasks=<MagicMock name='mock.tasks' id='1668165960368'>
+[2026-07-30 10:19:57] [INFO] [server] [server.py:237] [send_action] 会话 test-session-001 执行完成，phase=story_progressing
+[2026-07-30 10:19:57] [INFO] [server] [server.py:219] [send_action] 会话 test-session-002 收到操作 action='custom' payload='我想探索左边的小路' -> user_input='我想探索左边的小路'
+[2026-07-30 10:19:57] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1668165060640'> tasks=<MagicMock name='mock.tasks' id='1668165569792'>
+[2026-07-30 10:19:57] [INFO] [server] [server.py:237] [send_action] 会话 test-session-002 执行完成，phase=story_progressing
+[2026-07-30 10:19:57] [INFO] [server] [server.py:219] [send_action] 会话 test-session-003 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 10:19:57] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1668165985536'> tasks=<MagicMock name='mock.tasks' id='1668165899440'>
+[2026-07-30 10:19:57] [INFO] [server] [server.py:237] [send_action] 会话 test-session-003 执行完成，phase=story_progressing
+[2026-07-30 10:19:57] [INFO] [server] [server.py:219] [send_action] 会话 test-session-005 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 10:19:57] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1668165689088'> tasks=<MagicMock name='mock.tasks' id='1668165943056'>
+[2026-07-30 10:19:57] [ERROR] [server] [server.py:250] [send_action] 会话 test-session-005 执行失败：执行失败
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 231, in send_action
+    result = await graph.ainvoke(Command(resume=user_input), config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 执行失败
+[2026-07-30 10:19:57] [WARNING] [server] [server.py:263] [get_session] 会话 nonexistent-session 不存在
+[2026-07-30 10:19:57] [ERROR] [server] [server.py:269] [get_session] 会话 test-session-error 获取状态失败：数据库错误
+Traceback (most recent call last):
+  File "E:\code\I don't write novels\server.py", line 261, in get_session
+    state = await graph.aget_state(config)
+  File "unittest\mock.py", line 2234, in _execute_mock_call
+Exception: 数据库错误
+[2026-07-30 10:19:57] [INFO] [server] [server.py:183] [create_session] 新建会话 b46ec5e8-b668-4bd5-985a-c67fb003f986，user_request='测试需求'
+[2026-07-30 10:19:57] [INFO] [server] [server.py:191] [create_session] 会话 b46ec5e8-b668-4bd5-985a-c67fb003f986 启动完成，phase=story_progressing
+[2026-07-30 10:19:57] [INFO] [server] [server.py:183] [create_session] 新建会话 71c2e50d-3330-4703-9bc1-822bd03db167，user_request='测试'
+[2026-07-30 10:19:57] [INFO] [server] [server.py:191] [create_session] 会话 71c2e50d-3330-4703-9bc1-822bd03db167 启动完成，phase=init
+[2026-07-30 10:19:58] [INFO] [server] [server.py:183] [create_session] 新建会话 3026b9fc-9f7c-402f-813a-a94a56acd66b，user_request='测试'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:191] [create_session] 会话 3026b9fc-9f7c-402f-813a-a94a56acd66b 启动完成，phase=critic_loop
+[2026-07-30 10:19:58] [INFO] [server] [server.py:183] [create_session] 新建会话 8d420d72-1604-4497-ad77-2dfb0f061d62，user_request='测试'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:191] [create_session] 会话 8d420d72-1604-4497-ad77-2dfb0f061d62 启动完成，phase=world_building
+[2026-07-30 10:19:58] [INFO] [server] [server.py:183] [create_session] 新建会话 3af93fd7-d387-4933-969a-add8d78694ea，user_request='测试'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:191] [create_session] 会话 3af93fd7-d387-4933-969a-add8d78694ea 启动完成，phase=completed
+[2026-07-30 10:19:58] [INFO] [server] [server.py:183] [create_session] 新建会话 a4df6d37-5116-4eaf-b024-e888e75c5c11，user_request='测试'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:191] [create_session] 会话 a4df6d37-5116-4eaf-b024-e888e75c5c11 启动完成，phase=done
+[2026-07-30 10:19:58] [INFO] [server] [server.py:183] [create_session] 新建会话 79b74556-8b5e-421a-9f26-b77ee6d847b9，user_request='测试'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:191] [create_session] 会话 79b74556-8b5e-421a-9f26-b77ee6d847b9 启动完成，phase=unknown_state
+[2026-07-30 10:19:58] [INFO] [server] [server.py:183] [create_session] 新建会话 670f980e-bc65-421d-ac02-65d3c4e61778，user_request='末日废土，主角带着女儿寻找绿洲'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:191] [create_session] 会话 670f980e-bc65-421d-ac02-65d3c4e61778 启动完成，phase=story_progressing
+[2026-07-30 10:19:58] [INFO] [server] [server.py:219] [send_action] 会话 test-session-action 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1668165602752'> tasks=<MagicMock name='mock.tasks' id='1668166626960'>
+[2026-07-30 10:19:58] [INFO] [server] [server.py:237] [send_action] 会话 test-session-action 执行完成，phase=story_progressing
+[2026-07-30 10:19:58] [INFO] [server] [server.py:408] [resume_session] 从记忆 orig-001 续写为新会话 b267f8d9-2901-4c96-a0f6-141bd6d651fc
+[2026-07-30 10:19:58] [INFO] [server] [server.py:415] [resume_session] 会话 b267f8d9-2901-4c96-a0f6-141bd6d651fc 启动完成，phase=story_progressing
+[2026-07-30 10:19:58] [INFO] [server] [server.py:219] [send_action] 会话 done-session 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1668165715808'> tasks=<MagicMock name='mock.tasks' id='1668165735024'>
+[2026-07-30 10:19:58] [INFO] [server] [server.py:237] [send_action] 会话 done-session 执行完成，phase=done
+[2026-07-30 10:19:58] [INFO] [server] [server.py:219] [send_action] 会话 progressing-session 收到操作 action='A' payload=None -> user_input='A'
+[2026-07-30 10:19:58] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=None next=<MagicMock name='mock.next' id='1668165973664'> tasks=<MagicMock name='mock.tasks' id='1668165731232'>
+[2026-07-30 10:19:58] [INFO] [server] [server.py:237] [send_action] 会话 progressing-session 执行完成，phase=story_progressing
+[2026-07-30 10:21:32] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-30 10:55:17] [INFO] [server] [server.py:183] [create_session] 新建会话 ea948d17-7052-4dde-a2e7-1d231dcf7876，user_request='大致剧情是公元3100年，太阳的核聚变反应因未知原因急剧衰减，预计将在五百年内熄灭。人类依靠环绕太阳的“恒星能量维持阵列”（SMA）注入暗物质来维持其稳定燃烧，确保每个明天太阳依旧升起。暗物质来自木星轨道的巨型采集舰队，但资源日益枯竭。联合政府为维护社会稳定，将真相列为最高机密，宣称太阳状态正常。联合政府暗中挪走暗物质储备造恒星级飞船，为了社会稳定对外宣称明天太阳照常升起，只是为了在太阳熄灭之前，帮助整个人类逃离太阳系，原本计划建造的飞船最多能够让83%的世界人口逃离，而反叛军则认为联合政府腐败贪污了暗物质存储，政府军所在之处百姓不留一人，只剩狼藉。双方交火死伤惨重，联合政府军仓促应战，加速造飞船。百姓在已建造好的飞船上前往深空（期间可能会被反叛军发现），最后结果是反叛军战胜了政府军，而联合政府留下了一艘为建造完的恒星级飞船和建造团队（用总工程师的角度来叙述），最后只有不足20%的人类存活，反叛军为了维护自身合法地位将活捉的政府军人员从飞船上扔在太空中（详细描述）。'
+[2026-07-30 10:57:37] [INFO] [server] [server.py:183] [create_session] 新建会话 97264cfd-e1ee-48b3-98c6-73a42af86f1f，user_request='大致剧情是公元3100年，太阳的核聚变反应因未知原因急剧衰减，预计将在五百年内熄灭。人类依靠环绕太阳的“恒星能量维持阵列”（SMA）注入暗物质来维持其稳定燃烧，确保每个明天太阳依旧升起。暗物质来自木星轨道的巨型采集舰队，但资源日益枯竭。联合政府为维护社会稳定，将真相列为最高机密，宣称太阳状态正常。联合政府暗中挪走暗物质储备造恒星级飞船，为了社会稳定对外宣称明天太阳照常升起，只是为了在太阳熄灭之前，帮助整个人类逃离太阳系，原本计划建造的飞船最多能够让83%的世界人口逃离，而反叛军则认为联合政府腐败贪污了暗物质存储，政府军所在之处百姓不留一人，只剩狼藉。双方交火死伤惨重，联合政府军仓促应战，加速造飞船。百姓在已建造好的飞船上前往深空（期间可能会被反叛军发现），最后结果是反叛军战胜了政府军，而联合政府留下了一艘为建造完的恒星级飞船和建造团队（用总工程师的角度来叙述），最后只有不足20%的人类存活，反叛军为了维护自身合法地位将活捉的政府军人员从飞船上扔在太空中（详细描述）。'
+[2026-07-30 10:58:13] [INFO] [server] [server.py:191] [create_session] 会话 ea948d17-7052-4dde-a2e7-1d231dcf7876 启动完成，phase=story_progressing
+[2026-07-30 11:00:42] [INFO] [server] [server.py:191] [create_session] 会话 97264cfd-e1ee-48b3-98c6-73a42af86f1f 启动完成，phase=story_progressing
+[2026-07-30 11:16:01] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-30 11:20:33] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-31 08:26:09] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 08:26:25] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 3cf82ec0-4c72-40f6-acb6-9b2886dcbec2
+[2026-07-31 08:26:25] [INFO] [server] [server.py:415] [resume_session] 会话 3cf82ec0-4c72-40f6-acb6-9b2886dcbec2 启动完成，phase=story_progressing
+[2026-07-31 08:26:57] [INFO] [server] [server.py:408] [resume_session] 从记忆 8d502f6d-fe15-4f02-8718-0a0a52057752 续写为新会话 07aa6086-7456-4c7b-b164-16cc8c95d781
+[2026-07-31 08:26:57] [INFO] [server] [server.py:415] [resume_session] 会话 07aa6086-7456-4c7b-b164-16cc8c95d781 启动完成，phase=story_progressing
+[2026-07-31 08:31:10] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-31 08:31:21] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 08:31:40] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 175e47ce-d76f-44da-9be5-da04f88358c4
+[2026-07-31 08:31:44] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 15cdcc34-ff44-4911-bb17-3e7be0fdf129
+[2026-07-31 08:31:45] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 2ccb3e8f-ab1c-4c17-a305-29627bd9e930
+[2026-07-31 08:31:50] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 73afe6c8-4da1-4feb-9313-b186127ebada
+[2026-07-31 08:31:54] [INFO] [server] [server.py:408] [resume_session] 从记忆 8d502f6d-fe15-4f02-8718-0a0a52057752 续写为新会话 2cfb2820-34b7-42d8-96d6-d41c92b9e77e
+[2026-07-31 08:31:59] [INFO] [server] [server.py:408] [resume_session] 从记忆 8d502f6d-fe15-4f02-8718-0a0a52057752 续写为新会话 768d333f-dfd7-47a1-9e6f-881ba63d4b53
+[2026-07-31 08:32:00] [INFO] [server] [server.py:408] [resume_session] 从记忆 8d502f6d-fe15-4f02-8718-0a0a52057752 续写为新会话 b301f2e3-3e91-4a41-822f-a37055aeb8c0
+[2026-07-31 08:32:17] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 d4020025-aefe-4285-9550-d7d89406516b
+[2026-07-31 08:32:18] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 1a439bff-8d7a-4e02-8062-6e4ed1aad619
+[2026-07-31 08:32:41] [INFO] [server] [server.py:415] [resume_session] 会话 2ccb3e8f-ab1c-4c17-a305-29627bd9e930 启动完成，phase=story_progressing
+[2026-07-31 08:32:56] [INFO] [server] [server.py:415] [resume_session] 会话 175e47ce-d76f-44da-9be5-da04f88358c4 启动完成，phase=story_progressing
+[2026-07-31 08:33:00] [INFO] [server] [server.py:415] [resume_session] 会话 15cdcc34-ff44-4911-bb17-3e7be0fdf129 启动完成，phase=story_progressing
+[2026-07-31 08:33:17] [INFO] [server] [server.py:415] [resume_session] 会话 2cfb2820-34b7-42d8-96d6-d41c92b9e77e 启动完成，phase=story_progressing
+[2026-07-31 08:33:18] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 c8f7edd6-2c83-4888-8a42-4ae0a206df22
+[2026-07-31 08:33:24] [INFO] [server] [server.py:415] [resume_session] 会话 b301f2e3-3e91-4a41-822f-a37055aeb8c0 启动完成，phase=story_progressing
+[2026-07-31 08:33:25] [INFO] [server] [server.py:408] [resume_session] 从记忆 ea948d17-7052-4dde-a2e7-1d231dcf7876 续写为新会话 3e0f21c2-9103-41c9-8875-febf6ccc9b7e
+[2026-07-31 08:33:29] [INFO] [server] [server.py:415] [resume_session] 会话 1a439bff-8d7a-4e02-8062-6e4ed1aad619 启动完成，phase=story_progressing
+[2026-07-31 08:33:30] [INFO] [server] [server.py:415] [resume_session] 会话 d4020025-aefe-4285-9550-d7d89406516b 启动完成，phase=story_progressing
+[2026-07-31 08:33:34] [INFO] [server] [server.py:415] [resume_session] 会话 768d333f-dfd7-47a1-9e6f-881ba63d4b53 启动完成，phase=story_progressing
+[2026-07-31 08:33:42] [INFO] [server] [server.py:415] [resume_session] 会话 73afe6c8-4da1-4feb-9313-b186127ebada 启动完成，phase=story_progressing
+[2026-07-31 08:34:31] [INFO] [server] [server.py:415] [resume_session] 会话 c8f7edd6-2c83-4888-8a42-4ae0a206df22 启动完成，phase=story_progressing
+[2026-07-31 08:35:02] [INFO] [server] [server.py:415] [resume_session] 会话 3e0f21c2-9103-41c9-8875-febf6ccc9b7e 启动完成，phase=story_progressing
+[2026-07-31 08:36:45] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-31 08:36:58] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 11:23:32] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-31 15:48:13] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 15:48:51] [INFO] [server] [server.py:183] [create_session] 新建会话 eadba331-ae45-440a-bb62-8ba068439a19，user_request='末日废土风格'
+[2026-07-31 15:54:15] [INFO] [server] [server.py:183] [create_session] 新建会话 ced9147a-bf52-4f5f-ad06-3ae9dbcb7e2f，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲，路上遇到流浪者、掠夺者，还有关于旧世界的线索'
+[2026-07-31 15:54:15] [INFO] [server] [server.py:191] [create_session] 会话 eadba331-ae45-440a-bb62-8ba068439a19 启动完成，phase=story_progressing
+[2026-07-31 15:56:27] [INFO] [server] [server.py:191] [create_session] 会话 ced9147a-bf52-4f5f-ad06-3ae9dbcb7e2f 启动完成，phase=story_progressing
+[2026-07-31 15:56:49] [INFO] [server] [server.py:219] [send_action] 会话 ced9147a-bf52-4f5f-ad06-3ae9dbcb7e2f 收到操作 action='B' payload=None -> user_input='B'
+[2026-07-31 15:56:49] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=True next=('supervisor',) tasks=(PregelTask(id='1e0ce0dd-5014-3e98-0944-b6a4d55b2065', name='supervisor', path=('__pregel_pull', 'supervisor'), error=None, interrupts=(Interrupt(value={'message': '请做出选择或自由输入', 'options': [{'id': 'A', 'text': '迎向烟尘，准备交涉或战斗', 'hint': '可能是掠夺者，也可能是流浪者，风险未知', 'risk_level': '高风险'}, {'id': 'B', 'text': '躲进附近的岩石缝隙，观察情况', 'hint': '暂时安全，但可能错过机会，水也快没了', 'risk_level': '安全'}, {'id': 'C', 'text': '转向信号塔，探索旧世界遗迹', 'hint': '可能找到有用信息或物资，但塔内可能有危险', 'risk_level': '中等'}], 'hint': 'A. 迎向烟尘，准备交涉或战斗\nB. 躲进附近的岩石缝隙，观察情况\nC. 转向信号塔，探索旧世界遗迹'}, id='4026829d7a16ffac0d58fd022b5964c5'),), state=None, result=None),)
+[2026-07-31 15:58:13] [INFO] [server] [server.py:237] [send_action] 会话 ced9147a-bf52-4f5f-ad06-3ae9dbcb7e2f 执行完成，phase=story_progressing
+[2026-07-31 15:58:24] [INFO] [server] [server.py:219] [send_action] 会话 ced9147a-bf52-4f5f-ad06-3ae9dbcb7e2f 收到操作 action='回到上一步' payload=None -> user_input='回到上一步'
+[2026-07-31 15:58:24] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=True next=('supervisor',) tasks=(PregelTask(id='a3f53038-d248-7abb-394a-fd76cf0026b3', name='supervisor', path=('__pregel_pull', 'supervisor'), error=None, interrupts=(Interrupt(value={'message': '请做出选择或自由输入', 'options': [{'id': 'A', 'text': '冒险启动无线电发送求救信号，希望能联系到友善的幸存者或绿洲的守护者，但可能暴露位置吸引所有掠夺者。', 'hint': '暴露风险极大，但可能获得关键信息和援手。', 'risk_level': '高风险'}, {'id': 'B', 'text': '收起地图，带着小禾从后门悄悄撤离，趁着夜色向地图标记的绿洲方向前进，争取在车队发现前离开。', 'hint': '相对安全，但绿洲位置未知，可能面临长途跋涉的缺水风险。', 'risk_level': '中等'}, {'id': 'C', 'text': '在塔内寻找隐蔽角落躲藏，观察车队的意图和人数，再决定是交涉还是偷袭。', 'hint': '可能避免冲突，但若被搜查则陷入绝境。', 'risk_level': '中等'}], 'hint': 'A. 冒险启动无线电发送求救信号，希望能联系到友善的幸存者或绿洲的守护者，但可能暴露位置吸引所有掠夺者。\nB. 收起地图，带着小禾从后门悄悄撤离，趁着夜色向地图标记的绿洲方向前进，争取在车队发现前离开。\nC. 在塔内寻找隐蔽角落躲藏，观察车队的意图和人数，再决定是交涉还是偷袭。'}, id='9cc7cce32dcb16415115beb59318656a'),), state=None, result=None),)
+[2026-07-31 15:58:24] [INFO] [server] [server.py:237] [send_action] 会话 ced9147a-bf52-4f5f-ad06-3ae9dbcb7e2f 执行完成，phase=story_progressing
+[2026-07-31 15:58:37] [INFO] [server] [server.py:219] [send_action] 会话 ced9147a-bf52-4f5f-ad06-3ae9dbcb7e2f 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-07-31 15:58:37] [INFO] [server] [server.py:224] [send_action] 当前状态 phase=story_progressing awaiting_user=True next=('supervisor',) tasks=(PregelTask(id='adb9fc32-0e21-2b27-d5d7-9260260598b0', name='supervisor', path=('__pregel_pull', 'supervisor'), error=None, interrupts=(Interrupt(value={'message': '请做出选择或自由输入', 'options': [{'id': 'A', 'text': '迎向烟尘，准备交涉或战斗', 'hint': '可能是掠夺者，也可能是流浪者，风险未知', 'risk_level': '高风险'}, {'id': 'B', 'text': '躲进附近的岩石缝隙，观察情况', 'hint': '暂时安全，但可能错过机会，水也快没了', 'risk_level': '安全'}, {'id': 'C', 'text': '转向信号塔，探索旧世界遗迹', 'hint': '可能找到有用信息或物资，但塔内可能有危险', 'risk_level': '中等'}], 'hint': 'A. 迎向烟尘，准备交涉或战斗\nB. 躲进附近的岩石缝隙，观察情况\nC. 转向信号塔，探索旧世界遗迹'}, id='28fce7b9a277b76f75779653b2fef2bc'),), state=None, result=None),)
+[2026-07-31 15:59:25] [INFO] [server] [server.py:237] [send_action] 会话 ced9147a-bf52-4f5f-ad06-3ae9dbcb7e2f 执行完成，phase=done
+[2026-07-31 16:00:36] [INFO] [server] [server.py:183] [create_session] 新建会话 ced7db3a-1fd9-4fde-8699-565846b60728，user_request='公元2157年，第三次世界大战以‘灰烬雨’核打击终结，地表覆盖致命辐射尘，生态系统崩溃'
+[2026-07-31 16:04:01] [INFO] [server] [server.py:191] [create_session] 会话 ced7db3a-1fd9-4fde-8699-565846b60728 启动完成，phase=story_progressing
+[2026-07-31 16:07:45] [INFO] [server] [server.py:183] [create_session] 新建会话 3306aee5-3721-4199-9024-93c3a7fe498b，user_request='公元2157年，第三次世界大战以‘灰烬雨’核打击终结，地表覆盖致命辐射尘，生态系统崩溃'
+[2026-07-31 16:11:36] [INFO] [server] [server.py:191] [create_session] 会话 3306aee5-3721-4199-9024-93c3a7fe498b 启动完成，phase=story_progressing
+[2026-07-31 16:12:16] [INFO] [server] [server.py:183] [create_session] 新建会话 62f3fc1e-393b-4724-97bd-711b6fc994d7，user_request="公元2157年，第三次世界大战以代号'灰烬雨'的饱和核打击告终。"
+[2026-07-31 16:15:39] [INFO] [server] [server.py:191] [create_session] 会话 62f3fc1e-393b-4724-97bd-711b6fc994d7 启动完成，phase=story_progressing
+[2026-07-31 16:16:13] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-31 16:18:58] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 16:19:39] [INFO] [server] [server.py:183] [create_session] 新建会话 91c660cb-72c5-4c54-9e2b-234de498c2f8，user_request="公元2157年，代号'灰烬雨'的饱和核打击终结了第三次世界大战，全球文明瞬间崩塌。"
+[2026-07-31 16:22:17] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 16:22:23] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-31 16:27:13] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 16:27:36] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 16:27:36] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-07-31 16:28:14] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-07-31 16:28:55] [INFO] [server] [server.py:183] [create_session] 新建会话 3b099684-49d9-4a3a-b3f3-497b84c031b3，user_request='末日废土风格'
+[2026-07-31 16:30:20] [INFO] [server] [server.py:183] [create_session] 新建会话 9cdc585f-8d7b-4e54-bcf1-52f0568d47ef，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲，路上遇到流浪者、掠夺者，还有关于旧世界的线索'
+[2026-07-31 16:31:39] [INFO] [server] [server.py:191] [create_session] 会话 3b099684-49d9-4a3a-b3f3-497b84c031b3 启动完成，phase=story_progressing
+[2026-07-31 16:33:18] [INFO] [server] [server.py:191] [create_session] 会话 9cdc585f-8d7b-4e54-bcf1-52f0568d47ef 启动完成，phase=story_progressing
+[2026-07-31 16:33:54] [INFO] [server] [server.py:183] [create_session] 新建会话 6f807e29-d5f3-421b-a24a-7ded327eec44，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲，路上遇到流浪者、掠夺者，还有关于旧世界的线索'
+[2026-07-31 16:36:51] [INFO] [server] [server.py:183] [create_session] 新建会话 74577dc4-50f5-4ed2-bb08-86cdfd23985e，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲'
+[2026-07-31 16:37:30] [INFO] [server] [server.py:191] [create_session] 会话 6f807e29-d5f3-421b-a24a-7ded327eec44 启动完成，phase=story_progressing
+[2026-07-31 16:39:22] [INFO] [server] [server.py:191] [create_session] 会话 74577dc4-50f5-4ed2-bb08-86cdfd23985e 启动完成，phase=story_progressing
+[2026-07-31 16:39:40] [INFO] [server] [server.py:183] [create_session] 新建会话 45077ace-3f4a-4e83-b72c-9a3add8d81c9，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲'
+[2026-07-31 16:43:06] [INFO] [server] [server.py:191] [create_session] 会话 45077ace-3f4a-4e83-b72c-9a3add8d81c9 启动完成，phase=story_progressing
+[2026-07-31 16:44:28] [INFO] [server] [server.py:183] [create_session] 新建会话 71718a39-2753-4da3-bc27-c5b8782774d0，user_request='公元2157年，全球核战争与生化灾难将地球化为废土。天空被永久的灰霾笼罩，大地干裂，水源被辐射和毒素污染，动植物发生异变，成为致命的怪物。'
+[2026-07-31 16:46:54] [INFO] [server] [server.py:191] [create_session] 会话 71718a39-2753-4da3-bc27-c5b8782774d0 启动完成，phase=story_progressing
+[2026-08-02 16:18:33] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-02 16:21:44] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-02 16:21:44] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-02 16:22:09] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-02 16:22:32] [INFO] [server] [server.py:183] [create_session] 新建会话 a239ed6f-e3ff-4253-803d-e2d04df13e0a，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲，路上遇到流浪者、掠夺者，还有关于旧世界的线索'
+[2026-08-02 16:24:16] [INFO] [server] [server.py:191] [create_session] 会话 a239ed6f-e3ff-4253-803d-e2d04df13e0a 启动完成，phase=story_progressing
+[2026-08-02 16:30:47] [INFO] [server] [server.py:183] [create_session] 新建会话 6a0aa038-8aef-4a0b-9bde-b4eab766f46e，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲，路上遇到流浪者、掠夺者，还有关于旧世界的线索'
+[2026-08-02 16:32:59] [INFO] [server] [server.py:191] [create_session] 会话 6a0aa038-8aef-4a0b-9bde-b4eab766f46e 启动完成，phase=story_progressing
+[2026-08-02 16:52:50] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-02 16:53:20] [INFO] [server] [server.py:183] [create_session] 新建会话 81c118c2-73b1-48fb-b768-a5b3d1068c2f，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲，路上遇到流浪者、掠夺者，还有关于旧世界的线索'
+[2026-08-02 16:55:22] [INFO] [server] [server.py:191] [create_session] 会话 81c118c2-73b1-48fb-b768-a5b3d1068c2f 启动完成，phase=story_progressing
+[2026-08-02 16:57:12] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-02 16:57:45] [INFO] [server] [server.py:183] [create_session] 新建会话 a5b431be-7d2d-41d3-9e9a-5ff0eb152f06，user_request='末日废土世界，主角是一位带着年幼女儿在荒原上寻找绿洲的父亲，路上遇到流浪者、掠夺者，还有关于旧世界的线索'
+[2026-08-02 17:00:51] [INFO] [server] [server.py:191] [create_session] 会话 a5b431be-7d2d-41d3-9e9a-5ff0eb152f06 启动完成，phase=story_progressing
+[2026-08-02 17:09:54] [INFO] [server] [server.py:183] [create_session] 新建会话 20e12d2c-db3b-4bb9-b88b-2481644ec4a3，user_request='末日废土，主角是个带着女儿寻找绿洲的父亲，途中遇到各种危险和人性考验'
+[2026-08-02 17:10:49] [INFO] [server] [server.py:183] [create_session] 新建会话 af63c09c-f6f0-49a0-80e6-27c1d0cf0c97，user_request='末日废土，主角是个带着女儿寻找绿洲的父亲，途中遇到各种危险和人性考验'
+[2026-08-02 17:12:12] [INFO] [server] [server.py:191] [create_session] 会话 20e12d2c-db3b-4bb9-b88b-2481644ec4a3 启动完成，phase=story_progressing
+[2026-08-02 17:12:56] [INFO] [server] [server.py:191] [create_session] 会话 af63c09c-f6f0-49a0-80e6-27c1d0cf0c97 启动完成，phase=story_progressing
+[2026-08-02 17:21:10] [INFO] [server] [server.py:412] [resume_session] 从记忆 a5b431be-7d2d-41d3-9e9a-5ff0eb152f06 续写为新会话 89a7117a-ecc6-40dc-a1ed-f02d1c301627
+[2026-08-02 17:22:46] [INFO] [server] [server.py:419] [resume_session] 会话 89a7117a-ecc6-40dc-a1ed-f02d1c301627 启动完成，phase=story_progressing
+[2026-08-03 19:14:57] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-03 19:17:10] [INFO] [server] [server.py:412] [resume_session] 从记忆 af63c09c-f6f0-49a0-80e6-27c1d0cf0c97 续写为新会话 b85537ce-ea10-4d0d-82c9-a0a9e37af4b7
+[2026-08-03 19:18:59] [INFO] [server] [server.py:419] [resume_session] 会话 b85537ce-ea10-4d0d-82c9-a0a9e37af4b7 启动完成，phase=story_progressing
+[2026-08-03 19:42:19] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-04 13:49:05] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-04 13:51:17] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-04 13:53:07] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-04 13:53:40] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-05 16:59:43] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-05 17:10:56] [INFO] [server] [server.py:183] [create_session] 新建会话 9e49943f-a1f5-40a3-8b1b-36ee2249273e，user_request='22世纪中叶，全球核战争与气候崩溃使地球沦为废土。大地龟裂，辐射尘遮蔽天空，水源枯竭，变异生物横行。幸存者在资源匮乏的荒原上挣扎求生，形成弱肉强食的丛林法则。传说中，有一片名为“伊甸”的绿洲，由一位前科学家利用远古净化技术建立，那里有清洁的水源、可耕种的土壤，以及免受辐射威胁的庇护所。但伊甸的位置并非固定，而是随地下暗河移动，只有通过散布在废土各处的导航图碎片才能找到。主角林晨曾是地质学家，在妻子死于辐射病后，他带着女儿林夕踏上寻访伊甸的旅程。这趟旅途不仅是生存之战，更是对人性善恶的终极考验——当资源枯竭、信任稀缺，每个选择都可能导向救赎或堕落。'
+[2026-08-05 17:11:00] [ERROR] [server] [server.py:203] [create_session] 会话 9e49943f-a1f5-40a3-8b1b-36ee2249273e 启动失败：cannot import name 'streamablehttp_client' from 'mcp.client.streamable_http' (E:\conda\envs\no_write_novelsenv\Lib\site-packages\mcp\client\streamable_http.py)
+Traceback (most recent call last):
+  File "d:\1\code\code\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 4090, in ainvoke
+    async for chunk in self.astream(
+    ...<30 lines>...
+            chunks.append(chunk)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3440, in astream
+    async for _ in runner.atick(
+    ...<16 lines>...
+            yield o
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+    ...<15 lines>...
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 733, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        step.ainvoke(input, config, **kwargs), context=context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 707, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 698, in wrapper
+    return func(*args, **kwargs)
+  File "d:\1\code\code\code\I don't write novels\src\agents\researcher.py", line 21, in world_builder_node
+    search_results = search_for_world_building(user_request)
+  File "d:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 169, in search_for_world_building
+    return search_bing(user_request)
+  File "d:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 141, in search_bing
+    return _run_async(_call_mcp_tool("bing_search", {"query": query})) or ""
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 58, in _run_async
+    return asyncio.run(coro)
+           ~~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\runners.py", line 196, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\runners.py", line 119, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "d:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 125, in _call_mcp_tool
+    return await _call_mcp_tool_http(tool_name, arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 64, in _call_mcp_tool_http
+    from mcp.client.streamable_http import streamablehttp_client
+ImportError: cannot import name 'streamablehttp_client' from 'mcp.client.streamable_http' (E:\conda\envs\no_write_novelsenv\Lib\site-packages\mcp\client\streamable_http.py)
+During task with name 'world_builder' and id 'c21afe3b-5a65-5e34-fd03-ac6c5e292da1'
+[2026-08-05 17:12:07] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-05 17:12:21] [INFO] [server] [server.py:183] [create_session] 新建会话 f16d68d1-0961-4fc3-925f-90cce6250488，user_request='22世纪中叶，全球核战争与气候崩溃使地球沦为废土。大地龟裂，辐射尘遮蔽天空，水源枯竭，变异生物横行。幸存者在资源匮乏的荒原上挣扎求生，形成弱肉强食的丛林法则。传说中，有一片名为“伊甸”的绿洲，由一位前科学家利用远古净化技术建立，那里有清洁的水源、可耕种的土壤，以及免受辐射威胁的庇护所。但伊甸的位置并非固定，而是随地下暗河移动，只有通过散布在废土各处的导航图碎片才能找到。主角林晨曾是地质学家，在妻子死于辐射病后，他带着女儿林夕踏上寻访伊甸的旅程。这趟旅途不仅是生存之战，更是对人性善恶的终极考验——当资源枯竭、信任稀缺，每个选择都可能导向救赎或堕落。'
+[2026-08-05 17:12:23] [ERROR] [server] [server.py:203] [create_session] 会话 f16d68d1-0961-4fc3-925f-90cce6250488 启动失败：cannot import name 'streamablehttp_client' from 'mcp.client.streamable_http' (E:\conda\envs\no_write_novelsenv\Lib\site-packages\mcp\client\streamable_http.py)
+Traceback (most recent call last):
+  File "D:\1\code\code\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 4090, in ainvoke
+    async for chunk in self.astream(
+    ...<30 lines>...
+            chunks.append(chunk)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3440, in astream
+    async for _ in runner.atick(
+    ...<16 lines>...
+            yield o
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+    ...<15 lines>...
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 733, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        step.ainvoke(input, config, **kwargs), context=context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 707, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 698, in wrapper
+    return func(*args, **kwargs)
+  File "D:\1\code\code\code\I don't write novels\src\agents\researcher.py", line 21, in world_builder_node
+    search_results = search_for_world_building(user_request)
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 169, in search_for_world_building
+    return search_bing(user_request)
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 141, in search_bing
+    return _run_async(_call_mcp_tool("bing_search", {"query": query})) or ""
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 58, in _run_async
+    return asyncio.run(coro)
+           ~~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\runners.py", line 196, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\runners.py", line 119, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 125, in _call_mcp_tool
+    return await _call_mcp_tool_http(tool_name, arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 64, in _call_mcp_tool_http
+    from mcp.client.streamable_http import streamablehttp_client
+ImportError: cannot import name 'streamablehttp_client' from 'mcp.client.streamable_http' (E:\conda\envs\no_write_novelsenv\Lib\site-packages\mcp\client\streamable_http.py)
+During task with name 'world_builder' and id 'f1f71958-abb8-020f-17b7-094a4ac3f0ce'
+[2026-08-05 17:14:51] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-05 17:15:00] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-05 17:15:05] [INFO] [server] [server.py:183] [create_session] 新建会话 62911912-e2bf-46dc-8af7-e55462d54156，user_request='22世纪中叶，全球核战争与气候崩溃使地球沦为废土。大地龟裂，辐射尘遮蔽天空，水源枯竭，变异生物横行。幸存者在资源匮乏的荒原上挣扎求生，形成弱肉强食的丛林法则。传说中，有一片名为“伊甸”的绿洲，由一位前科学家利用远古净化技术建立，那里有清洁的水源、可耕种的土壤，以及免受辐射威胁的庇护所。但伊甸的位置并非固定，而是随地下暗河移动，只有通过散布在废土各处的导航图碎片才能找到。主角林晨曾是地质学家，在妻子死于辐射病后，他带着女儿林夕踏上寻访伊甸的旅程。这趟旅途不仅是生存之战，更是对人性善恶的终极考验——当资源枯竭、信任稀缺，每个选择都可能导向救赎或堕落。'
+[2026-08-05 17:15:07] [ERROR] [server] [server.py:203] [create_session] 会话 62911912-e2bf-46dc-8af7-e55462d54156 启动失败：cannot import name 'streamablehttp_client' from 'mcp.client.streamable_http' (E:\conda\envs\no_write_novelsenv\Lib\site-packages\mcp\client\streamable_http.py)
+Traceback (most recent call last):
+  File "D:\1\code\code\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 4090, in ainvoke
+    async for chunk in self.astream(
+    ...<30 lines>...
+            chunks.append(chunk)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3440, in astream
+    async for _ in runner.atick(
+    ...<16 lines>...
+            yield o
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+    ...<15 lines>...
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 733, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        step.ainvoke(input, config, **kwargs), context=context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 707, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 698, in wrapper
+    return func(*args, **kwargs)
+  File "D:\1\code\code\code\I don't write novels\src\agents\researcher.py", line 21, in world_builder_node
+    search_results = search_for_world_building(user_request)
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 169, in search_for_world_building
+    return search_bing(user_request)
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 141, in search_bing
+    return _run_async(_call_mcp_tool("bing_search", {"query": query})) or ""
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 58, in _run_async
+    return asyncio.run(coro)
+           ~~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\runners.py", line 196, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\runners.py", line 119, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 125, in _call_mcp_tool
+    return await _call_mcp_tool_http(tool_name, arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 64, in _call_mcp_tool_http
+    from mcp.client.streamable_http import streamablehttp_client
+ImportError: cannot import name 'streamablehttp_client' from 'mcp.client.streamable_http' (E:\conda\envs\no_write_novelsenv\Lib\site-packages\mcp\client\streamable_http.py)
+During task with name 'world_builder' and id 'eb896883-ac11-a927-c3cd-716da6bc5972'
+[2026-08-05 17:20:03] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-05 17:57:28] [INFO] [server] [server.py:74] [lifespan] 异步图初始化完成
+[2026-08-05 17:59:29] [INFO] [server] [server.py:412] [resume_session] 从记忆 b85537ce-ea10-4d0d-82c9-a0a9e37af4b7 续写为新会话 fa6040ea-1bd5-4d8f-91fe-dd1ea57551cd
+[2026-08-05 17:59:56] [INFO] [server] [server.py:183] [create_session] 新建会话 561d8d5a-cb23-4178-b65e-e2d2f85b8cde，user_request='22世纪中叶，全球核战争与气候崩溃使地球沦为废土。大地龟裂，辐射尘遮蔽天空，水源枯竭，变异生物横行。幸存者在资源匮乏的荒原上挣扎求生，形成弱肉强食的丛林法则。传说中，有一片名为“伊甸”的绿洲，由一位前科学家利用远古净化技术建立，那里有清洁的水源、可耕种的土壤，以及免受辐射威胁的庇护所。但伊甸的位置并非固定，而是随地下暗河移动，只有通过散布在废土各处的导航图碎片才能找到。主角林晨曾是地质学家，在妻子死于辐射病后，他带着女儿林夕踏上寻访伊甸的旅程。这趟旅途不仅是生存之战，更是对人性善恶的终极考验——当资源枯竭、信任稀缺，每个选择都可能导向救赎或堕落。'
+[2026-08-05 17:59:58] [ERROR] [server] [server.py:203] [create_session] 会话 561d8d5a-cb23-4178-b65e-e2d2f85b8cde 启动失败：cannot import name 'streamablehttp_client' from 'mcp.client.streamable_http' (E:\conda\envs\no_write_novelsenv\Lib\site-packages\mcp\client\streamable_http.py)
+Traceback (most recent call last):
+  File "D:\1\code\code\code\I don't write novels\server.py", line 185, in create_session
+    result = await graph.ainvoke(initial_state, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 4090, in ainvoke
+    async for chunk in self.astream(
+    ...<30 lines>...
+            chunks.append(chunk)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3440, in astream
+    async for _ in runner.atick(
+    ...<16 lines>...
+            yield o
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+    ...<15 lines>...
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 733, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        step.ainvoke(input, config, **kwargs), context=context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 707, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 698, in wrapper
+    return func(*args, **kwargs)
+  File "D:\1\code\code\code\I don't write novels\src\agents\researcher.py", line 21, in world_builder_node
+    search_results = search_for_world_building(user_request)
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 171, in search_for_world_building
+    return search_bing(user_request)
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 143, in search_bing
+    return _run_async(_call_mcp_tool("bing_search", {"query": query})) or ""
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 58, in _run_async
+    return asyncio.run(coro)
+           ~~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\runners.py", line 196, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\runners.py", line 119, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 127, in _call_mcp_tool
+    return await _call_mcp_tool_http(tool_name, arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\src\tools\search_tool.py", line 64, in _call_mcp_tool_http
+    from mcp.client.streamable_http import streamablehttp_client
+ImportError: cannot import name 'streamablehttp_client' from 'mcp.client.streamable_http' (E:\conda\envs\no_write_novelsenv\Lib\site-packages\mcp\client\streamable_http.py)
+During task with name 'world_builder' and id '7a43df18-f483-b5c2-aab7-50d5bd7b19f5'
+[2026-08-05 18:00:51] [INFO] [server] [server.py:419] [resume_session] 会话 fa6040ea-1bd5-4d8f-91fe-dd1ea57551cd 启动完成，phase=story_progressing
+[2026-08-05 18:05:24] [INFO] [server] [server.py:88] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-06 13:26:42] [INFO] [server] [server.py:77] [lifespan] 异步图初始化完成
+[2026-08-06 13:26:49] [INFO] [server] [server.py:87] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-06 13:58:59] [INFO] [server] [server.py:76] [lifespan] 异步图初始化完成
+[2026-08-06 13:58:59] [INFO] [server] [server.py:86] [lifespan] 异步 checkpointer 连接已关闭

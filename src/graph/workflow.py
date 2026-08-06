@@ -9,7 +9,7 @@ from src.agents.researcher import world_builder_node
 from src.agents.writer import story_driver_node
 from src.agents.reviewer import critic_node
 from src.agents.integrator import integrator_node
-from src.utils.database import is_postgres
+from src.utils.database import get_db_path
 from src.utils.logger import setup_logger
 
 logger = setup_logger("workflow")
@@ -62,23 +62,15 @@ def _build_workflow():
 
 
 async def build_graph_async():
-    """构建 LangGraph 图（异步版本，支持 SSE 流式输出）"""
-    from src.utils.database import DATABASE_URL
+    """构建 LangGraph 图（异步版本，支持 SSE 流式输出）
+
+    使用单一 SQLite 库 (novel.db) 作为 checkpointer。
+    注意：AsyncSqliteSaver 需手动持有连接，使其在应用生命周期内保持存活。
+    """
+    import aiosqlite
+
+    conn = await aiosqlite.connect(get_db_path())
+    checkpointer = AsyncSqliteSaver(conn)
 
     workflow = _build_workflow()
-
-    if is_postgres():
-        from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-
-        checkpointer = AsyncPostgresSaver.from_conn_string(DATABASE_URL)
-        await checkpointer.setup()
-    else:
-        # SQLite 异步 checkpointer
-        # 注意：from_conn_string() 返回的是异步上下文管理器，不能直接传给
-        # compile()，必须手动打开连接并持有，使其在应用生命周期内保持存活。
-        import aiosqlite
-
-        conn = await aiosqlite.connect("novel_sessions.db")
-        checkpointer = AsyncSqliteSaver(conn)
-
     return workflow.compile(checkpointer=checkpointer)
