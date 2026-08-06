@@ -15,8 +15,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# 同时加载根目录 .env 和 configs/.env
-load_dotenv()
+# 统一加载 configs/.env（单一配置来源）
 load_dotenv(Path(__file__).resolve().parent.parent.parent / "configs" / ".env")
 
 # ── 读取 YAML 配置作默认值 ──────────────────────────
@@ -63,6 +62,17 @@ TEMPERATURE_CREATIVE = float(os.getenv("TEMPERATURE_CREATIVE",
     str(_yaml_val("quality", "temperature_creative", default=0.8))))
 TEMPERATURE_CRITIC = float(os.getenv("TEMPERATURE_CRITIC",
     str(_yaml_val("quality", "temperature_critic", default=0.3))))
+
+# ── RAG 检索配置 ────────────────────────────────────
+
+CHROMA_HOST = os.getenv("CHROMA_HOST", _yaml_val("rag", "chroma_host", default="localhost"))
+CHROMA_PORT = int(os.getenv("CHROMA_PORT", str(_yaml_val("rag", "chroma_port", default=8081))))
+CHROMA_COLLECTION = os.getenv("CHROMA_COLLECTION", _yaml_val("rag", "chroma_collection", default="default"))
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", _yaml_val("rag", "embedding_model", default="BAAI/bge-m3"))
+RERANK_MODEL = os.getenv("RERANK_MODEL", _yaml_val("rag", "rerank_model", default="BAAI/bge-reranker-v2-m3"))
+RETRIEVE_K = int(os.getenv("RETRIEVE_K", str(_yaml_val("rag", "retrieve_k", default=20))))
+RERANK_TOP_K = int(os.getenv("RERANK_TOP_K", str(_yaml_val("rag", "rerank_top_k", default=5))))
+RAG_CACHE_TTL = int(os.getenv("RAG_CACHE_TTL", str(_yaml_val("rag", "cache_ttl", default=300))))
 
 # ── MCP Bing 搜索配置 ───────────────────────────────
 

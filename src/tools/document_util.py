@@ -81,6 +81,12 @@ def split_documents(docs: List[Document]) -> List[Document]:
 
 def create_index(file_path: str):
     """将单个文档入库到 ChromaDB"""
+    import sys
+    from pathlib import Path as _Path
+
+    _PROJECT_ROOT = str(_Path(__file__).resolve().parent.parent.parent)
+    if _PROJECT_ROOT not in sys.path:
+        sys.path.insert(0, _PROJECT_ROOT)
     from src.tools.rag_tool import _get_vector_store
 
     docs = load_documents(file_path)
@@ -93,6 +99,12 @@ def create_index(file_path: str):
 
 def create_index_from_dir(dir_path: str = None):
     """遍历知识库目录，加载所有文档并入库"""
+    import sys
+    from pathlib import Path as _Path
+
+    _PROJECT_ROOT = str(_Path(__file__).resolve().parent.parent.parent)
+    if _PROJECT_ROOT not in sys.path:
+        sys.path.insert(0, _PROJECT_ROOT)
     from src.tools.rag_tool import _get_vector_store
 
     if dir_path is None:
@@ -113,4 +125,4 @@ def create_index_from_dir(dir_path: str = None):
 
 
 if __name__ == "__main__":
-    create_index_from_dir()
+    create_index_from_dir("C:\\Users\\yzx\\Downloads")

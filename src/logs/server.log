@@ -1119,3 +1119,10 @@ During task with name 'world_builder' and id '7a43df18-f483-b5c2-aab7-50d5bd7b19
 [2026-08-06 13:26:49] [INFO] [server] [server.py:87] [lifespan] 异步 checkpointer 连接已关闭
 [2026-08-06 13:58:59] [INFO] [server] [server.py:76] [lifespan] 异步图初始化完成
 [2026-08-06 13:58:59] [INFO] [server] [server.py:86] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-06 19:39:29] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-06 19:39:30] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-06 19:39:56] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-06 19:42:19] [INFO] [server] [server.py:198] [create_session] 新建会话 6d2737bc-8e65-4d0d-913b-532f0ea54e3b，user_request='末日废土'
+[2026-08-06 19:43:24] [INFO] [server] [server.py:200] [create_session] 会话 6d2737bc-8e65-4d0d-913b-532f0ea54e3b 启动完成，phase=story_progressing
+[2026-08-06 19:47:42] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-06 19:50:13] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成

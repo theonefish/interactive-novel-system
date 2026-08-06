@@ -8,7 +8,7 @@ import re
 from src.graph.state import NovelState
 from src.utils.llm import llm_call
 from src.utils.config import TEMPERATURE_CREATIVE, OPTIONS_COUNT, SEGMENT_LENGTH
-from src.tools.memory import build_memory_context, _apply_updates, create_initial_memory
+from src.tools.memory import build_memory_context, apply_updates, create_initial_memory
 from src.tools.rag_tool import retrieve_for_writing
 from src.prompts.writer_prompt import STORY_DRIVER_PROMPT
 from src.utils.logger import setup_logger
@@ -110,7 +110,7 @@ def story_driver_node(state: NovelState) -> dict:
     if not memory:
         memory = create_initial_memory(state.get("characters", []))
     if segment and memory_updates:
-        memory = _apply_updates(memory, memory_updates, turn)
+        memory = apply_updates(memory, memory_updates, turn)
 
     return {
         "story_segments": new_segments,

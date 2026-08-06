@@ -4,8 +4,9 @@
 使用标准库 sqlite3，与 checkpointer 同库不同表。
 """
 
-import sqlite3
-from datetime import datetime
+import sys
+import os
+from datetime import datetime, timezone
 from typing import Optional, List
 
 from src.utils.database import get_conn
@@ -16,7 +17,7 @@ def save_session_meta(meta: dict) -> None:
 
     若 session_id 已存在则更新（保留 created_at），否则插入新记录。
     """
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     session_id = meta["session_id"]
 
     with get_conn() as conn:
@@ -48,7 +49,6 @@ def save_session_meta(meta: dict) -> None:
 def get_session_meta(session_id: str) -> Optional[dict]:
     """按 session_id 获取单条会话元数据，不存在返回 None。"""
     with get_conn() as conn:
-        conn.row_factory = sqlite3.Row
         row = conn.execute(
             "SELECT * FROM session_metas WHERE session_id = ?", (session_id,)
         ).fetchone()
@@ -58,7 +58,6 @@ def get_session_meta(session_id: str) -> Optional[dict]:
 def list_session_metas() -> List[dict]:
     """获取所有会话元数据，按 updated_at DESC 排序。"""
     with get_conn() as conn:
-        conn.row_factory = sqlite3.Row
         rows = conn.execute(
             "SELECT * FROM session_metas ORDER BY updated_at DESC"
         ).fetchall()
@@ -67,7 +66,7 @@ def list_session_metas() -> List[dict]:
 
 def update_session_meta(session_id: str, updates: dict) -> None:
     """按 session_id 更新指定字段，并自动刷新 updated_at。"""
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat()
     updates_with_ts = {**updates, "updated_at": now}
 
     with get_conn() as conn:

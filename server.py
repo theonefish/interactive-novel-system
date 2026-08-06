@@ -25,14 +25,10 @@ from langgraph.errors import GraphInterrupt
 logger = setup_logger("server")
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-
 app_graph_async = None
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # 请求/响应模型
-# ═══════════════════════════════════════════════════════════════════════════
 
 class CreateSessionRequest(BaseModel):
     user_request: str
@@ -63,9 +59,7 @@ class SessionResponse(BaseModel):
     error: str = ""
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # 生命周期
-# ═══════════════════════════════════════════════════════════════════════════
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -98,9 +92,7 @@ app.add_middleware(
 )
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # 辅助函数
-# ═══════════════════════════════════════════════════════════════════════════
 
 def _build_initial_state(user_request: str) -> NovelState:
     """构建初始状态"""
@@ -187,9 +179,8 @@ def _save_meta(session_id: str, state: dict, title: Optional[str] = None):
     session_store.save_session_meta(meta) if title is not None else session_store.update_session_meta(session_id, meta)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # API 路由
-# ═══════════════════════════════════════════════════════════════════════════
+
 
 @app.post("/api/sessions", response_model=SessionResponse)
 async def create_session(req: CreateSessionRequest):
@@ -412,19 +403,14 @@ async def get_memory(memory_id: str):
     return memory
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # 静态文件（生产环境，作为 SPA fallback，需在所有 API 路由之后挂载）
-# ═══════════════════════════════════════════════════════════════════════════
-
 try:
     app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="frontend")
 except Exception:
     pass  # 开发模式下无前端构建产物
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # 启动入口
-# ═══════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
     import uvicorn

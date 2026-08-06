@@ -82,7 +82,7 @@
 ├── config.py                 # 根配置占位文件（实际配置见 src/utils/config.py，见 §5）
 ├── configs/
 │   ├── settings.yaml         # YAML 默认配置（LLM / 创作 / 质控 / RAG / misc）
-│   └── .env                  # 环境变量（优先级最高，实际存放于项目根目录 .env）
+│   └── .env                  # 环境变量（优先级最高，项目唯一的 .env 配置来源）
 ├── pyproject.toml            # 依赖清单
 ├── exchange_rag_agent/       # RAG 参考实现（独立模块，供 src/tools 下的 RAG 代码参考）
 │   ├── chroma_util.py        # ChromaDB 连接与集合管理
@@ -406,7 +406,7 @@ python -m src.app
 - **`GraphInterrupt` 导入报错**：在 langgraph 1.x 中应 `from langgraph.errors import GraphInterrupt`，而非 `langgraph.types`。
 - **RAG 检索为空**：确认 ChromaDB 已启动且知识库已通过 §12 入库。
 - **Bing 搜索不生效**：检查 `mcp_bing_config` 格式与网络可达性；未配置时系统会安全跳过搜索。
-- **找不到 `configs/.env`**：`.env` 实际位于**项目根目录**（与 `server.py` 同级）。`configs/settings.yaml` 仅作默认值后备。
+- **找不到 `.env`**：`.env` 位于 **`configs/` 目录**下（与 `settings.yaml` 同级）。`configs/settings.yaml` 仅作默认值后备。
 - **根目录 `config.py` 是空的**：它是历史占位文件，真正生效的配置在 `src/utils/config.py`，请勿依赖根目录 `config.py`。
 - **`tools/` 与 `utils/` 根目录文件**：这是历史遗留的镜像目录，主逻辑以 `src/tools/`、`src/utils/` 为准，避免误改。
 - **`exchange_rag_agent/` 目录**：是 RAG 能力的参考实现（独立模块），`src/tools/rag_tool.py` 与 `document_util.py` 的设计参考了它，但运行时以 `src/tools` 下代码为准。

@@ -5,20 +5,17 @@
 与 checkpointer / 会话元数据同库不同表。
 """
 
-import sqlite3
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List, Dict
 
 from src.utils.database import get_conn
 
-
 def save_long_term_memory(session_id: str, state: Dict) -> None:
     """将已完成会话的完整状态持久化为一条长期记忆。
-
     session_id 作为记忆主键（memory_id），若已存在则覆盖（续写完成后刷新）。
     """
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).isoformat() # 使用 UTC 时间戳
 
     record = {
         "memory_id": session_id,
@@ -32,6 +29,7 @@ def save_long_term_memory(session_id: str, state: Dict) -> None:
         "created_at": state.get("created_at", now),
         "completed_at": now,
     }
+    # 将长期记忆写入数据库
     with get_conn() as conn:
         conn.execute(
             """
@@ -46,7 +44,6 @@ def save_long_term_memory(session_id: str, state: Dict) -> None:
 def get_long_term_memory(memory_id: str) -> Optional[Dict]:
     """按 memory_id 取单条长期记忆，反序列化 JSON 字段后返回；不存在返回 None。"""
     with get_conn() as conn:
-        conn.row_factory = sqlite3.Row
         row = conn.execute(
             "SELECT * FROM long_term_memories WHERE memory_id = ?", (memory_id,)
         ).fetchone()
@@ -61,11 +58,9 @@ def get_long_term_memory(memory_id: str) -> Optional[Dict]:
 
 def list_long_term_memories() -> List[Dict]:
     """列出所有长期记忆摘要（简化字段，便于列表展示）。
-
     preview 取自 final_output 前 80 字；若为空则取 story_segments 最后一段前 80 字。
     """
     with get_conn() as conn:
-        conn.row_factory = sqlite3.Row
         rows = conn.execute(
             "SELECT memory_id, title, final_output, story_segments, created_at, completed_at FROM long_term_memories ORDER BY completed_at DESC"
         ).fetchall()
@@ -83,4 +78,5 @@ def list_long_term_memories() -> List[Dict]:
                 "completed_at": data.get("completed_at", ""),
                 "preview": preview,
             })
+        # 按 completed_at 降序排序（最新完成的记忆在前）
         return result

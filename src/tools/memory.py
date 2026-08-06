@@ -1,13 +1,14 @@
-"""记忆管理器 - 为 Agent 提供故事记忆能力"""
+"""
+记忆管理器 - 为 Agent 提供故事记忆能力
+记录剧情发展状态,人物的性格特点,关系,成长弧线,以及剧情线索和伏笔点
+有效避免挖坑不填
+"""
 
-from typing import TypedDict, List, Optional
-from src.utils.llm import llm_call
-from src.utils.config import TEMPERATURE_CRITIC
+from typing import TypedDict, List
 
 
 # ─── 记忆类型定义 ───────────────────────────────────
-
-
+# 角色记忆
 class CharacterMemory(TypedDict):
     name: str
     traits: List[str]            # 性格特征
@@ -15,20 +16,20 @@ class CharacterMemory(TypedDict):
     arc: str                     # 当前成长弧线
     last_appearance: int         # 最后出现轮次
 
-
+# 剧情线索
 class PlotThread(TypedDict):
     description: str             # 线索描述
     status: str                  # active / resolved / abandoned
     created_turn: int
     last_mentioned: int
 
-
+# 伏笔点
 class Foreshadowing(TypedDict):
     description: str
     planted_turn: int
     status: str                  # pending / fulfilled
 
-
+# 整体记忆状态
 class MemoryState(TypedDict):
     characters: List[CharacterMemory]
     plot_threads: List[PlotThread]
@@ -37,52 +38,7 @@ class MemoryState(TypedDict):
     world_notes: List[str]       # 世界观细节笔记
 
 
-# ─── 记忆提取提示词 ─────────────────────────────────
-
-MEMORY_EXTRACT_PROMPT = """你是一位故事分析师，负责从最新的剧情片段中提取记忆信息。
-
-根据最新剧情片段，更新以下记忆内容：
-
-【已有记忆】
-角色档案：{characters}
-剧情线索：{plot_threads}
-伏笔：{foreshadowing}
-时间线事件：{timeline}
-世界观笔记：{world_notes}
-
-【最新剧情片段】
-{segment}
-
-【用户输入】
-{user_input}
-
-请分析片段，输出 JSON 格式的记忆更新（只输出有变化的部分，没有变化就留空数组）：
-
-{{
-  "character_updates": [
-    {{
-      "name": "角色名",
-      "traits": ["新增的性格特征"],
-      "relationships": ["新增的关系描述"],
-      "arc": "角色成长弧线变化"
-    }}
-  ],
-  "new_plot_threads": [
-    {{"description": "新线索描述", "status": "active"}}
-  ],
-  "resolved_threads": ["已解决线索的描述"],
-  "new_foreshadowing": [
-    {{"description": "伏笔描述", "status": "pending"}}
-  ],
-  "fulfilled_foreshadowing": ["已回收的伏笔描述"],
-  "timeline_events": ["关键事件摘要"],
-  "world_notes": ["新的世界观细节"]
-}}"""
-
-
 # ─── 记忆管理函数 ───────────────────────────────────
-
-
 def build_memory_context(memory: MemoryState, current_turn: int = None) -> str:
     """构建记忆摘要文本，用于注入 Agent 的 Prompt
 
@@ -135,78 +91,7 @@ def build_memory_context(memory: MemoryState, current_turn: int = None) -> str:
     return "\n".join(parts)
 
 
-def extract_memory_updates(
-    segment: str,
-    user_input: str,
-    current_memory: MemoryState,
-    current_turn: int,
-) -> MemoryState:
-    """从新剧情片段中提取记忆更新"""
-    if not segment:
-        return current_memory
-
-    # 构建当前记忆的文本表示
-    chars = current_memory.get("characters", [])
-    char_text = "\n".join(
-        f"{c.get('name', '?')}: 性格={'、'.join(c.get('traits', []))}, "
-        f"关系={'；'.join(c.get('relationships', []))}, 弧线={c.get('arc', '')}"
-        for c in chars
-    ) or "无"
-
-    plot_text = "\n".join(
-        f"{t['description']}（{t['status']}）"
-        for t in current_memory.get("plot_threads", [])
-    ) or "无"
-
-    fore_text = "\n".join(
-        f"{f['description']}（{f['status']}）"
-        for f in current_memory.get("foreshadowing", [])
-    ) or "无"
-
-    timeline_text = "\n".join(current_memory.get("timeline", [])) or "无"
-    notes_text = "\n".join(current_memory.get("world_notes", [])) or "无"
-
-    prompt = MEMORY_EXTRACT_PROMPT.format(
-        characters=char_text,
-        plot_threads=plot_text,
-        foreshadowing=fore_text,
-        timeline=timeline_text,
-        world_notes=notes_text,
-        segment=segment,
-        user_input=user_input,
-    )
-
-    response = llm_call(
-        system_prompt=prompt,
-        user_prompt="请分析并提取记忆更新。",
-        temperature=TEMPERATURE_CRITIC,
-        max_tokens=1024,
-    )
-
-    # 解析 JSON 更新
-    updates = _parse_memory_json(response)
-
-    # 合并到当前记忆
-    new_memory = _apply_updates(current_memory, updates, current_turn)
-    return new_memory
-
-
-def _parse_memory_json(text: str) -> dict:
-    """从 LLM 响应中提取 JSON"""
-    import json
-    import re
-
-    # 尝试提取 JSON 块
-    match = re.search(r"\{.*\}", text, re.DOTALL)
-    if match:
-        try:
-            return json.loads(match.group())
-        except json.JSONDecodeError:
-            pass
-    return {}
-
-
-def _apply_updates(memory: MemoryState, updates: dict, turn: int) -> MemoryState:
+def apply_updates(memory: MemoryState, updates: dict, turn: int) -> MemoryState:
     """将提取的更新合并到记忆状态"""
     new_memory = dict(memory)
 

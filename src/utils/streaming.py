@@ -8,7 +8,7 @@ import json
 from typing import AsyncGenerator, Dict, Any
 
 
-def _json_safe(obj: Any) -> Any:
+def _json_safe(obj: Any) -> Any: # 防止任意对象破坏 SSE
     """将不可 JSON 序列化的对象转为字符串"""
     if isinstance(obj, (str, int, float, bool, type(None))):
         return obj
@@ -76,7 +76,7 @@ async def transform_graph_events(
                     "node": current_node,
                     "content": chunk.content,
                 })
-
+        # 节点运行时报错兜底
         elif event_kind == "on_chain_error":
             yield format_sse_event("error", {
                 "node": name,

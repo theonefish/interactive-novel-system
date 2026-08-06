@@ -519,3 +519,20 @@
 [2026-08-05 17:59:56] [INFO] [supervisor] [supervisor.py:158] [supervisor_node] phase=init，移交路由进入 world_builder
 [2026-08-05 17:59:56] [INFO] [supervisor] [supervisor.py:228] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
 [2026-08-05 18:00:51] [INFO] [supervisor] [supervisor.py:147] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-06 19:42:19] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-08-06 19:42:19] [INFO] [supervisor] [supervisor.py:161] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-08-06 19:42:19] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-08-06 19:43:24] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-06 19:45:24] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-06 19:45:24] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-08-06 19:46:33] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-06 19:53:37] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-06 19:53:37] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-08-06 19:55:48] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-06 19:57:07] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-06 19:57:07] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=True has_world=True
+[2026-08-06 19:57:07] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-06 19:57:24] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-06 19:57:24] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
+[2026-08-06 19:58:07] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=completed awaiting_user=True choices=1
+[2026-08-06 19:58:07] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True

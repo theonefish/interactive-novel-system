@@ -17,9 +17,14 @@ def get_db_path() -> str:
 
 
 def get_conn() -> sqlite3.Connection:
-    """打开数据库连接（启用外键、行工厂为字典）并自动建表"""
+    """打开数据库连接（启用外键、行工厂为字典，统一在连接层设置）
+
+    行工厂统一设为 sqlite3.Row，避免各存储模块重复设置；
+    既支持字段名访问（row["col"]），也支持下标访问（row[0]）。
+    """
     conn = sqlite3.connect(DB_PATH)
     conn.execute("PRAGMA foreign_keys = ON")
+    conn.row_factory = sqlite3.Row
     _init_tables(conn)
     return conn
 
