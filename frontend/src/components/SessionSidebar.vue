@@ -184,7 +184,36 @@ function confirmDelete(s) {
 </script>
 
 <style scoped>
+/* 续写按钮：与主区 3D 方形按钮同一套视觉语言——朱砂、直角、深色底缘模拟厚度。
+   侧栏小按钮用纯 CSS 实现微立体，避免为小控件单独开 WebGL 渲染上下文的开销 */
 .resume-btn {
   margin-left: auto;
+  height: 26px;
+  padding: 0 10px;
+  background: #a63d2f !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: #f8f1e2 !important;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  /* 底缘 3px 深色 = 方块按钮的"厚度" */
+  box-shadow: 0 3px 0 #7c2a1f, 0 4px 8px rgba(166, 61, 47, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.resume-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #7c2a1f, 0 6px 12px rgba(166, 61, 47, 0.3);
+}
+
+/* 按下时下沉、厚度压缩，模拟实体按键反馈 */
+.resume-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #7c2a1f, 0 2px 4px rgba(166, 61, 47, 0.2);
+}
+
+.resume-btn .el-icon {
+  margin-right: 4px;
 }
 </style>

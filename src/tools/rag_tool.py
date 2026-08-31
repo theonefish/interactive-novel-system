@@ -40,7 +40,7 @@ RERANK_BASE_URL = os.getenv("RERANK_BASE_URL", )
 """
 它给 RAG 检索加了一层缓存：
 同样的查询在 5 分钟内直接返回上次结果，减少重复调用底层向量库/搜索接口；
-缓存条目超过 128 条时淘汰最旧数据，防止内存无限增长
+缓存条目超过 128 条时淘汰最旧数据，防止内存无限增长，短期内快速复用，避免频繁调用底层接口。
 """
 class _TTLCache:
     """进程内 LRU + TTL 缓存，用于缓存 RAG 检索结果"""
@@ -59,7 +59,7 @@ class _TTLCache:
         return None               # 未命中或已过期，返回 None
 
     def set(self, key: str, value: str):
-        # 容量已满：淘汰「写入时间最早」的那条记录（最老优先淘汰）
+        # 容量已满：淘汰「写入时间最早」的那条记录
         if len(self._cache) >= self._maxsize:
             oldest = min(self._cache, key=lambda k: self._cache[k][1])
             del self._cache[oldest]

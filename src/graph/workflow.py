@@ -62,8 +62,7 @@ def _build_workflow():
 
 
 async def build_graph_async():
-    """构建 LangGraph 图（异步版本，支持 SSE 流式输出）
-
+    """构建 LangGraph 图
     使用单一 SQLite 库 (novel.db) 作为 checkpointer。
     注意：AsyncSqliteSaver 需手动持有连接，使其在应用生命周期内保持存活。
     """

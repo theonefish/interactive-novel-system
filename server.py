@@ -1,11 +1,13 @@
 """FastAPI 服务层 - 提供 REST API 和静态文件服务"""
 
 import uuid
+import asyncio
+from pathlib import Path
 
 from typing import Optional, AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Request, Query
+from fastapi import FastAPI, HTTPException, Request, Query, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
@@ -25,25 +27,28 @@ from langgraph.errors import GraphInterrupt
 logger = setup_logger("server")
 
 
+# 全局持有已编译的 LangGraph 异步图（在 lifespan 启动时构建，生命周期内复用）。
+# 所有接口都从这个单例取图执行，避免每次请求重新编译图。
 app_graph_async = None
 
 
-# 请求/响应模型
+# 请求/响应模型（Pydantic，用于接口入参校验与出参序列化）
 
 class CreateSessionRequest(BaseModel):
-    user_request: str
+    user_request: str  # 用户的创作需求（小说主题/世界观设定要求等）
 
 
 class ActionRequest(BaseModel):
-    action: str
-    payload: Optional[str] = None
+    action: str  # 用户操作类型（也作为默认输入文本）
+    payload: Optional[str] = None  # 可选：具体的用户输入内容（选 A/B/C 或自由文本），优先级高于 action
 
 
 class UpdateTitleRequest(BaseModel):
-    title: str
+    title: str  # 会话标题
 
 
 class SessionResponse(BaseModel):
+    # 返回给前端的完整状态快照：当前阶段、轮次、剧情片段、选项、世界观、审查结果、最终正文等
     session_id: str
     phase: str
     turn: int
@@ -124,7 +129,8 @@ def _build_initial_state(user_request: str) -> NovelState:
 
 
 def _state_to_response(state: dict, session_id: str) -> SessionResponse:
-    """将 LangGraph 状态转换为 API 响应"""
+    """将 LangGraph 返回的内部状态（dict）裁剪/映射为对外暴露的 SessionResponse。
+    只挑选前端需要的字段，避免把 messages 等大对象直接吐给前端。"""
     phase = state.get("current_phase", "init")
 
     # 阶段到展示名的映射（其余统一视为处理中）
@@ -154,7 +160,10 @@ def _state_to_response(state: dict, session_id: str) -> SessionResponse:
 
 
 async def _run_graph(graph, graph_input, config) -> dict:
-    """执行图并返回最终状态（兼容 interrupt 暂停底层）"""
+    """执行图并返回最终状态（兼容 interrupt 暂停底层）。
+    当图中调用 interrupt() 时，LangGraph 会抛出 GraphInterrupt 异常并暂停，
+    此时图状态已 checkpoint 到 SQLite；我们捕获异常后读取已保存的状态返回前端，
+    让前端渲染「等待用户」面板，而不是让请求直接报错。"""
     try:
         return await graph.ainvoke(graph_input, config)  # 正常跑完
     except GraphInterrupt:
@@ -164,7 +173,10 @@ async def _run_graph(graph, graph_input, config) -> dict:
 
 
 def _save_meta(session_id: str, state: dict, title: Optional[str] = None):
-    """根据图状态写入/更新会话元数数据"""
+    """根据图状态写入/更新会话元数据（session_metas 表）。
+    - 新建会话时带 title 用 save_session_meta；
+    - 后续更新用 update_session_meta；
+    - 会话进入 done 时额外持久化长期记忆（long_term_memories 表），供续写接口恢复。"""
     meta = {
         "session_id": session_id,
         "current_phase": state.get("current_phase", ""),
@@ -182,9 +194,73 @@ def _save_meta(session_id: str, state: dict, title: Optional[str] = None):
 # API 路由
 
 
+# 生命周期管理：应用启动时构建图、关闭时释放 checkpointer 连接
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global app_graph_async
+
+    # 初始化异步图
+    app_graph_async = await build_graph_async()  # 编译 LangGraph 并挂载 SQLite checkpointer
+    logger.info("[lifespan] 异步图初始化完成")
+
+    yield
+
+    # ─── 关闭时清理 ───
+    # 异步图
+    if app_graph_async and hasattr(app_graph_async, "checkpointer"):
+        cp = app_graph_async.checkpointer
+        if hasattr(cp, "conn") and hasattr(cp.conn, "close"):
+            await cp.conn.close()  # aiosqlite 连接需要 await close
+            logger.info("[lifespan] 异步 checkpointer 连接已关闭")
+
+
+app = FastAPI(title="交互式小说创作系统", lifespan=lifespan)
+
+# CORS：允许前端跨域调用（开发期放开全部来源，生产应收紧 allow_origins）
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# 辅助函数
+
+def _build_initial_state(user_request: str) -> NovelState:
+    """构建初始状态：把所有 NovelState 字段初始化为空白/起始值，current_phase=init 让图从 world_builder 起步。"""
+    return {
+        "user_request": user_request,
+        "world_setting": "",
+        "characters": [],
+        "rules": "",
+        "setting_confirmed": False,
+        "story_segments": [],
+        "current_segment": "",
+        "plot_version": 0,
+        "segment_history": [],
+        "current_options": [],
+        "user_choices": [],
+        "current_turn": 0,
+        "awaiting_user": False,
+        "critique": "",
+        "critique_score": 0,
+        "risk_warnings": [],
+        "final_output": "",
+        "memory": create_initial_memory([]),
+        "messages": [],
+        "human_approval": None,
+        "current_phase": "init",
+        "iteration_count": 0,
+        "max_internal_iterations": 3,
+    }
+
+
 @app.post("/api/sessions", response_model=SessionResponse)
 async def create_session(req: CreateSessionRequest):
-    """创建新会话"""
+    """创建新会话：构建初始状态 → 跑图（生成世界观/角色/规则并审查、等待用户确认）→ 返回首屏状态。
+    用 session_id 作为 LangGraph 的 thread_id，使该会话后续的 action/stream 能复用同一份 checkpoint。"""
     if not req.user_request.strip():
         raise HTTPException(status_code=400, detail="创作需求不能为空")
 
@@ -207,7 +283,8 @@ async def create_session(req: CreateSessionRequest):
 
 @app.post("/api/sessions/{session_id}/action", response_model=SessionResponse)
 async def send_action(session_id: str, req: ActionRequest):
-    """发送用户操作"""
+    """发送用户操作（非流式）：接收用户在选项面板上的选择/自由输入。
+    用 Command(resume=...) 恢复被 interrupt 暂停的图，让 supervisor 从 _get_resume_input 取到输入并继续推进。"""
     config = {"configurable": {"thread_id": session_id}}
     graph = app_graph_async
 
@@ -231,7 +308,7 @@ async def send_action(session_id: str, req: ActionRequest):
 
 @app.get("/api/sessions/{session_id}", response_model=SessionResponse)
 async def get_session(session_id: str):
-    """获取会话状态"""
+    """获取会话状态：从 checkpointer 直接读取某 thread 的最新状态快照，不做图执行。用于刷新/恢复页面。"""
     config = {"configurable": {"thread_id": session_id}}
     graph = app_graph_async
 
@@ -250,13 +327,13 @@ async def get_session(session_id: str):
 
 @app.get("/api/sessions")
 async def list_sessions():
-    """获取所有会话及进度摘要"""
+    """获取所有会话及进度摘要（会话列表页用），直接读 session_metas 表。"""
     return session_store.list_session_metas()
 
 
 @app.patch("/api/sessions/{session_id}")
 async def update_session_title(session_id: str, req: UpdateTitleRequest):
-    """更新会话标题"""
+    """更新会话标题：仅在会话已存在时允许修改 session_metas 表的 title 字段。"""
     existing = session_store.get_session_meta(session_id)
     if not existing:
         raise HTTPException(status_code=404, detail="会话不存在")
@@ -266,11 +343,18 @@ async def update_session_title(session_id: str, req: UpdateTitleRequest):
 
 @app.delete("/api/sessions/{session_id}", status_code=204)
 async def delete_session(session_id: str):
-    """删除会话元数据"""
+    """删除会话元数据：仅删 session_metas 记录（长期记忆与 checkpoint 不在此清理）。"""
     session_store.delete_session_meta(session_id)
     return None
 
 
+@app.post("/api/sessions/{session_id}/resume", response_model=SessionResponse)
+async def resume_session(session_id: str):
+    """基于已完成的长期记忆续写新会话
+
+    从长期记忆恢复世界观、角色、规则、记忆状态，清空前情进度，
+    生成新 session_id 并以 story_progressing 阶段启动图。
+    """
 @app.get("/api/sessions/{session_id}/stream")
 async def stream_session(session_id: str, request: Request, action: str = Query("")):
     """SSE 流式输出 - 逐节点/逐 token 推进图执行结果
@@ -305,6 +389,7 @@ async def stream_session(session_id: str, request: Request, action: str = Query(
         from langgraph.types import Command
         try:
             # 使用 astream_events 流式执行，将用户输入恢复给被中断的图
+            # （action 经 Command(resume=action) 传入，supervisor 的 interrupt 处即可取到）
             async_gen = graph.astream_events(
                 Command(resume=action),
                 config,
@@ -356,9 +441,10 @@ async def resume_session(session_id: str):
     # 保留原剧情作为上下文，story_driver 会基于此续写而非重写
     prev_segments = memory.get("story_segments", []) or []
     prev_turn = len(prev_segments)
+    # 构造续写提示：带上原标题，并要求 LLM 基于已有世界观/前情推进、避免重复
     user_request = f"【续写】{memory['title']}：请基于已有世界观和已有前情继续推进故事，不要重复已存在内容"
     initial_state = _build_initial_state(user_request)
-    # 从长期记忆恢复世界观、角色、规则、记忆状态
+    # 从长期记忆恢复世界观、角色、规则、记忆状态（跳过 world_builder，直接进入剧情推进）
     initial_state["world_setting"] = memory.get("world_setting", "")
     initial_state["characters"] = memory.get("characters", [])
     initial_state["rules"] = memory.get("rules", "")
@@ -390,28 +476,138 @@ async def resume_session(session_id: str):
 
 @app.get("/api/memories")
 async def list_memories():
-    """获取所有长期记忆列表"""
+    """获取所有长期记忆列表（续写入口页用），读 long_term_memories 表。"""
     return long_term_memory.list_long_term_memories()
 
 
 @app.get("/api/memories/{memory_id}")
 async def get_memory(memory_id: str):
-    """获取单条长期记忆详情"""
+    """获取单条长期记忆详情（debug/预览用）。"""
     memory = long_term_memory.get_long_term_memory(memory_id)
     if memory is None:
         raise HTTPException(status_code=404, detail="长期记忆不存在")
     return memory
 
 
-# 静态文件（生产环境，作为 SPA fallback，需在所有 API 路由之后挂载）
+# ─── 参考文件上传（知识库入库） ───────────────────────────
+# 上传的参考文件保存到项目根目录的 knowledge_base/，
+# 与 document_util.create_index_from_dir 的批量入库目录保持一致。
+
+KNOWLEDGE_BASE_DIR = Path(__file__).resolve().parent / "knowledge_base"
+
+
+def _normalize_text_bytes(content: bytes) -> bytes:
+    """把文本文件内容统一转成 UTF-8 编码。
+
+    白话：中文 Windows 下保存的 txt/md 常见是 GBK 编码，
+    而后续 TextLoader 固定按 UTF-8 读取会直接报错。
+    这里先按 UTF-8 试解码，失败就按 GBK 解码再重新编码为 UTF-8，
+    保证落盘的文件一定能被正确解析。"""
+    try:
+        content.decode("utf-8")
+        return content  # 本来就是 UTF-8，原样返回
+    except UnicodeDecodeError:
+        try:
+            return content.decode("gbk").encode("utf-8")
+        except UnicodeDecodeError:
+            return content  # 两种编码都解不了，原样返回，交给 Loader 去报错
+
+
+def _ingest_file_to_chroma(save_path: Path):
+    """把单个文件入库到 Chroma：加载 → 分割 → 向量化写入。
+
+    注意：这是一个耗时的同步操作（每个片段都要调 embedding API），
+    调用方必须用 asyncio.to_thread 放到线程池里跑，避免阻塞事件循环。
+
+    返回 (原始文档数, 分割后的片段数)。"""
+    from src.tools.document_util import load_documents, split_documents
+    from src.tools.rag_tool import _get_vector_store
+
+    docs = load_documents(str(save_path))
+    chunks = split_documents(docs)
+    if chunks:
+        vector_store = _get_vector_store()
+        vector_store.add_documents(chunks)
+    return len(docs), len(chunks)
+
+
+@app.post("/api/knowledge/upload")
+async def upload_knowledge_file(file: UploadFile = File(...)):
+    """上传参考文件：保存到 knowledge_base/ → 解析分割 → 入库 Chroma 向量库。
+
+    入库后，写作 Agent 创作剧情时会通过 RAG 检索自动引用这些内容作为参考。
+    支持 txt / md / pdf / docx / csv 五种格式。
+    """
+    from src.tools.document_util import SUPPORTED_FORMATS
+
+    # 1. 校验文件格式
+    filename = file.filename or "unnamed"
+    suffix = Path(filename).suffix.lower()
+    if suffix not in SUPPORTED_FORMATS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"不支持的格式 {suffix or '(无后缀)'}，仅支持 txt/md/pdf/docx/csv",
+        )
+
+    # 2. 读取内容；文本类文件做编码规范化，避免 GBK 文件解析失败
+    content = await file.read()
+    if suffix in (".txt", ".md", ".csv"):
+        content = _normalize_text_bytes(content)
+
+    # 3. 保存到知识库目录
+    KNOWLEDGE_BASE_DIR.mkdir(parents=True, exist_ok=True)
+    save_path = KNOWLEDGE_BASE_DIR / filename
+    save_path.write_bytes(content)
+
+    # 4. 解析 + 入库（丢线程池执行，不阻塞服务）
+    try:
+        docs_count, chunk_count = await asyncio.to_thread(
+            _ingest_file_to_chroma, save_path
+        )
+    except Exception as e:
+        # 入库失败时删掉已保存的文件，保持知识库目录干净
+        save_path.unlink(missing_ok=True)
+        logger.exception(f"[upload] 文件 {filename} 入库失败：{e}")
+        raise HTTPException(status_code=500, detail=f"入库失败：{str(e)}")
+
+    if chunk_count == 0:
+        save_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=400, detail="文件解析后没有有效内容，请检查文件")
+
+    logger.info(f"[upload] 文件 {filename} 入库完成：{docs_count} 个文档 / {chunk_count} 个片段")
+    return {
+        "filename": filename,
+        "documents": docs_count,
+        "chunks": chunk_count,
+        "message": f"已入库 {chunk_count} 个片段，AI 创作时将自动作为参考",
+    }
+
+
+@app.get("/api/knowledge/files")
+async def list_knowledge_files():
+    """列出知识库目录中已上传的参考文件（前端上传区展示用）。"""
+    from src.tools.document_util import SUPPORTED_FORMATS
+
+    if not KNOWLEDGE_BASE_DIR.exists():
+        return []
+    files = []
+    for p in sorted(KNOWLEDGE_BASE_DIR.iterdir()):
+        if p.is_file() and p.suffix.lower() in SUPPORTED_FORMATS:
+            files.append({"filename": p.name, "size": p.stat().st_size})
+    return files
+
+
+# 静态文件（生产环境）：在所有 API 路由之后挂载，作为 SPA fallback 提供前端构建产物。
+# 开发模式下 frontend/dist 不存在则静默跳过（直接调 API 即可）。
 try:
     app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="frontend")
 except Exception:
     pass  # 开发模式下无前端构建产物
 
 
-# 启动入口
+# 启动入口：直接用 uvicorn 拉起 FastAPI（生产可改用 gunicorn + uvicorn worker）。
+# 端口 8001 需与前端 API 基址一致。
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

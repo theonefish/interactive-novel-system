@@ -1,10 +1,9 @@
 <template>
   <div class="app-root">
-    <!-- 背景装饰 -->
+    <!-- 背景装饰：three.js 漂浮纸张 + 纸张纹理 -->
+    <PaperScene />
     <div class="bg-decoration">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
+      <div class="paper-grain"></div>
     </div>
 
     <!-- 顶部导航 -->
@@ -66,14 +65,41 @@
               :disabled="isWaiting"
               class="start-textarea"
             />
-            <el-button
+            <!-- 参考资料上传：文件入库后 AI 创作时自动 RAG 检索引用 -->
+            <div class="upload-section">
+              <div class="upload-header">
+                <span class="upload-label">
+                  <el-icon><Paperclip /></el-icon>
+                  参考资料（可选）
+                </span>
+                <button class="upload-btn" :disabled="uploading" @click="triggerUpload">
+                  {{ uploading ? '上传入库中...' : '上传文件' }}
+                </button>
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept=".txt,.md,.pdf,.docx,.csv"
+                  style="display: none"
+                  @change="onFileSelected"
+                />
+              </div>
+              <p class="upload-tip">支持 txt / md / pdf / docx / csv，上传后 AI 创作时将自动检索引用</p>
+              <div v-if="knowledgeFiles.length" class="file-list">
+                <div v-for="f in knowledgeFiles" :key="f.filename" class="file-item">
+                  <span class="file-name">{{ f.filename }}</span>
+                  <span class="file-size">{{ formatSize(f.size) }}</span>
+                </div>
+              </div>
+            </div>
+            <Button3D
               class="start-btn"
-              :loading="isWaiting"
+              type="primary"
+              :disabled="isWaiting"
               @click="startSession"
             >
-              <el-icon v-if="!isWaiting" style="margin-right: 8px"><Promotion /></el-icon>
+              <el-icon v-if="!isWaiting"><Promotion /></el-icon>
               {{ isWaiting ? '创作中...' : '开始创作' }}
-            </el-button>
+            </Button3D>
           </div>
         </div>
       </transition>
@@ -203,8 +229,8 @@
             </div>
             <p class="approval-desc">当前剧情需要你的确认</p>
             <div class="approval-actions">
-              <button class="btn-approve" @click="sendApproval('approved')">通过</button>
-              <button class="btn-reject" @click="showRejectionInput = true">驳回</button>
+              <Button3D class="btn-approve" type="success" @click="sendApproval('approved')">通过</Button3D>
+              <Button3D class="btn-reject" type="danger" @click="showRejectionInput = true">驳回</Button3D>
             </div>
             <transition name="fade">
               <div v-if="showRejectionInput" class="rejection-box">
@@ -265,13 +291,16 @@ import { ElMessage } from 'element-plus'
 import {
   Promotion, Back, Reading, Loading,
   Compass, ArrowDown, Select, Document, CircleClose,
-  Fold, Expand, DocumentChecked,
+  Fold, Expand, DocumentChecked, Paperclip,
 } from '@element-plus/icons-vue'
 import {
   createSession, streamAction, getSession,
   listSessions, updateSession, deleteSession, resumeSession,
+  uploadKnowledgeFile, listKnowledgeFiles,
 } from './api/client.js'
 import SessionSidebar from './components/SessionSidebar.vue'
+import PaperScene from './components/PaperScene.vue'
+import Button3D from './components/Button3D.vue'
 
 const currentPhase = ref('start')
 const initialRequest = ref('')
@@ -300,6 +329,11 @@ const streamingMsgIndex = ref(null)   // 当前打字机气泡在 messages 中�
 const streamingTarget = ref('')       // 打字机目标完整文本
 const streamStatus = ref('')          // 当前节点进度提示
 let typeTimer = null                  // 打字机定时器
+
+// ── 参考文件上传状态 ──
+const knowledgeFiles = ref([])        // 已上传的参考文件列表
+const uploading = ref(false)          // 上传中标记（按钮置灰 + 文案切换）
+const fileInput = ref(null)           // 隐藏的 file input 引用
 
 const showInput = computed(() => currentPhase.value !== 'start' && currentPhase.value !== 'done')
 const showFinalOutput = computed(() => currentPhase.value === 'done' && finalOutput.value)
@@ -688,8 +722,50 @@ async function onResume(id) {
   }
 }
 
+// ── 参考文件上传 ──
+
+// 点击"上传文件"按钮：触发隐藏的 file input 打开文件选择框
+function triggerUpload() {
+  fileInput.value?.click()
+}
+
+// 用户选好文件后调用：上传到后端入库，成功后刷新文件列表
+async function onFileSelected(e) {
+  const file = e.target.files?.[0]
+  e.target.value = '' // 清空选择，允许下次重复选择同一文件
+  if (!file) return
+  uploading.value = true
+  try {
+    const { data } = await uploadKnowledgeFile(file)
+    ElMessage.success(`「${data.filename}」已入库 ${data.chunks} 个片段`)
+    await loadKnowledgeFiles()
+  } catch (err) {
+    ElMessage.error(err.response?.data?.detail || '上传失败，请检查文件格式')
+  } finally {
+    uploading.value = false
+  }
+}
+
+// 拉取已上传的参考文件列表
+async function loadKnowledgeFiles() {
+  try {
+    const { data } = await listKnowledgeFiles()
+    knowledgeFiles.value = Array.isArray(data) ? data : []
+  } catch (_) {
+    knowledgeFiles.value = []
+  }
+}
+
+// 文件大小格式化：1024 以下显示 B，再往上 KB / MB
+function formatSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
 onMounted(() => {
   loadSessions()
+  loadKnowledgeFiles()
 })
 
 watch(messages, scrollToBottom, { deep: true })
@@ -703,22 +779,25 @@ watch(messages, scrollToBottom, { deep: true })
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  /* 纸质风格：优先使用衬线字体，营造印刷书籍的观感 */
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'SimSun', Georgia, serif;
+  /* 纸张底色放在 body 上，让 .app-root 保持透明，露出下层 three.js 画布 */
+  background: #efe7d6;
 }
 </style>
 
 <style scoped>
 .app-root {
   min-height: 100vh;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: transparent;
+  color: #43392a;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow-x: hidden;
 }
 
-/* ─── 背景装饰 ─── */
+/* ─── 背景装饰：宣纸纹理 ─── */
 .bg-decoration {
   position: fixed;
   inset: 0;
@@ -727,44 +806,12 @@ body {
   pointer-events: none;
 }
 
-.blob {
+.paper-grain {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.25;
-  animation: blob-float 20s ease-in-out infinite;
-}
-
-.blob-1 {
-  width: 500px;
-  height: 500px;
-  background: #6366f1;
-  top: -100px;
-  left: -100px;
-}
-
-.blob-2 {
-  width: 400px;
-  height: 400px;
-  background: #8b5cf6;
-  bottom: -50px;
-  right: 10%;
-  animation-delay: -7s;
-}
-
-.blob-3 {
-  width: 350px;
-  height: 350px;
-  background: #ec4899;
-  top: 40%;
-  right: -80px;
-  animation-delay: -14s;
-}
-
-@keyframes blob-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(60px, -40px) scale(1.1); }
-  66% { transform: translate(-40px, 30px) scale(0.9); }
+  inset: 0;
+  /* feTurbulence 噪点模拟纸张纤维，叠在暖米色底上形成宣纸质感 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
 }
 
 /* ─── 顶部导航 ─── */
@@ -776,9 +823,9 @@ body {
   justify-content: space-between;
   padding: 0 32px;
   height: 72px;
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+  background: rgba(250, 245, 233, 0.92);
+  border-bottom: 1px solid #d9cdb4;
+  box-shadow: 0 2px 10px rgba(96, 74, 44, 0.08);
 }
 
 .header-left {
@@ -793,24 +840,26 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border-radius: 12px;
+  /* 朱红印章质感的 logo 底板 */
+  background: #a63d2f;
+  border-radius: 8px;
   font-size: 22px;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  color: #f8f1e2;
+  box-shadow: 0 2px 6px rgba(166, 61, 47, 0.35), inset 0 0 0 2px rgba(248, 241, 226, 0.35);
 }
 
 .header-title {
   font-size: 20px;
   font-weight: 700;
-  color: #f1f5f9;
-  letter-spacing: 0.5px;
+  color: #3d3223;
+  letter-spacing: 1px;
 }
 
 .header-subtitle {
   font-size: 12px;
-  color: #64748b;
+  color: #8d7c62;
   margin-top: 2px;
+  letter-spacing: 0.5px;
 }
 
 /* ─── 主内容 ─── */
@@ -839,16 +888,16 @@ body {
 }
 
 .collapse-btn {
-  color: #94a3b8;
+  color: #6b5d47;
   padding: 6px;
-  border: 1px solid rgba(99, 102, 241, 0.15);
+  border: 1px solid #d9cdb4;
   border-radius: 8px;
-  background: rgba(30, 41, 59, 0.5);
+  background: rgba(255, 252, 244, 0.8);
 }
 
 .collapse-btn:hover {
-  color: #c7d2fe;
-  background: rgba(99, 102, 241, 0.12);
+  color: #a63d2f;
+  background: #f3e8d8;
 }
 
 /* ─── 初始界面 ─── */
@@ -869,72 +918,158 @@ body {
 .hero-title {
   font-size: 36px;
   font-weight: 800;
-  background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #3d3223;
+  letter-spacing: 4px;
   margin-bottom: 12px;
+  position: relative;
+  display: inline-block;
+}
+
+/* 标题下的朱砂笔触下划线 */
+.hero-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 72px;
+  height: 4px;
+  background: #a63d2f;
+  border-radius: 2px;
+  opacity: 0.85;
 }
 
 .hero-desc {
-  color: #94a3b8;
+  color: #7d6c52;
   font-size: 15px;
+  margin-top: 8px;
 }
 
 .start-form {
   width: 100%;
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: 20px;
+  /* 一张铺开的稿纸：微透明，隐约透出背景里漂浮的 3D 纸张 */
+  background: rgba(251, 246, 234, 0.88);
+  border: 1px solid #ddd0b6;
+  border-radius: 6px;
   padding: 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(96, 74, 44, 0.12), 0 2px 6px rgba(96, 74, 44, 0.08);
 }
 
 .start-textarea :deep(.el-textarea__inner) {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 12px;
-  color: #e2e8f0;
+  background: #fffdf6;
+  border: 1px solid #d9cdb4;
+  border-radius: 6px;
+  color: #43392a;
   font-size: 15px;
-  line-height: 1.8;
+  font-family: inherit;
+  line-height: 1.9;
   padding: 16px;
   resize: none;
+  box-shadow: inset 0 1px 3px rgba(96, 74, 44, 0.06);
 }
 
 .start-textarea :deep(.el-textarea__inner):focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: #a63d2f;
+  box-shadow: 0 0 0 3px rgba(166, 61, 47, 0.1);
 }
 
 .start-textarea :deep(.el-textarea__inner)::placeholder {
-  color: #475569;
+  color: #b3a488;
 }
 
+/* 开始创作按钮：外观由 Button3D 的 three.js 模型渲染，这里只定尺寸与文字 */
 .start-btn {
   width: 100%;
   margin-top: 20px;
   height: 48px;
   font-size: 16px;
   font-weight: 600;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* ─── 参考资料上传区 ─── */
+.upload-section {
+  margin-top: 18px;
+  background: #f5edda;
+  border: 1px dashed #c8b78f;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.upload-header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 
-.start-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 36px rgba(99, 102, 241, 0.5);
+.upload-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7a5c2e;
 }
 
-.start-btn:disabled {
-  opacity: 0.6;
+.upload-btn {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #b99b6d;
+  background: #fffdf6;
+  color: #7a5c2e;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.upload-btn:hover:not(:disabled) {
+  background: #f3e8d8;
+  border-color: #a63d2f;
+  color: #a63d2f;
+}
+
+.upload-btn:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
+}
+
+.upload-tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #9c8a6b;
+}
+
+.file-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fffdf6;
+  border: 1px solid #e0d5bd;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.file-name {
+  font-size: 13px;
+  color: #5a4c38;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-size: 12px;
+  color: #9c8a6b;
+  flex-shrink: 0;
+  margin-left: 12px;
 }
 
 /* ─── 创作界面 ─── */
@@ -948,25 +1083,25 @@ body {
 
 /* ─── 世界观面板 ─── */
 .world-panel {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: 16px;
+  background: rgba(251, 246, 234, 0.88);
+  border: 1px solid #ddd0b6;
+  border-radius: 6px;
   overflow: hidden;
+  box-shadow: 0 4px 14px rgba(96, 74, 44, 0.08);
 }
 
 /* ─── 完整小说面板 ─── */
 .final-panel {
-  background: rgba(16, 185, 129, 0.08);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  border-radius: 16px;
+  background: #f6f3e4;
+  border: 1px solid #c3cbae;
+  border-radius: 6px;
   overflow: hidden;
   margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(96, 74, 44, 0.1);
 }
 
 .final-panel .panel-header:hover {
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(63, 96, 58, 0.06);
 }
 
 .final-body {
@@ -983,22 +1118,31 @@ body {
 }
 
 .final-body::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.3);
+  background: rgba(63, 96, 58, 0.35);
   border-radius: 10px;
 }
 
 .final-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.5);
+  background: rgba(63, 96, 58, 0.55);
 }
 
 .final-text {
-  color: #e2e8f0;
+  color: #3a3527;
   font-size: 15px;
-  line-height: 2;
+  line-height: 2.1;
   white-space: pre-wrap;
-  background: rgba(15, 23, 42, 0.4);
-  padding: 20px;
-  border-radius: 12px;
+  background: #fffdf4;
+  padding: 24px 28px;
+  border-radius: 4px;
+  border: 1px solid #e3dcc2;
+  /* 稿纸横线：淡墨横格线 */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 31px,
+    rgba(120, 100, 70, 0.08) 31px,
+    rgba(120, 100, 70, 0.08) 32px
+  );
 }
 
 .panel-header {
@@ -1012,7 +1156,7 @@ body {
 }
 
 .panel-header:hover {
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(166, 61, 47, 0.05);
 }
 
 .panel-title {
@@ -1021,12 +1165,13 @@ body {
   gap: 8px;
   font-size: 15px;
   font-weight: 600;
-  color: #c7d2fe;
+  color: #7a3b2c;
+  letter-spacing: 1px;
 }
 
 .toggle-icon {
   transition: transform 0.3s;
-  color: #64748b;
+  color: #9c8a6b;
 }
 
 .toggle-icon.collapsed {
@@ -1038,22 +1183,21 @@ body {
 }
 
 .world-text {
-  color: #cbd5e1;
+  color: #5a4c38;
   font-size: 14px;
-  line-height: 1.9;
-  background: rgba(99, 102, 241, 0.06);
+  line-height: 1.95;
+  background: #f5edda;
   padding: 16px;
-  border-radius: 12px;
-  border-left: 3px solid #6366f1;
+  border-radius: 4px;
+  border-left: 3px solid #a63d2f;
 }
 
 .sub-title {
   font-size: 13px;
   font-weight: 600;
-  color: #94a3b8;
+  color: #7a5c2e;
   margin: 18px 0 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
 .char-cards {
@@ -1065,10 +1209,10 @@ body {
 .char-card {
   display: flex;
   gap: 14px;
-  background: rgba(15, 23, 42, 0.5);
+  background: #fffdf6;
   padding: 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(99, 102, 241, 0.1);
+  border-radius: 6px;
+  border: 1px solid #e0d5bd;
 }
 
 .char-avatar {
@@ -1078,11 +1222,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border-radius: 10px;
+  /* 角色头像做成小印章 */
+  background: #a63d2f;
+  border-radius: 6px;
   font-size: 18px;
   font-weight: 700;
-  color: #fff;
+  color: #f8f1e2;
+  box-shadow: inset 0 0 0 2px rgba(248, 241, 226, 0.3);
 }
 
 .char-info {
@@ -1092,7 +1238,7 @@ body {
 .char-name {
   font-size: 15px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #3d3223;
   margin-bottom: 4px;
 }
 
@@ -1105,52 +1251,52 @@ body {
 
 .char-tag {
   font-size: 12px;
-  color: #a5b4fc;
-  background: rgba(99, 102, 241, 0.15);
+  color: #7a5c2e;
+  background: #f1e6cf;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 4px;
+  border: 1px solid #ddcaa4;
 }
 
 .char-desc {
   font-size: 13px;
-  color: #64748b;
-  line-height: 1.6;
+  color: #8d7c62;
+  line-height: 1.7;
 }
 
 .rules-box {
   margin-top: 16px;
-  background: rgba(245, 158, 11, 0.08);
-  border-left: 3px solid #f59e0b;
+  background: #f7efdb;
+  border-left: 3px solid #9c6b1f;
   padding: 14px;
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 6px 6px 0;
 }
 
 .rules-label {
   font-size: 12px;
   font-weight: 600;
-  color: #f59e0b;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  color: #9c6b1f;
+  letter-spacing: 2px;
   display: block;
   margin-bottom: 4px;
 }
 
 .rules-text {
   font-size: 14px;
-  color: #cbd5e1;
-  line-height: 1.7;
+  color: #5a4c38;
+  line-height: 1.8;
 }
 
 /* ─── 聊天日志 ─── */
 .chat-log {
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(99, 102, 241, 0.1);
-  border-radius: 16px;
+  background: rgba(251, 246, 234, 0.88);
+  border: 1px solid #ddd0b6;
+  border-radius: 6px;
   padding: 24px;
   min-height: 300px;
   max-height: 56vh;
   overflow-y: auto;
+  box-shadow: 0 4px 14px rgba(96, 74, 44, 0.08);
 }
 
 .chat-log::-webkit-scrollbar {
@@ -1162,19 +1308,19 @@ body {
 }
 
 .chat-log::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
+  background: rgba(122, 92, 46, 0.3);
   border-radius: 10px;
 }
 
 .chat-log::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5);
+  background: rgba(122, 92, 46, 0.5);
 }
 
 /* ─── 消息气泡 ─── */
 .msg {
   margin-bottom: 18px;
   padding: 16px 18px;
-  border-radius: 16px;
+  border-radius: 6px;
   animation: msg-in 0.3s ease-out;
 }
 
@@ -1184,27 +1330,33 @@ body {
 }
 
 .msg.system {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(99, 102, 241, 0.1);
+  /* AI 正文：像印在纸上的一段文字 */
+  background: #fffdf6;
+  border: 1px solid #e0d5bd;
+  border-left: 3px solid #7a5c2e;
   margin-right: 50px;
-  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 6px rgba(96, 74, 44, 0.06);
 }
 
 .msg.user {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  /* 用户输入：淡黄便签纸 */
+  background: #fdf3d3;
+  border: 1px solid #e3d193;
   margin-left: 50px;
-  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 6px rgba(96, 74, 44, 0.08);
 }
 
 .msg.notice {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  /* 内部评审：红笔批注 */
+  background: #fbeee9;
+  border: 1px solid #e6c0b3;
+  border-left: 3px solid #a63d2f;
 }
 
 .msg.final {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.15));
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: #eef2e2;
+  border: 1px solid #c3cbae;
+  border-left: 3px solid #3f603a;
 }
 
 .msg-meta {
@@ -1215,19 +1367,19 @@ body {
   font-size: 11px;
   font-weight: 600;
   padding: 3px 10px;
-  border-radius: 6px;
-  letter-spacing: 0.5px;
+  border-radius: 4px;
+  letter-spacing: 1px;
 }
 
-.tag-system { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
-.tag-final { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.tag-notice { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-.tag-user { background: rgba(139, 92, 246, 0.25); color: #c4b5fd; }
+.tag-system { background: #f1e6cf; color: #7a5c2e; border: 1px solid #ddcaa4; }
+.tag-final { background: #dde7cd; color: #3f603a; border: 1px solid #b8c8a0; }
+.tag-notice { background: #f3dcd3; color: #a63d2f; border: 1px solid #ddb4a5; }
+.tag-user { background: #f3e5b6; color: #8a6a14; border: 1px solid #ddc98b; }
 
 .msg-body {
   font-size: 15px;
-  line-height: 1.9;
-  color: #e2e8f0;
+  line-height: 1.95;
+  color: #43392a;
   white-space: pre-wrap;
 }
 
@@ -1235,7 +1387,7 @@ body {
   content: '▍';
   display: inline-block;
   margin-left: 2px;
-  color: #818cf8;
+  color: #a63d2f;
   animation: caret-blink 1s step-end infinite;
   vertical-align: baseline;
 }
@@ -1251,8 +1403,9 @@ body {
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
-  background: rgba(99, 102, 241, 0.08);
-  border-radius: 16px;
+  background: #f5edda;
+  border: 1px dashed #c8b78f;
+  border-radius: 6px;
   width: fit-content;
 }
 
@@ -1264,7 +1417,7 @@ body {
 .typing-dots span {
   width: 8px;
   height: 8px;
-  background: #818cf8;
+  background: #a63d2f;
   border-radius: 50%;
   animation: dot-bounce 1.4s ease-in-out infinite;
 }
@@ -1279,7 +1432,7 @@ body {
 
 .typing-text {
   font-size: 13px;
-  color: #818cf8;
+  color: #7a3b2c;
 }
 
 /* ─── 选项栏 ─── */
@@ -1293,9 +1446,9 @@ body {
   display: flex;
   align-items: stretch;
   gap: 0;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: 14px;
+  background: #fffdf6;
+  border: 1px solid #ddd0b6;
+  border-radius: 6px;
   padding: 0;
   cursor: pointer;
   transition: all 0.2s;
@@ -1303,13 +1456,14 @@ body {
   text-align: left;
   color: inherit;
   font-family: inherit;
+  box-shadow: 0 2px 6px rgba(96, 74, 44, 0.06);
 }
 
 .option-card:hover {
-  border-color: rgba(99, 102, 241, 0.4);
-  background: rgba(99, 102, 241, 0.08);
+  border-color: #a63d2f;
+  background: #fdf9ee;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 8px 20px rgba(166, 61, 47, 0.15);
 }
 
 .option-id {
@@ -1318,10 +1472,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(99, 102, 241, 0.15);
+  /* 选项编号做成朱印 */
+  background: #a63d2f;
   font-size: 20px;
   font-weight: 800;
-  color: #818cf8;
+  color: #f8f1e2;
 }
 
 .option-content {
@@ -1331,8 +1486,8 @@ body {
 
 .option-text {
   font-size: 14px;
-  color: #e2e8f0;
-  line-height: 1.6;
+  color: #43392a;
+  line-height: 1.7;
   margin-bottom: 6px;
 }
 
@@ -1344,30 +1499,32 @@ body {
 
 .opt-hint {
   font-size: 11px;
-  color: #64748b;
-  background: rgba(100, 116, 139, 0.15);
+  color: #8d7c62;
+  background: #f1ead9;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 4px;
+  border: 1px solid #e0d5bd;
 }
 
 .opt-risk {
   font-size: 11px;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
-.risk-safe { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.risk-medium { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-.risk-risky { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-.risk-default { background: rgba(100, 116, 139, 0.2); color: #94a3b8; }
+.risk-safe { background: #dde7cd; color: #3f603a; border: 1px solid #b8c8a0; }
+.risk-medium { background: #f5e8c8; color: #9c6b1f; border: 1px solid #e0cb94; }
+.risk-risky { background: #f3dcd3; color: #a63d2f; border: 1px solid #ddb4a5; }
+.risk-default { background: #eee7d6; color: #7d6c52; border: 1px solid #dcd2ba; }
 
 /* ─── 人工审核 ─── */
 .approval-panel {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 16px;
+  background: #fbf6ea;
+  border: 1px solid #ddd0b6;
+  border-left: 4px solid #a63d2f;
+  border-radius: 6px;
   padding: 20px;
-  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 14px rgba(96, 74, 44, 0.1);
 }
 
 .approval-header {
@@ -1376,13 +1533,14 @@ body {
   gap: 8px;
   font-size: 16px;
   font-weight: 600;
-  color: #c7d2fe;
+  color: #7a3b2c;
   margin-bottom: 8px;
+  letter-spacing: 1px;
 }
 
 .approval-desc {
   font-size: 14px;
-  color: #94a3b8;
+  color: #8d7c62;
   margin-bottom: 16px;
 }
 
@@ -1391,36 +1549,22 @@ body {
   gap: 12px;
 }
 
-.btn-approve, .btn-reject, .btn-submit {
-  padding: 10px 24px;
-  border-radius: 10px;
+.btn-approve, .btn-reject {
+  border-radius: 0; /* 方形 3D 按钮 */
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-  font-family: inherit;
+  letter-spacing: 1px;
 }
 
+/* 通过 / 驳回：外观交给 Button3D 的 3D 模型，这里只定宽高 */
 .btn-approve {
-  background: linear-gradient(135deg, #10b981, #34d399);
-  color: #fff;
-}
-
-.btn-approve:hover {
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-  transform: translateY(-1px);
+  width: 100px;
+  height: 42px;
 }
 
 .btn-reject {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.btn-reject:hover {
-  background: rgba(239, 68, 68, 0.25);
-  transform: translateY(-1px);
+  width: 100px;
+  height: 42px;
 }
 
 .rejection-box {
@@ -1428,37 +1572,46 @@ body {
 }
 
 .rejection-box :deep(.el-textarea__inner) {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 10px;
-  color: #e2e8f0;
+  background: #fffdf6;
+  border: 1px solid #d9cdb4;
+  border-radius: 6px;
+  color: #43392a;
   font-size: 14px;
+  font-family: inherit;
   padding: 12px;
   margin-bottom: 12px;
 }
 
 .rejection-box :deep(.el-textarea__inner):focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: #a63d2f;
+  box-shadow: 0 0 0 3px rgba(166, 61, 47, 0.1);
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #ef4444, #f87171);
-  color: #fff;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  letter-spacing: 1px;
+  background: #a63d2f;
+  color: #f8f1e2;
 }
 
 .btn-submit:hover {
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 6px 16px rgba(166, 61, 47, 0.35);
   transform: translateY(-1px);
 }
 
 /* ─── 输入区 ─── */
 .input-area {
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(99, 102, 241, 0.15);
-  border-radius: 16px;
+  background: rgba(251, 246, 234, 0.88);
+  border: 1px solid #ddd0b6;
+  border-radius: 6px;
   padding: 18px;
+  box-shadow: 0 4px 14px rgba(96, 74, 44, 0.08);
 }
 
 .input-row {
@@ -1469,34 +1622,35 @@ body {
 
 .text-input {
   flex: 1;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 12px;
+  background: #fffdf6;
+  border: 1px solid #d9cdb4;
+  border-radius: 6px;
   padding: 12px 16px;
-  color: #e2e8f0;
+  color: #43392a;
   font-size: 14px;
   font-family: inherit;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 1px 3px rgba(96, 74, 44, 0.06);
 }
 
 .text-input::placeholder {
-  color: #475569;
+  color: #b3a488;
 }
 
 .text-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: #a63d2f;
+  box-shadow: 0 0 0 3px rgba(166, 61, 47, 0.1);
 }
 
 .send-btn {
   width: 48px;
   height: 48px;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #a63d2f;
   border: none;
-  border-radius: 12px;
-  color: #fff;
+  border-radius: 6px;
+  color: #f8f1e2;
   font-size: 20px;
   cursor: pointer;
   display: flex;
@@ -1506,7 +1660,7 @@ body {
 }
 
 .send-btn:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 6px 16px rgba(166, 61, 47, 0.35);
   transform: translateY(-1px);
 }
 
@@ -1526,47 +1680,46 @@ body {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border-radius: 10px;
+  border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent;
   font-family: inherit;
   transition: all 0.2s;
-  color: #cbd5e1;
 }
 
 .btn-back {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.25);
-  color: #fbbf24;
+  background: #f7efdb;
+  border-color: #ddc98b;
+  color: #9c6b1f;
 }
 
 .btn-back:hover:not(:disabled) {
-  background: rgba(245, 158, 11, 0.2);
-  border-color: rgba(245, 158, 11, 0.4);
+  background: #f3e5c0;
+  border-color: #9c6b1f;
 }
 
 .btn-finish {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.25);
-  color: #a5b4fc;
+  background: #f1e6cf;
+  border-color: #d3bd93;
+  color: #7a5c2e;
 }
 
 .btn-finish:hover:not(:disabled) {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: rgba(99, 102, 241, 0.4);
+  background: #ead9ba;
+  border-color: #7a5c2e;
 }
 
 .btn-end {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #f87171;
+  background: #fbeee9;
+  border-color: #ddb4a5;
+  color: #a63d2f;
 }
 
 .btn-end:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
+  background: #f6e1d9;
+  border-color: #a63d2f;
 }
 
 .action-btn:disabled {
@@ -1581,8 +1734,10 @@ body {
   text-align: center;
   padding: 16px;
   font-size: 12px;
-  color: #475569;
-  border-top: 1px solid rgba(99, 102, 241, 0.08);
+  color: #9c8a6b;
+  letter-spacing: 1px;
+  border-top: 1px solid #d9cdb4;
+  background: rgba(250, 245, 233, 0.7);
 }
 
 /* ─── 过渡动画 ─── */
