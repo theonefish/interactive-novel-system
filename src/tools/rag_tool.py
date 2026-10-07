@@ -30,43 +30,18 @@ from src.utils.config import (
     RETRIEVE_K,
     RERANK_TOP_K,
     RAG_CACHE_TTL,
+    RAG_MAX_CHARS_PER_CHUNK,
 )
+from src.utils.prompt_utils import truncate_text
+from src.utils.ttl_cache import TTLCache
 
 EMBEDDING_API_KEY = os.getenv("OPENAI_API_KEY", "")
 EMBEDDING_BASE_URL = os.getenv("OPENAI_BASE_URL", )
 RERANK_BASE_URL = os.getenv("RERANK_BASE_URL", )
 
 # ─── TTL 缓存（减少重复 API 调用）────────────────────
-"""
-它给 RAG 检索加了一层缓存：
-同样的查询在 5 分钟内直接返回上次结果，减少重复调用底层向量库/搜索接口；
-缓存条目超过 128 条时淘汰最旧数据，防止内存无限增长，短期内快速复用，避免频繁调用底层接口。
-"""
-class _TTLCache:
-    """进程内 LRU + TTL 缓存，用于缓存 RAG 检索结果"""
-    def __init__(self, maxsize: int = 128, ttl: int = 300):
-        self._cache = {}          # 缓存字典：key -> (value, 写入时间戳)
-        self._maxsize = maxsize   # 最大缓存条数（容量上限）
-        self._ttl = ttl           # 单条记录的存活时间（秒），超时失效
-
-    def get(self, key: str):
-        # 命中缓存：取出值与写入时间戳，判断是否仍在 TTL 有效期内
-        if key in self._cache:
-            val, ts = self._cache[key]
-            if time.time() - ts < self._ttl:
-                return val        # 未过期 -> 直接返回缓存值
-            del self._cache[key]  # 已过期 -> 主动删除，防止脏数据堆积
-        return None               # 未命中或已过期，返回 None
-
-    def set(self, key: str, value: str):
-        # 容量已满：淘汰「写入时间最早」的那条记录
-        if len(self._cache) >= self._maxsize:
-            oldest = min(self._cache, key=lambda k: self._cache[k][1])
-            del self._cache[oldest]
-        # 写入新值，并记录当前时间戳
-        self._cache[key] = (value, time.time())
-
-_rag_cache = _TTLCache(ttl=RAG_CACHE_TTL)
+# 缓存的 key 只由「稳定的检索词」决定，保证同一会话里多次检索能命中缓存。
+_rag_cache = TTLCache(ttl=RAG_CACHE_TTL)
 
 # ─── Embedding ─────────────────────────────────────
 
@@ -140,7 +115,7 @@ def retrieve(query: str, top_k: int = RERANK_TOP_K) -> str:
 
         # 3. 取最优片段
         top_chunks = [candidates[i] for i in ranked_indices]
-        result = "\n\n---\n\n".join(chunk.page_content for chunk in top_chunks)
+        result = format_chunks(top_chunks)
         if result:
             _rag_cache.set(cache_key, result)
         return result
@@ -148,6 +123,27 @@ def retrieve(query: str, top_k: int = RERANK_TOP_K) -> str:
     except Exception as e:
         print(f"[rag_tool] 检索失败: {e}")
         return ""
+
+def format_chunks(chunks: List) -> str:
+    """把检索到的片段拼成参考素材，每片按上限截断（控制注入 prompt 的体积）。"""
+    return "\n\n---\n\n".join(
+        truncate_text(chunk.page_content, RAG_MAX_CHARS_PER_CHUNK) for chunk in chunks
+    )
+
+
+def build_stable_query(user_input: str, world_setting: str) -> str:
+    """用「不随每轮变化」的内容构造检索词。
+
+    以前 query 里带了「用户选择了：X」，每轮都变 → TTL 缓存永远不命中，
+    每轮都要重新做 embedding + rerank。改成只用用户需求 + 世界观关键词。
+    """
+    parts = []
+    if user_input:
+        parts.append(user_input[:100])
+    if world_setting:
+        parts.append(world_setting[:80])
+    return " ".join(parts).strip()
+
 
 def retrieve_for_writing(
     world_setting: str,
@@ -164,19 +160,10 @@ def retrieve_for_writing(
         user_input: 用户输入
         检索到的参考文本，无结果时返回空字符串
     """
-    # 用用户输入 + 世界观关键词构建查询
-    query_parts = []
-    if user_input:
-        query_parts.append(user_input[:100])
-    if world_setting:
-        # 取世界观前 50 字作为背景关键词
-        query_parts.append(world_setting[:50])
-    if current_context:
-        query_parts.append(current_context[:50])
-    # 如果没有用户输入，则直接使用世界观关键词作为查询
-    query = " ".join(query_parts) if query_parts else world_setting
-    # 如果 query 为空，则直接返回空字符串，避免无意义的检索
-    if not query.strip():
+    # 只用稳定内容做检索词（story_history / current_context 不参与），
+    # 这样同一会话里多轮检索的 query 一致，TTL 缓存能真正命中。
+    query = build_stable_query(user_input, world_setting)
+    if not query:
         return ""
 
     return retrieve(query)

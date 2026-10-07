@@ -2,15 +2,17 @@
 根据上下文、用户输入、角色描述、记忆、参考素材等信息生成下一段叙述和选项
 """
 
-import json
-import re
-
 from src.graph.state import NovelState
 from src.utils.llm import llm_call
-from src.utils.config import TEMPERATURE_CREATIVE, OPTIONS_COUNT, SEGMENT_LENGTH
+from src.utils.config import (
+    TEMPERATURE_CREATIVE, OPTIONS_COUNT, SEGMENT_LENGTH,
+    HISTORY_SEGMENTS_IN_PROMPT, MAX_CHARACTERS_IN_PROMPT, WRITER_MAX_TOKENS,
+)
+from src.utils.prompt_utils import format_characters, take_recent_segments
 from src.tools.memory import build_memory_context, apply_updates, create_initial_memory
 from src.tools.rag_tool import retrieve_for_writing
 from src.prompts.writer_prompt import STORY_DRIVER_PROMPT
+from src.utils.json_parse import parse_json_response
 from src.utils.logger import setup_logger
 
 logger = setup_logger("writer")
@@ -21,8 +23,9 @@ def story_driver_node(state: NovelState) -> dict:
     segments = state.get("story_segments", [])
     user_choices = state.get("user_choices", [])
 
-    # 构建最近3条历史摘要
-    story_history = "\n".join(segments[-3:]) if segments else "暂无"
+    # 只带最近 N 段历史（更早的不注入，控制每轮 prompt 体积）
+    recent_segments = take_recent_segments(segments, HISTORY_SEGMENTS_IN_PROMPT)
+    story_history = "\n".join(recent_segments) if recent_segments else "暂无"
 
     # 当前上下文
     current_context = ""
@@ -30,12 +33,8 @@ def story_driver_node(state: NovelState) -> dict:
         last = user_choices[-1]
         current_context = f"用户选择了：{last.get('content', '')}"
 
-    # 构建角色描述
-    characters = state.get("characters", [])
-    char_text = "\n".join(
-        f"{c.get('name', '?')}（{c.get('role', '')}）：{c.get('personality', '')}"
-        for c in characters
-    ) or "无"
+    # 构建角色描述（限制角色数量）
+    char_text = format_characters(state.get("characters", []), MAX_CHARACTERS_IN_PROMPT)
 
     # 记忆上下文（带滑动窗口裁剪）
     memory = state.get("memory", {})
@@ -69,18 +68,12 @@ def story_driver_node(state: NovelState) -> dict:
         system_prompt=prompt,
         user_prompt=f"第{turn}轮剧情：继续推进故事。",
         temperature=TEMPERATURE_CREATIVE,
-        max_tokens=2048,
+        max_tokens=WRITER_MAX_TOKENS,
+        node="story_driver",
     )
 
-    # 解析 JSON
-    try:
-        match = re.search(r"\{.*\}", response, re.DOTALL)
-        if match:
-            data = json.loads(match.group())
-        else:
-            data = {}
-    except json.JSONDecodeError:
-        data = {}
+    # 解析 JSON（兼容代码围栏 / 前后说明文字 / 被截断的输出）
+    data = parse_json_response(response, logger)
 
     segment = data.get("segment", "")
     options = data.get("options", [])

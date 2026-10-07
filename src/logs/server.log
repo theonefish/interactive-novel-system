@@ -1126,3 +1126,396 @@ During task with name 'world_builder' and id '7a43df18-f483-b5c2-aab7-50d5bd7b19
 [2026-08-06 19:43:24] [INFO] [server] [server.py:200] [create_session] 会话 6d2737bc-8e65-4d0d-913b-532f0ea54e3b 启动完成，phase=story_progressing
 [2026-08-06 19:47:42] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
 [2026-08-06 19:50:13] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-06 20:06:35] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-06 20:06:57] [INFO] [server] [server.py:198] [create_session] 新建会话 db0d6f52-c2c9-4631-8685-7a414d86a049，user_request='22世纪中叶，全球核战争与气候崩溃使地球沦为废土。大地龟裂，辐射尘遮蔽天空，水源枯竭，变异生物横行。幸存者在资源匮乏的荒原上挣扎求生，形成弱肉强食的丛林法则。传说中，有一片名为“伊甸”的绿洲，由一位前科学家利用远古净化技术建立，那里有清洁的水源、可耕种的土壤，以及免受辐射威胁的庇护所。但伊甸的位置并非固定，而是随地下暗河移动，只有通过散布在废土各处的导航图碎片才能找到。主角林晨曾是地质学家，在妻子死于辐射病后，他带着女儿林夕踏上寻访伊甸的旅程。这趟旅途不仅是生存之战，更是对人性善恶的终极考验——当资源枯竭、信任稀缺，每个选择都可能导向救赎或堕落。\n\n角色设定'
+[2026-08-06 20:08:37] [INFO] [server] [server.py:200] [create_session] 会话 db0d6f52-c2c9-4631-8685-7a414d86a049 启动完成，phase=story_progressing
+[2026-08-06 20:15:41] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-13 15:57:51] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-13 15:59:08] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-18 17:13:02] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-18 17:15:20] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-18 17:15:26] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-18 17:44:05] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-18 17:50:52] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-18 17:58:54] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-18 17:59:59] [INFO] [server] [server.py:198] [create_session] 新建会话 ece0808e-23b1-4dca-a5e1-f3d2a355a1b9，user_request='末日废土，主角是个带着女儿寻找绿洲的父亲，沿途遇到各种幸存者和变异生物'
+[2026-08-18 18:06:21] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-18 18:10:03] [INFO] [server] [server.py:200] [create_session] 会话 ece0808e-23b1-4dca-a5e1-f3d2a355a1b9 启动完成，phase=story_progressing
+[2026-08-19 16:20:58] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-19 16:20:58] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-19 16:20:58] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-19 16:20:58] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-19 16:20:58] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-19 16:20:58] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-19 16:20:58] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-19 16:22:40] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-19 16:23:16] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-19 16:23:22] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-19 16:40:09] [INFO] [server] [server.py:198] [create_session] 新建会话 ddbfebef-acf1-46c5-b88e-e64c4a8ded63，user_request='公元2157年，全球核战争与生化灾难将地球化为废土。'
+[2026-08-19 16:46:55] [INFO] [server] [server.py:200] [create_session] 会话 ddbfebef-acf1-46c5-b88e-e64c4a8ded63 启动完成，phase=story_progressing
+[2026-08-20 16:36:04] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-20 18:33:07] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-21 16:15:38] [INFO] [server] [server.py:70] [lifespan] 异步图初始化完成
+[2026-08-21 16:49:08] [INFO] [server] [server.py:80] [lifespan] 异步 checkpointer 连接已关闭
+[2026-08-24 16:50:11] [INFO] [server] [server.py:202] [lifespan] 异步图初始化完成
+[2026-08-24 17:04:11] [INFO] [server] [server.py:272] [create_session] 新建会话 ac118322-c9d3-4885-9216-14ae44810fde，user_request='公元2157年，第三次世界大战的核弹洗地后，地球沦为废土。百分之九十的土地被辐射污染，水源枯竭，天空常年灰霾。旧文明彻底崩溃，幸存者分裂为无数小聚落，在废墟间挣扎求生。辐射和化学物质使生物发生恐怖变异，诞生了诸如巨蝎、毒蚊、变异熊等怪物，它们占据着废土的主要生态位。在这片绝望之地，有一个传说：在极西之地，有一片未被污染的绿洲，那里湖水清澈，草木茂盛，是唯一能让人安居的地方。主角陆尘曾是城市工程师，灾难中失去爱妻，他独自带着八岁的女儿小曦，背着仅存的水和干粮，踏上前往传说中绿洲的征途。他们穿越荒芜的戈壁、废弃的城市、有毒的沼泽，遭遇变异生物的袭击，也遇到形形色色的幸存者——有慷慨相助的，也有意图不轨的。每一次选择都可能导向生存或死亡。这个世界是关于父爱、希望与人性在极端环境下的折射。'
+[2026-08-24 17:06:36] [INFO] [server] [server.py:274] [create_session] 会话 ac118322-c9d3-4885-9216-14ae44810fde 启动完成，phase=story_progressing
+[2026-08-30 20:12:51] [INFO] [server] [server.py:204] [lifespan] 异步图初始化完成
+[2026-08-30 20:13:54] [INFO] [server] [server.py:214] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 17:12:42] [INFO] [server] [server.py:285] [create_session] 新建会话 6246456a-0947-4c10-b79a-e55103460756，user_request='赛博朋克侦探'
+[2026-10-07 17:12:42] [ERROR] [server] [server.py:291] [create_session] 会话 6246456a-0947-4c10-b79a-e55103460756 启动失败：<asyncio.locks.Lock object at 0x000001ED858D0C20 [locked]> is bound to a different event loop
+Traceback (most recent call last):
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3440, in astream
+    async for _ in runner.atick(
+    ...<16 lines>...
+            yield o
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+    ...<15 lines>...
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 733, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        step.ainvoke(input, config, **kwargs), context=context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 707, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 698, in wrapper
+    return func(*args, **kwargs)
+  File "D:\1\code\code\code\I don't write novels\src\agents\supervisor.py", line 193, in supervisor_node
+    human_feedback = interrupt(review_data)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\types.py", line 927, in interrupt
+    raise GraphInterrupt(
+    ...<6 lines>...
+    )
+langgraph.errors.GraphInterrupt: (Interrupt(value={'kind': 'setting_confirm', 'question': '世界观设定已生成，请确认后进入剧情创作。', 'world_setting': '设定A：义体记忆可交易', 'characters': [{'name': '侦探', 'personality': '冷静、多疑', 'role': '主角'}], 'rules': '规则1\n规则2', 'score': 9, 'issues': [], 'suggestion': '很好', 'options': [{'id': 'approved', 'text': '批准，使用这个设定'}, {'id': 'rejected', 'text': '驳回，重新生成设定'}]}, id='fa83cd819fda68fb10ad07ef59f2b6fd'),)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\1\code\code\code\I don't write novels\server.py", line 286, in create_session
+    result, interrupt_payload = await _run_graph(graph, initial_state, config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\server.py", line 177, in _run_graph
+    result = await graph.ainvoke(graph_input, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 4090, in ainvoke
+    async for chunk in self.astream(
+    ...<30 lines>...
+            chunks.append(chunk)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3353, in astream
+    async with AsyncPregelLoop(
+               ~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+    ...<18 lines>...
+        has_graph_lifecycle_callbacks=bool(graph_callback_manager.handlers),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as loop:
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_loop.py", line 1983, in __aexit__
+    return await exit_task
+           ^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\contextlib.py", line 768, in __aexit__
+    raise exc
+  File "E:\conda\envs\no_write_novelsenv\Lib\contextlib.py", line 751, in __aexit__
+    cb_suppress = await cb(*exc_details)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_executor.py", line 209, in __aexit__
+    raise exc
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\checkpoint\sqlite\aio.py", line 583, in aput_writes
+    await self.setup()
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\checkpoint\sqlite\aio.py", line 312, in setup
+    async with self.lock:
+               ^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\locks.py", line 14, in __aenter__
+    await self.acquire()
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\locks.py", line 105, in acquire
+    fut = self._get_loop().create_future()
+          ~~~~~~~~~~~~~~^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\mixins.py", line 20, in _get_loop
+    raise RuntimeError(f'{self!r} is bound to a different event loop')
+RuntimeError: <asyncio.locks.Lock object at 0x000001ED858D0C20 [locked]> is bound to a different event loop
+[2026-10-07 17:12:42] [INFO] [server] [server.py:308] [send_action] 会话 None 收到操作 action='approved' payload=None -> user_input='approved'
+[2026-10-07 17:12:42] [ERROR] [server] [server.py:316] [send_action] 会话 None 执行失败：<asyncio.locks.Lock object at 0x000001ED858D0C20 [locked]> is bound to a different event loop
+Traceback (most recent call last):
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3440, in astream
+    async for _ in runner.atick(
+    ...<16 lines>...
+            yield o
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+    ...<15 lines>...
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 733, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        step.ainvoke(input, config, **kwargs), context=context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 707, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 698, in wrapper
+    return func(*args, **kwargs)
+  File "D:\1\code\code\code\I don't write novels\src\agents\supervisor.py", line 233, in supervisor_node
+    user_input = interrupt({
+        "kind": "choice",
+    ...<2 lines>...
+        "hint": options_text,
+    })
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\types.py", line 927, in interrupt
+    raise GraphInterrupt(
+    ...<6 lines>...
+    )
+langgraph.errors.GraphInterrupt: (Interrupt(value={'kind': 'choice', 'message': '请做出选择或自由输入', 'options': [{'id': 'A', 'text': '谨慎推进', 'hint': '稳', 'risk_level': '安全'}, {'id': 'B', 'text': '强行突入', 'hint': '险', 'risk_level': '高风险'}], 'hint': 'A. 谨慎推进\nB. 强行突入'}, id='dca01281fbabb3dfa341bb4fda3946d6'),)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\1\code\code\code\I don't write novels\server.py", line 311, in send_action
+    result, interrupt_payload = await _run_graph(graph, Command(resume=user_input), config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\server.py", line 177, in _run_graph
+    result = await graph.ainvoke(graph_input, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 4090, in ainvoke
+    async for chunk in self.astream(
+    ...<30 lines>...
+            chunks.append(chunk)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3353, in astream
+    async with AsyncPregelLoop(
+               ~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+    ...<18 lines>...
+        has_graph_lifecycle_callbacks=bool(graph_callback_manager.handlers),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as loop:
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_loop.py", line 1983, in __aexit__
+    return await exit_task
+           ^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\contextlib.py", line 768, in __aexit__
+    raise exc
+  File "E:\conda\envs\no_write_novelsenv\Lib\contextlib.py", line 751, in __aexit__
+    cb_suppress = await cb(*exc_details)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_executor.py", line 209, in __aexit__
+    raise exc
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_loop.py", line 1798, in _checkpointer_put_after_previous
+    await prev
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_loop.py", line 1800, in _checkpointer_put_after_previous
+    await cast(BaseCheckpointSaver, self.checkpointer).aput(
+        config, checkpoint, metadata, new_versions
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\checkpoint\sqlite\aio.py", line 530, in aput
+    await self.setup()
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\checkpoint\sqlite\aio.py", line 312, in setup
+    async with self.lock:
+               ^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\locks.py", line 14, in __aenter__
+    await self.acquire()
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\locks.py", line 105, in acquire
+    fut = self._get_loop().create_future()
+          ~~~~~~~~~~~~~~^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\mixins.py", line 20, in _get_loop
+    raise RuntimeError(f'{self!r} is bound to a different event loop')
+RuntimeError: <asyncio.locks.Lock object at 0x000001ED858D0C20 [locked]> is bound to a different event loop
+[2026-10-07 17:12:42] [INFO] [server] [server.py:308] [send_action] 会话 None 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-10-07 17:12:42] [ERROR] [server] [server.py:316] [send_action] 会话 None 执行失败：<asyncio.locks.Lock object at 0x000001ED858D0C20 [locked]> is bound to a different event loop
+Traceback (most recent call last):
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3440, in astream
+    async for _ in runner.atick(
+    ...<16 lines>...
+            yield o
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_runner.py", line 396, in atick
+    await arun_with_retry(
+    ...<15 lines>...
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_retry.py", line 744, in arun_with_retry
+    return await task.proc.ainvoke(task.input, config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 733, in ainvoke
+    input = await asyncio.create_task(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        step.ainvoke(input, config, **kwargs), context=context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+    ret = await self.afunc(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 707, in run_in_executor
+    return await asyncio.get_running_loop().run_in_executor(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langchain_core\runnables\config.py", line 698, in wrapper
+    return func(*args, **kwargs)
+  File "D:\1\code\code\code\I don't write novels\src\agents\supervisor.py", line 233, in supervisor_node
+    user_input = interrupt({
+        "kind": "choice",
+    ...<2 lines>...
+        "hint": options_text,
+    })
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\types.py", line 927, in interrupt
+    raise GraphInterrupt(
+    ...<6 lines>...
+    )
+langgraph.errors.GraphInterrupt: (Interrupt(value={'kind': 'choice', 'message': '请做出选择或自由输入', 'options': [{'id': 'A', 'text': '谨慎推进', 'hint': '稳', 'risk_level': '安全'}, {'id': 'B', 'text': '强行突入', 'hint': '险', 'risk_level': '高风险'}], 'hint': 'A. 谨慎推进\nB. 强行突入'}, id='0b57668b17813012414674e7d877b503'),)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\1\code\code\code\I don't write novels\server.py", line 311, in send_action
+    result, interrupt_payload = await _run_graph(graph, Command(resume=user_input), config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\1\code\code\code\I don't write novels\server.py", line 177, in _run_graph
+    result = await graph.ainvoke(graph_input, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 4090, in ainvoke
+    async for chunk in self.astream(
+    ...<30 lines>...
+            chunks.append(chunk)
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\main.py", line 3353, in astream
+    async with AsyncPregelLoop(
+               ~~~~~~~~~~~~~~~^
+        input,
+        ^^^^^^
+    ...<18 lines>...
+        has_graph_lifecycle_callbacks=bool(graph_callback_manager.handlers),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as loop:
+    ^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_loop.py", line 1983, in __aexit__
+    return await exit_task
+           ^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\contextlib.py", line 768, in __aexit__
+    raise exc
+  File "E:\conda\envs\no_write_novelsenv\Lib\contextlib.py", line 751, in __aexit__
+    cb_suppress = await cb(*exc_details)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_executor.py", line 209, in __aexit__
+    raise exc
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_loop.py", line 1798, in _checkpointer_put_after_previous
+    await prev
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\pregel\_loop.py", line 1800, in _checkpointer_put_after_previous
+    await cast(BaseCheckpointSaver, self.checkpointer).aput(
+        config, checkpoint, metadata, new_versions
+    )
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\checkpoint\sqlite\aio.py", line 530, in aput
+    await self.setup()
+  File "E:\conda\envs\no_write_novelsenv\Lib\site-packages\langgraph\checkpoint\sqlite\aio.py", line 312, in setup
+    async with self.lock:
+               ^^^^^^^^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\locks.py", line 14, in __aenter__
+    await self.acquire()
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\locks.py", line 105, in acquire
+    fut = self._get_loop().create_future()
+          ~~~~~~~~~~~~~~^^
+  File "E:\conda\envs\no_write_novelsenv\Lib\asyncio\mixins.py", line 20, in _get_loop
+    raise RuntimeError(f'{self!r} is bound to a different event loop')
+RuntimeError: <asyncio.locks.Lock object at 0x000001ED858D0C20 [locked]> is bound to a different event loop
+[2026-10-07 17:13:56] [INFO] [server] [server.py:215] [lifespan] 异步图初始化完成
+[2026-10-07 17:13:56] [INFO] [server] [server.py:285] [create_session] 新建会话 ba3a28a3-6617-41f1-832a-cb163eaa93e7，user_request='赛博朋克侦探'
+[2026-10-07 17:13:56] [INFO] [server] [server.py:287] [create_session] 会话 ba3a28a3-6617-41f1-832a-cb163eaa93e7 启动完成，phase=world_building
+[2026-10-07 17:13:56] [INFO] [server] [server.py:308] [send_action] 会话 ba3a28a3-6617-41f1-832a-cb163eaa93e7 收到操作 action='approved' payload=None -> user_input='approved'
+[2026-10-07 17:13:56] [INFO] [server] [server.py:312] [send_action] 会话 ba3a28a3-6617-41f1-832a-cb163eaa93e7 执行完成，phase=story_progressing
+[2026-10-07 17:13:56] [INFO] [server] [server.py:308] [send_action] 会话 ba3a28a3-6617-41f1-832a-cb163eaa93e7 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-10-07 17:13:56] [INFO] [server] [server.py:312] [send_action] 会话 ba3a28a3-6617-41f1-832a-cb163eaa93e7 执行完成，phase=done
+[2026-10-07 17:13:56] [INFO] [server] [server.py:475] [resume_session] 从记忆 ba3a28a3-6617-41f1-832a-cb163eaa93e7 续写为新会话 b4e1526f-0bd6-43c1-80fc-ffc77c8d942a
+[2026-10-07 17:13:56] [INFO] [server] [server.py:477] [resume_session] 会话 b4e1526f-0bd6-43c1-80fc-ffc77c8d942a 启动完成，phase=story_progressing
+[2026-10-07 17:13:56] [INFO] [server] [server.py:225] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 17:14:19] [INFO] [server] [server.py:215] [lifespan] 异步图初始化完成
+[2026-10-07 17:14:19] [INFO] [server] [server.py:285] [create_session] 新建会话 41b72e5c-d37a-41b8-a0a8-916656752cb4，user_request='赛博朋克侦探'
+[2026-10-07 17:14:19] [INFO] [server] [server.py:287] [create_session] 会话 41b72e5c-d37a-41b8-a0a8-916656752cb4 启动完成，phase=world_building
+[2026-10-07 17:14:19] [INFO] [server] [server.py:225] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 17:17:16] [INFO] [server] [server.py:215] [lifespan] 异步图初始化完成
+[2026-10-07 17:17:16] [INFO] [server] [server.py:285] [create_session] 新建会话 d47c9e57-75bb-41c4-8f94-0e0f33ab9609，user_request='赛博朋克侦探'
+[2026-10-07 17:17:16] [INFO] [server] [server.py:287] [create_session] 会话 d47c9e57-75bb-41c4-8f94-0e0f33ab9609 启动完成，phase=world_building
+[2026-10-07 17:17:16] [INFO] [server] [server.py:308] [send_action] 会话 d47c9e57-75bb-41c4-8f94-0e0f33ab9609 收到操作 action='approved' payload=None -> user_input='approved'
+[2026-10-07 17:17:16] [INFO] [server] [server.py:312] [send_action] 会话 d47c9e57-75bb-41c4-8f94-0e0f33ab9609 执行完成，phase=story_progressing
+[2026-10-07 17:17:16] [INFO] [server] [server.py:308] [send_action] 会话 d47c9e57-75bb-41c4-8f94-0e0f33ab9609 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-10-07 17:17:16] [INFO] [server] [server.py:312] [send_action] 会话 d47c9e57-75bb-41c4-8f94-0e0f33ab9609 执行完成，phase=done
+[2026-10-07 17:17:16] [INFO] [server] [server.py:475] [resume_session] 从记忆 d47c9e57-75bb-41c4-8f94-0e0f33ab9609 续写为新会话 9ab6c3fc-0692-44bd-8640-1f86843b040c
+[2026-10-07 17:17:16] [INFO] [server] [server.py:477] [resume_session] 会话 9ab6c3fc-0692-44bd-8640-1f86843b040c 启动完成，phase=story_progressing
+[2026-10-07 17:17:16] [INFO] [server] [server.py:225] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 20:31:30] [INFO] [server] [server.py:215] [lifespan] 异步图初始化完成
+[2026-10-07 20:32:43] [INFO] [server] [server.py:285] [create_session] 新建会话 22d8225c-3da1-44d2-844c-78ea46fabc71，user_request='公元3100年，太阳的核聚变反应因未知原因急剧衰减，预计将在五百年内熄灭。人类依靠环绕太阳的“恒星能量维持阵列”（SMA）注入暗物质来维持其稳定燃烧，确保每个明天太阳依旧升起。暗物质来自木星轨道的巨型采集舰队，但资源日益枯竭。联合政府为维护社会稳定，将真相列为最高机密，宣称太阳状态正常。然而，一位天体物理学家通过计算发现，暗物质储量仅够维持十年，而非官方宣称的一百年。他必须在揭露真相与避免全球恐慌之间做出抉择。这个世界笼罩在刘慈欣式的宏大悲怆中：个体良知与集体生存的冲突，虚假的希望与残酷的现实交织，而人类文明在宇宙的冷漠中挣扎前行。'
+[2026-10-07 20:33:10] [INFO] [server] [server.py:287] [create_session] 会话 22d8225c-3da1-44d2-844c-78ea46fabc71 启动完成，phase=world_building
+[2026-10-07 20:37:37] [WARNING] [server] [server.py:309] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 20:37:37] [WARNING] [server] [server.py:409] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 20:37:59] [INFO] [server] [server.py:221] [lifespan] 异步图初始化完成
+[2026-10-07 20:37:59] [INFO] [server] [server.py:291] [create_session] 新建会话 23baccd2-ed7d-464c-87fb-4cf56eb2901c，user_request='赛博朋克侦探'
+[2026-10-07 20:37:59] [INFO] [server] [server.py:293] [create_session] 会话 23baccd2-ed7d-464c-87fb-4cf56eb2901c 启动完成，phase=world_building
+[2026-10-07 20:37:59] [INFO] [server] [server.py:319] [send_action] 会话 23baccd2-ed7d-464c-87fb-4cf56eb2901c 收到操作 action='生成全文' payload=None -> user_input='生成全文'
+[2026-10-07 20:37:59] [INFO] [server] [server.py:323] [send_action] 会话 23baccd2-ed7d-464c-87fb-4cf56eb2901c 执行完成，phase=done
+[2026-10-07 20:37:59] [WARNING] [server] [server.py:409] [stream_session] 会话 23baccd2-ed7d-464c-87fb-4cf56eb2901c 正在执行中，拒绝并发流
+[2026-10-07 20:37:59] [WARNING] [server] [server.py:309] [send_action] 会话 23baccd2-ed7d-464c-87fb-4cf56eb2901c 正在执行中，拒绝重复请求
+[2026-10-07 20:37:59] [INFO] [server] [server.py:231] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 20:38:13] [WARNING] [server] [server.py:309] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 20:38:13] [WARNING] [server] [server.py:409] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 20:38:52] [INFO] [server] [server.py:225] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 20:40:13] [INFO] [server] [server.py:221] [lifespan] 异步图初始化完成
+[2026-10-07 20:42:44] [INFO] [server] [server.py:291] [create_session] 新建会话 331576a5-2ed2-4ae1-80c9-2743cf5bdda0，user_request='公元3100年，太阳的核聚变反应因未知原因急剧衰减，预计将在五百年内熄灭。人类依靠环绕太阳的“恒星能量维持阵列”（SMA）注入暗物质来维持其稳定燃烧，确保每个明天太阳依旧升起。暗物质来自木星轨道的巨型采集舰队，但资源日益枯竭。联合政府为维护社会稳定，将真相列为最高机密，宣称太阳状态正常。然而，一位天体物理学家通过计算发现，暗物质储量仅够维持十年，而非官方宣称的一百年。他必须在揭露真相与避免全球恐慌之间做出抉择。这个世界笼罩在刘慈欣式的宏大悲怆中：个体良知与集体生存的冲突，虚假的希望与残酷的现实交织，而人类文明在宇宙的冷漠中挣扎前行。'
+[2026-10-07 20:43:36] [INFO] [server] [server.py:293] [create_session] 会话 331576a5-2ed2-4ae1-80c9-2743cf5bdda0 启动完成，phase=story_progressing
+[2026-10-07 20:45:19] [INFO] [server] [server.py:231] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 20:51:40] [WARNING] [server] [server.py:309] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 20:51:40] [WARNING] [server] [server.py:409] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 20:51:54] [WARNING] [server] [server.py:309] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 20:51:54] [WARNING] [server] [server.py:409] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 20:54:34] [WARNING] [server] [server.py:310] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 20:54:34] [WARNING] [server] [server.py:410] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 20:56:10] [INFO] [server] [server.py:221] [lifespan] 异步图初始化完成
+[2026-10-07 20:56:45] [INFO] [server] [server.py:292] [create_session] 新建会话 4320fa6b-8e98-4dc7-bb69-cf10fe4a43dd，user_request='公元3100年，太阳的核聚变反应因未知原因急剧衰减，预计将在五百年内熄灭。人类依靠环绕太阳的“恒星能量维持阵列”（SMA）注入暗物质来维持其稳定燃烧，确保每个明天太阳依旧升起。暗物质来自木星轨道的巨型采集舰队，但资源日益枯竭。联合政府为维护社会稳定，将真相列为最高机密，宣称太阳状态正常。然而，一位天体物理学家通过计算发现，暗物质储量仅够维持十年，而非官方宣称的一百年。他必须在揭露真相与避免全球恐慌之间做出抉择。这个世界笼罩在刘慈欣式的宏大悲怆中：个体良知与集体生存的冲突，虚假的希望与残酷的现实交织，而人类文明在宇宙的冷漠中挣扎前行。'
+[2026-10-07 20:57:08] [INFO] [server] [server.py:294] [create_session] 会话 4320fa6b-8e98-4dc7-bb69-cf10fe4a43dd 启动完成，phase=world_building
+[2026-10-07 21:03:15] [WARNING] [server] [server.py:310] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 21:03:15] [WARNING] [server] [server.py:410] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 21:03:34] [INFO] [server] [server.py:221] [lifespan] 异步图初始化完成
+[2026-10-07 21:03:34] [INFO] [server] [server.py:292] [create_session] 新建会话 b2bd3741-3226-4796-b3f7-fe479ad44a9c，user_request='赛博朋克侦探'
+[2026-10-07 21:03:34] [INFO] [server] [server.py:294] [create_session] 会话 b2bd3741-3226-4796-b3f7-fe479ad44a9c 启动完成，phase=world_building
+[2026-10-07 21:03:34] [INFO] [server] [server.py:231] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 21:03:47] [WARNING] [server] [server.py:310] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 21:03:47] [WARNING] [server] [server.py:410] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 21:05:22] [INFO] [server] [server.py:231] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-07 21:05:26] [INFO] [server] [server.py:221] [lifespan] 异步图初始化完成
+[2026-10-07 21:17:16] [WARNING] [server] [server.py:316] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 21:17:16] [WARNING] [server] [server.py:416] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 21:17:52] [WARNING] [server] [server.py:316] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 21:17:52] [WARNING] [server] [server.py:416] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 21:18:12] [WARNING] [server] [server.py:316] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 21:18:12] [WARNING] [server] [server.py:416] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 21:18:46] [WARNING] [server] [server.py:316] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 21:18:46] [WARNING] [server] [server.py:416] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 21:20:47] [WARNING] [server] [server.py:316] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-07 21:20:47] [WARNING] [server] [server.py:416] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流

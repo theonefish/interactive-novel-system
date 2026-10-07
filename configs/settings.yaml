@@ -7,16 +7,22 @@ llm:
   openai_base_url: ""
   model: ""
   max_tokens: 2048
+  critic_model: ""             # critic 专用模型，留空=沿用主模型
+  writer_max_tokens: 2048      # 写剧情单次输出上限
 
 # 创作参数
 story:
   segment_length: 300          # 每轮片段字数
   options_count: 3             # 选项数量（不含自由输入）
+  history_segments_in_prompt: 2   # 注入 prompt 的历史段数（只带最近 N 段）
+  max_characters_in_prompt: 6     # 注入 prompt 的角色数上限
+  memory_context_max_chars: 400   # 记忆摘要注入上限（字符）
 
 # 质量控制
 quality:
   max_internal_iterations: 3   # Critic 内部最大循环
   pass_threshold: 6            # Critic 通过阈值（满分10）
+  critic_every_n_turns: 2      # 每几轮审核一次剧情（1=每轮；高风险选项与手动重写强制审核）
   temperature_creative: 0.8    # 创作温度
   temperature_critic: 0.3      # Critic 温度
 
@@ -28,7 +34,9 @@ rag:
   embedding_model: "BAAI/bge-m3"
   rerank_model: "BAAI/bge-reranker-v2-m3"
   retrieve_k: 20
-  rerank_top_k: 5
+  rerank_top_k: 3              # 注入 prompt 的检索片段数
+  max_chars_per_chunk: 300     # 每个检索片段的字符上限
+  search_cache_ttl: 3600       # 联网搜索结果缓存（秒）
   cache_ttl: 300               # RAG 缓存 TTL（秒）
 
 # 其他

@@ -196,7 +196,7 @@
 
         <!-- 选项栏 -->
         <transition name="slide-up">
-          <div v-if="options.length && !isWaiting" class="options-bar">
+          <div v-if="options.length && !isWaiting && !isReviewPending" class="options-bar">
             <button
               v-for="opt in options"
               :key="opt.id"
@@ -222,32 +222,57 @@
 
         <!-- 人工审核 -->
         <transition name="slide-up">
-          <div v-if="humanApproval === 'pending'" class="approval-panel">
+          <div v-if="isReviewPending" class="approval-panel">
             <div class="approval-header">
               <el-icon><Select /></el-icon>
-              <span>人工审核</span>
+              <span>{{ reviewTitle }}</span>
             </div>
-            <p class="approval-desc">当前剧情需要你的确认</p>
+            <p class="approval-desc">{{ review.question || '当前内容需要你的确认' }}</p>
+            <div v-if="typeof review.score === 'number'" class="approval-meta">
+              <span class="approval-score">评分 {{ review.score }}</span>
+              <span v-if="review.suggestion" class="approval-suggestion">{{ review.suggestion }}</span>
+            </div>
+            <ul v-if="review.issues && review.issues.length" class="approval-issues">
+              <li v-for="(issue, idx) in review.issues" :key="idx">{{ issue }}</li>
+            </ul>
             <div class="approval-actions">
-              <Button3D class="btn-approve" type="success" @click="sendApproval('approved')">通过</Button3D>
-              <Button3D class="btn-reject" type="danger" @click="showRejectionInput = true">驳回</Button3D>
+              <Button3D
+                class="btn-approve"
+                type="success"
+                :disabled="isWaiting"
+                @click="sendApproval('approved')"
+              >
+                {{ isWaiting ? '提交中…' : '通过' }}
+              </Button3D>
+              <Button3D
+                class="btn-reject"
+                type="danger"
+                :disabled="isWaiting"
+                @click="openRejection"
+              >
+                {{ rejectLabel }}
+              </Button3D>
             </div>
             <transition name="fade">
               <div v-if="showRejectionInput" class="rejection-box">
+                <p class="rejection-hint">{{ rejectionHint }}</p>
                 <el-input
                   v-model="rejectionFeedback"
                   type="textarea"
                   :rows="3"
-                  placeholder="输入修改意见..."
+                  :disabled="isWaiting"
+                  :placeholder="rejectionPlaceholder"
                 />
-                <button class="btn-submit" @click="sendApproval('rejected')">提交意见</button>
+                <button class="btn-submit" :disabled="isWaiting" @click="sendApproval('rejected')">
+                  {{ isWaiting ? '提交中…' : '提交' }}
+                </button>
               </div>
             </transition>
           </div>
         </transition>
 
         <!-- 输入区 -->
-        <div v-if="showInput" class="input-area">
+        <div v-if="showInput && !isReviewPending" class="input-area">
           <div class="input-row">
             <input
               v-model="userInput"
@@ -264,6 +289,10 @@
             <button class="action-btn btn-back" :disabled="!canBacktrack || isWaiting" @click="backtrack">
               <el-icon><Back /></el-icon>
               <span>回退</span>
+            </button>
+            <button class="action-btn btn-regen" :disabled="!canRegenerate || isWaiting" @click="regenerate">
+              <el-icon><RefreshRight /></el-icon>
+              <span>重新生成剧情</span>
             </button>
             <button class="action-btn btn-finish" :disabled="isWaiting" @click="sendUserInput('生成全文')">
               <el-icon><Document /></el-icon>
@@ -291,7 +320,7 @@ import { ElMessage } from 'element-plus'
 import {
   Promotion, Back, Reading, Loading,
   Compass, ArrowDown, Select, Document, CircleClose,
-  Fold, Expand, DocumentChecked, Paperclip,
+  Fold, Expand, DocumentChecked, Paperclip, RefreshRight,
 } from '@element-plus/icons-vue'
 import {
   createSession, streamAction, getSession,
@@ -311,6 +340,7 @@ const isWaiting = ref(false)
 const sessionId = ref('')
 const worldSetting = ref({ worldSetting: '', characters: [], rules: '' })
 const humanApproval = ref(null)
+const review = ref(null)               // 人工审核载荷（kind/question/score/issues...）
 const showRejectionInput = ref(false)
 const rejectionFeedback = ref('')
 const worldExpanded = ref(true)
@@ -335,9 +365,41 @@ const knowledgeFiles = ref([])        // 已上传的参考文件列表
 const uploading = ref(false)          // 上传中标记（按钮置灰 + 文案切换）
 const fileInput = ref(null)           // 隐藏的 file input 引用
 
+// 与后端 server.py 的 REVIEW_KINDS 保持一致：只有这些中断才需要弹出审核面板
+const REVIEW_KINDS = ['setting_confirm', 'setting_review', 'segment_review']
+
+const isReviewPending = computed(() => humanApproval.value === 'pending' && !!review.value)
+
+const reviewTitle = computed(() => {
+  const kind = review.value?.kind
+  if (kind === 'setting_confirm') return '世界观确认'
+  if (kind === 'setting_review') return '世界观审核'
+  if (kind === 'segment_review') return '剧情审核'
+  return '人工审核'
+})
+
+// 世界观确认阶段用「修改世界观」，其它审核阶段用「驳回」
+const rejectLabel = computed(() => (review.value?.kind === 'setting_confirm' ? '修改世界观' : '驳回'))
+
+const rejectionHint = computed(() => (
+  review.value?.kind === 'setting_confirm'
+    ? '可填写修改要求，AI 会据此重做世界观；不填则直接重新生成。'
+    : '可填写修改意见，AI 会据此重写。'
+))
+
+const rejectionPlaceholder = computed(() => (
+  review.value?.kind === 'setting_confirm'
+    ? '例如：改成蒸汽朋克背景，主角换成一位中年女性侦探'
+    : '输入修改意见...'
+))
+
 const showInput = computed(() => currentPhase.value !== 'start' && currentPhase.value !== 'done')
 const showFinalOutput = computed(() => currentPhase.value === 'done' && finalOutput.value)
 const canBacktrack = computed(() =>
+  currentPhase.value === 'story_progressing' && messages.value.some(m => m.type === 'system')
+)
+// 已有剧情片段时才允许「重新生成剧情」（首段还没生成了没什么可重写）
+const canRegenerate = computed(() =>
   currentPhase.value === 'story_progressing' && messages.value.some(m => m.type === 'system')
 )
 
@@ -425,6 +487,15 @@ function typeWriter(index, fullText) {
   }, 16)
 }
 
+// 后端返回 error（例如世界观构建失败）时，明确提示用户，而不是静默跳过
+function showBackendError(data) {
+  if (!data || !data.error) return
+  ElMessage.error(data.error)
+  const text = `⚠️ ${data.error}`
+  const last = messages.value[messages.value.length - 1]
+  if (!last || last.text !== text) messages.value.push({ type: 'notice', text })
+}
+
 // 流结束后收尾
 function finishStream() {
   isWaiting.value = false
@@ -445,6 +516,8 @@ function finishStream() {
 function applyFinal(data) {
   currentPhase.value = data.phase || 'processing'
   humanApproval.value = data.human_approval || null
+  review.value = data.human_approval === 'pending' ? (data.review || null) : null
+  showRejectionInput.value = false
   if (data.world_setting) worldSetting.value.worldSetting = data.world_setting
   if (data.characters) worldSetting.value.characters = data.characters
   if (data.rules) worldSetting.value.rules = data.rules
@@ -458,6 +531,7 @@ function applyFinal(data) {
     options.value = []
   }
   if (data.phase === 'done') options.value = []
+  showBackendError(data)
   if (streamingMsgIndex.value != null) {
     const mi = streamingMsgIndex.value
     const msg = messages.value[mi]
@@ -472,6 +546,7 @@ function applyFinal(data) {
 
 // 通过 SSE 驱动图执行，实时推送 token / 节点进度，正文打字机渲染
 function runStream(action, displayText) {
+  if (isWaiting.value) return  // 上一次请求还没结束，忽略重复点击
   messages.value.push({ type: 'user', text: displayText })
   const idx = messages.value.length
   messages.value.push({ type: 'system', turn: 0, text: '', streaming: true })
@@ -509,6 +584,16 @@ function runStream(action, displayText) {
     } catch (_) {}
   })
 
+  es.addEventListener('interrupt', (e) => {
+    try {
+      const d = JSON.parse(e.data)
+      if (d && REVIEW_KINDS.includes(d.kind)) {
+        review.value = d
+        humanApproval.value = 'pending'
+      }
+    } catch (_) {}
+  })
+
   es.addEventListener('final', (e) => {
     try { applyFinal(JSON.parse(e.data)) } catch (_) {}
   })
@@ -535,6 +620,7 @@ function runStream(action, displayText) {
 }
 
 function sendUserInput(input) {
+  if (isWaiting.value) return  // 生成中，忽略重复提交
   let action = input
   if (typeof action !== 'string' || action === '') {
     action = userInput.value.trim()
@@ -549,12 +635,25 @@ async function backtrack() {
   await sendUserInput('回到上一步')
 }
 
+// 重新生成当前这段剧情（后端会丢弃当前片段并用同一轮次重写）
+async function regenerate() {
+  await sendUserInput('重新生成剧情')
+}
+
+// 展开「修改/驳回」输入框（生成中不可再展开）
+function openRejection() {
+  if (isWaiting.value) return
+  showRejectionInput.value = true
+}
+
 async function sendApproval(decision) {
+  if (isWaiting.value) return  // 已在生成中，忽略重复点击
+  const isSetting = review.value?.kind === 'setting_confirm'
   let action = decision
-  let display = decision === 'approved' ? '审核通过' : '审核驳回'
+  let display = decision === 'approved' ? (isSetting ? '确认世界观' : '审核通过') : '审核驳回'
   if (decision === 'rejected') {
     action = rejectionFeedback.value.trim() || '驳回'
-    display = `审核驳回：${action}`
+    display = `${isSetting ? '世界观修改要求' : '审核驳回'}：${action}`
   }
   showRejectionInput.value = false
   rejectionFeedback.value = ''
@@ -564,6 +663,8 @@ async function sendApproval(decision) {
 function applyResponse(data) {
   currentPhase.value = data.phase || 'processing'
   humanApproval.value = data.human_approval || null
+  review.value = data.human_approval === 'pending' ? (data.review || null) : null
+  showRejectionInput.value = false
   if (data.world_setting) worldSetting.value.worldSetting = data.world_setting
   if (data.characters) worldSetting.value.characters = data.characters
   if (data.rules) worldSetting.value.rules = data.rules
@@ -583,6 +684,7 @@ function applyResponse(data) {
     messages.value.push({ type: 'notice', text: `内部评审：${data.critique}` })
   }
   if (data.phase === 'done') options.value = []
+  showBackendError(data)
   nextTick(scrollToBottom)
 }
 
@@ -620,6 +722,7 @@ function resetWorkspace() {
   options.value = []
   worldSetting.value = { worldSetting: '', characters: [], rules: '' }
   humanApproval.value = null
+  review.value = null
   showRejectionInput.value = false
   rejectionFeedback.value = ''
   currentTurn.value = 0
@@ -642,6 +745,7 @@ async function onSelectSession(id) {
     options.value = []
     worldSetting.value = { worldSetting: '', characters: [], rules: '' }
     humanApproval.value = null
+    review.value = null
     showRejectionInput.value = false
     rejectionFeedback.value = ''
     finalOutput.value = ''
@@ -703,6 +807,7 @@ async function onResume(id) {
     options.value = []
     worldSetting.value = { worldSetting: '', characters: [], rules: '' }
     humanApproval.value = null
+    review.value = null
     showRejectionInput.value = false
     rejectionFeedback.value = ''
     finalOutput.value = ''
@@ -1544,6 +1649,28 @@ body {
   margin-bottom: 16px;
 }
 
+.approval-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13px;
+  color: #7d6c52;
+  margin-bottom: 12px;
+}
+
+.approval-score {
+  font-weight: 600;
+  color: #a63d2f;
+}
+
+.approval-issues {
+  margin: 0 0 16px 18px;
+  font-size: 13px;
+  color: #7d6c52;
+  line-height: 1.7;
+}
+
 .approval-actions {
   display: flex;
   gap: 12px;
@@ -1569,6 +1696,13 @@ body {
 
 .rejection-box {
   margin-top: 16px;
+}
+
+.rejection-hint {
+  font-size: 13px;
+  color: #8d7c62;
+  line-height: 1.6;
+  margin-bottom: 8px;
 }
 
 .rejection-box :deep(.el-textarea__inner) {
@@ -1600,9 +1734,16 @@ body {
   color: #f8f1e2;
 }
 
-.btn-submit:hover {
+.btn-submit:hover:not(:disabled) {
   box-shadow: 0 6px 16px rgba(166, 61, 47, 0.35);
   transform: translateY(-1px);
+}
+
+.btn-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 /* ─── 输入区 ─── */
@@ -1698,6 +1839,17 @@ body {
 .btn-back:hover:not(:disabled) {
   background: #f3e5c0;
   border-color: #9c6b1f;
+}
+
+.btn-regen {
+  background: #eef3ea;
+  border-color: #b9cdb0;
+  color: #3f603a;
+}
+
+.btn-regen:hover:not(:disabled) {
+  background: #e2ebdb;
+  border-color: #3f603a;
 }
 
 .btn-finish {

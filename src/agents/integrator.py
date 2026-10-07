@@ -45,6 +45,7 @@ def integrator_node(state: NovelState) -> dict:
         user_prompt="请整合所有剧情片段，输出完整小说。",
         temperature=TEMPERATURE_CREATIVE,
         max_tokens=4096,
+        node="integrator",
     )
     # 返回整合结果字典格式
     return {

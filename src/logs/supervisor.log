@@ -536,3 +536,495 @@
 [2026-08-06 19:57:24] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
 [2026-08-06 19:58:07] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=completed awaiting_user=True choices=1
 [2026-08-06 19:58:07] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True
+[2026-08-06 20:06:57] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-08-06 20:06:57] [INFO] [supervisor] [supervisor.py:161] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-08-06 20:06:57] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-08-06 20:08:36] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-06 20:10:34] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-06 20:10:34] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-08-06 20:11:35] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-06 20:12:49] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-06 20:12:49] [INFO] [supervisor] [supervisor.py:231] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=True has_world=True
+[2026-08-06 20:12:49] [INFO] [supervisor] [supervisor.py:150] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-18 17:59:59] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-08-18 17:59:59] [INFO] [supervisor] [supervisor.py:167] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-08-18 17:59:59] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-08-18 18:06:49] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-18 18:06:49] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-08-18 18:08:11] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-18 18:09:58] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-18 18:09:58] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
+[2026-08-18 18:10:03] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-18 18:11:39] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=completed awaiting_user=True choices=1
+[2026-08-18 18:11:39] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True
+[2026-08-19 16:40:09] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-08-19 16:40:09] [INFO] [supervisor] [supervisor.py:167] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-08-19 16:40:09] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-08-19 16:46:55] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-20 16:59:13] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-20 16:59:13] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-08-20 17:00:16] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-24 17:04:11] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-08-24 17:04:11] [INFO] [supervisor] [supervisor.py:167] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-08-24 17:04:11] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-08-24 17:06:36] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-24 17:09:04] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-08-24 17:09:04] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-08-24 17:11:08] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-24 17:11:32] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-08-24 17:11:32] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-08-24 17:13:24] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-08-24 17:22:21] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-08-24 17:22:21] [INFO] [supervisor] [supervisor.py:237] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=True has_world=True
+[2026-08-24 17:22:21] [INFO] [supervisor] [supervisor.py:156] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 16:59:14] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 16:59:14] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 16:59:14] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 16:59:14] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 16:59:14] [INFO] [supervisor] [supervisor.py:271] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 16:59:14] [INFO] [supervisor] [supervisor.py:271] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:02:40] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:02:40] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:02:40] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:11:25] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:11:25] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:11:25] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:11:25] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:11:25] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=completed awaiting_user=True choices=1
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=None choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=None awaiting_user=None has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=None choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:224] [supervisor_node] story_progressing 无选项，移交 story_driver 生成新剧情
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=None awaiting_user=None has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=None choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=None awaiting_user=None has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=None choices=0
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:224] [supervisor_node] story_progressing 无选项，移交 story_driver 生成新剧情
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=None awaiting_user=None has_world=False
+[2026-10-07 17:12:42] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=completed awaiting_user=True choices=1
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=completed awaiting_user=True choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=False choices=0
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:224] [supervisor_node] story_progressing 无选项，移交 story_driver 生成新剧情
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:13:56] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:14:19] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:14:32] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:14:32] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:14:32] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:14:32] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:14:32] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:16:11] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:16:11] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:16:11] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:16:11] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:16:11] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=completed awaiting_user=True choices=1
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=completed awaiting_user=True choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=False choices=0
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:224] [supervisor_node] story_progressing 无选项，移交 story_driver 生成新剧情
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 17:17:16] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 20:32:43] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:32:44] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:32:44] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:33:10] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:33:10] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:33:28] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:33:28] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:33:28] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 20:34:07] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 20:34:28] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 20:37:37] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:37:37] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:37:37] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:37:37] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:37:37] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=completed setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=completed awaiting_user=True choices=0
+[2026-10-07 20:37:59] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=done setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 20:38:13] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:38:13] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:38:13] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:38:13] [INFO] [supervisor] [supervisor.py:192] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:38:13] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:42:44] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:42:44] [INFO] [supervisor] [supervisor.py:168] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:42:44] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:43:00] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=False choices=0
+[2026-10-07 20:43:00] [INFO] [supervisor] [supervisor.py:224] [supervisor_node] story_progressing 无选项，移交 story_driver 生成新剧情
+[2026-10-07 20:43:00] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:43:36] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 20:45:02] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 20:45:02] [INFO] [supervisor] [supervisor.py:272] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=False awaiting_user=True has_world=False
+[2026-10-07 20:45:02] [INFO] [supervisor] [supervisor.py:157] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 20:51:40] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:51:40] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:51:40] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:51:40] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:51:40] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:51:54] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:51:54] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:51:54] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:51:54] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:51:54] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=done awaiting_user=False choices=0
+[2026-10-07 20:52:15] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=done setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=done awaiting_user=False choices=0
+[2026-10-07 20:53:13] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=done setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:54:34] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:54:34] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:54:34] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:54:34] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:54:34] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:56:45] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 20:56:45] [INFO] [supervisor] [supervisor.py:165] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 20:56:45] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 20:57:08] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:57:08] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:57:52] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 20:57:52] [INFO] [supervisor] [supervisor.py:189] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 20:57:52] [INFO] [supervisor] [supervisor.py:277] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 20:58:18] [INFO] [supervisor] [supervisor.py:154] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 21:03:15] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:03:15] [INFO] [supervisor] [supervisor.py:229] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:03:15] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:03:15] [INFO] [supervisor] [supervisor.py:229] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:03:15] [INFO] [supervisor] [supervisor.py:317] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:03:15] [INFO] [supervisor] [supervisor.py:143] [handle_regenerate] 重写第 2 段剧情
+[2026-10-07 21:03:15] [INFO] [supervisor] [supervisor.py:132] [handle_regenerate] 没有可重写的片段，忽略该指令
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:205] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:317] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:229] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:229] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:317] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:143] [handle_regenerate] 重写第 1 段剧情
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:317] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:317] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:317] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=True has_world=True
+[2026-10-07 21:03:34] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 21:03:47] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:03:47] [INFO] [supervisor] [supervisor.py:229] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:03:47] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:03:47] [INFO] [supervisor] [supervisor.py:229] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:03:47] [INFO] [supervisor] [supervisor.py:317] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:03:47] [INFO] [supervisor] [supervisor.py:143] [handle_regenerate] 重写第 2 段剧情
+[2026-10-07 21:03:47] [INFO] [supervisor] [supervisor.py:132] [handle_regenerate] 没有可重写的片段，忽略该指令
+[2026-10-07 21:06:35] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 21:06:35] [INFO] [supervisor] [supervisor.py:317] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:07:10] [INFO] [supervisor] [supervisor.py:194] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 21:17:16] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:17:16] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:17:16] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:17:16] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:17:16] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:17:16] [INFO] [supervisor] [supervisor.py:144] [handle_regenerate] 重写第 2 段剧情
+[2026-10-07 21:17:16] [INFO] [supervisor] [supervisor.py:133] [handle_regenerate] 没有可重写的片段，忽略该指令
+[2026-10-07 21:17:52] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:17:52] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:17:52] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:17:52] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:17:52] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:17:52] [INFO] [supervisor] [supervisor.py:144] [handle_regenerate] 重写第 2 段剧情
+[2026-10-07 21:17:52] [INFO] [supervisor] [supervisor.py:133] [handle_regenerate] 没有可重写的片段，忽略该指令
+[2026-10-07 21:17:52] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=review_pending setting_confirmed=False awaiting_user=False has_world=True
+[2026-10-07 21:18:12] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:18:12] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:18:12] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:18:12] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:18:12] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:18:12] [INFO] [supervisor] [supervisor.py:144] [handle_regenerate] 重写第 2 段剧情
+[2026-10-07 21:18:12] [INFO] [supervisor] [supervisor.py:133] [handle_regenerate] 没有可重写的片段，忽略该指令
+[2026-10-07 21:18:12] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=review_pending setting_confirmed=False awaiting_user=False has_world=True
+[2026-10-07 21:18:46] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:18:46] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:18:46] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:18:46] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:18:46] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:18:46] [INFO] [supervisor] [supervisor.py:144] [handle_regenerate] 重写第 2 段剧情
+[2026-10-07 21:18:46] [INFO] [supervisor] [supervisor.py:133] [handle_regenerate] 没有可重写的片段，忽略该指令
+[2026-10-07 21:18:46] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=review_pending setting_confirmed=False awaiting_user=False has_world=True
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:206] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=3
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=3
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=4
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=4
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:144] [handle_regenerate] 重写第 5 段剧情
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:19:08] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=5
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=init awaiting_user=False choices=0
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:206] [supervisor_node] phase=init，移交路由进入 world_builder
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=init setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=0
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=1
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=2
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=3
+[2026-10-07 21:20:01] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=3
+[2026-10-07 21:20:02] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:20:02] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=4
+[2026-10-07 21:20:02] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=4
+[2026-10-07 21:20:02] [INFO] [supervisor] [supervisor.py:144] [handle_regenerate] 重写第 5 段剧情
+[2026-10-07 21:20:02] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=story_progressing setting_confirmed=True awaiting_user=False has_world=True
+[2026-10-07 21:20:02] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=story_progressing awaiting_user=True choices=5
+[2026-10-07 21:20:47] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:20:47] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:20:47] [INFO] [supervisor] [supervisor.py:195] [supervisor_node] 进入 phase=world_building awaiting_user=False choices=0
+[2026-10-07 21:20:47] [INFO] [supervisor] [supervisor.py:230] [supervisor_node] 世界观待确认，interrupt 等待用户审核
+[2026-10-07 21:20:47] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=world_building setting_confirmed=False awaiting_user=False has_world=False
+[2026-10-07 21:20:47] [INFO] [supervisor] [supervisor.py:144] [handle_regenerate] 重写第 2 段剧情
+[2026-10-07 21:20:47] [INFO] [supervisor] [supervisor.py:133] [handle_regenerate] 没有可重写的片段，忽略该指令
+[2026-10-07 21:20:47] [INFO] [supervisor] [supervisor.py:323] [supervisor_route] 路由决策 phase=review_pending setting_confirmed=False awaiting_user=False has_world=True

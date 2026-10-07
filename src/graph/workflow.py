@@ -7,7 +7,7 @@ from src.graph.state import NovelState
 from src.agents.supervisor import supervisor_node, supervisor_route, critic_route
 from src.agents.researcher import world_builder_node
 from src.agents.writer import story_driver_node
-from src.agents.reviewer import critic_node
+from src.agents.reviewer import critic_node, review_gate_node
 from src.agents.integrator import integrator_node
 from src.utils.database import get_db_path
 from src.utils.logger import setup_logger
@@ -23,6 +23,7 @@ def _build_workflow():
     workflow.add_node("world_builder", world_builder_node)
     workflow.add_node("story_driver", story_driver_node)
     workflow.add_node("critic", critic_node)
+    workflow.add_node("review_gate", review_gate_node)
     workflow.add_node("integrator", integrator_node)
 
     # 设置入口
@@ -37,6 +38,7 @@ def _build_workflow():
             "story_driver": "story_driver",
             "integrator": "integrator",
             "supervisor": "supervisor",
+            "review_gate": "review_gate",
             END: END,
         }
     )
@@ -48,6 +50,18 @@ def _build_workflow():
     # 审查节点条件边：违规打回重写/重生成，通过返回 supervisor
     workflow.add_conditional_edges(
         "critic",
+        critic_route,
+        {
+            "world_builder": "world_builder",
+            "story_driver": "story_driver",
+            "supervisor": "supervisor",
+            "review_gate": "review_gate",
+        }
+    )
+
+    # 审核闸门：只做 interrupt；用户答复后再按同一套 critic_route 决定去哪
+    workflow.add_conditional_edges(
+        "review_gate",
         critic_route,
         {
             "world_builder": "world_builder",

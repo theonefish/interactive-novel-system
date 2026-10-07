@@ -16,6 +16,9 @@ from dotenv import load_dotenv
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
+from src.utils.config import SEARCH_CACHE_TTL
+from src.utils.ttl_cache import TTLCache
+
 
 # 统一加载 configs/.env（单一配置来源）
 load_dotenv(Path(__file__).resolve().parent.parent.parent / "configs" / ".env")
@@ -34,6 +37,9 @@ def _load_mcp_config() -> dict:
 
 MCP_CONFIG = _load_mcp_config()  # 全局 MCP 配置字典
 MCP_BING_ENABLED = bool(MCP_CONFIG)  # 有配置即视为启用
+
+# 同一需求重复构建世界观时直接复用搜索结果，省一次 MCP 调用与更长的 prompt
+_search_cache = TTLCache(ttl=SEARCH_CACHE_TTL)
 
 
 def _run_async(coro):
@@ -96,7 +102,15 @@ def search_bing(query: str) -> str:
 
 
 def search_for_world_building(user_request: str) -> str:
-    """为世界观构建执行搜索（对外的统一入口）"""
+    """为世界观构建执行搜索（对外的统一入口，带缓存）"""
     if not MCP_BING_ENABLED:  # 未启用时返回空，不影响后续流程
         return ""
-    return search_bing(user_request)  # 复用搜索能力
+
+    cached = _search_cache.get(user_request)
+    if cached is not None:
+        return cached
+
+    result = search_bing(user_request)  # 复用搜索能力
+    if result:
+        _search_cache.set(user_request, result)
+    return result

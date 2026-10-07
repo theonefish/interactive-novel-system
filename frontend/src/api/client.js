@@ -99,4 +99,26 @@ export function getMemory(memoryId) {
   return api.get(`/memories/${memoryId}`)
 }
 
+/**
+ * 上传参考文件到知识库（后端会解析并入库 Chroma 向量库）
+ * @param {File} file 用户选择的文件对象
+ */
+export function uploadKnowledgeFile(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  // 入库时每个片段都要调 embedding 接口，大文件耗时较长，放宽超时
+  return api.post('/knowledge/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 300000,
+  })
+}
+
+/**
+ * 获取已上传的参考文件列表
+ * @returns {Promise} 返回 {filename, size} 数组
+ */
+export function listKnowledgeFiles() {
+  return api.get('/knowledge/files')
+}
+
 export default api

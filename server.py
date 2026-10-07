@@ -17,7 +17,7 @@ from src.graph.workflow import build_graph_async
 from src.graph.state import NovelState
 from src.tools import long_term_memory
 from src.tools.memory import create_initial_memory
-from src.utils import session_store
+from src.utils import session_store, usage
 
 from src.utils.streaming import transform_graph_events, format_sse_event
 from src.utils.logger import setup_logger
@@ -30,6 +30,12 @@ logger = setup_logger("server")
 # 全局持有已编译的 LangGraph 异步图（在 lifespan 启动时构建，生命周期内复用）。
 # 所有接口都从这个单例取图执行，避免每次请求重新编译图。
 app_graph_async = None
+
+# 正在执行的会话（同一会话同时只允许一个执行中的请求）。
+# 前端已做了按钮防抖，这里是服务端兜底：重复点击/并发 resume 会把同一个
+# thread 的 checkpoint 写乱，所以直接拒绝第二个请求。
+# 单事件循环内「判断 + 加入」之间没有 await，因此用普通 set 即可。
+_running_sessions: set = set()
 
 
 # 请求/响应模型（Pydantic，用于接口入参校验与出参序列化）
@@ -61,76 +67,75 @@ class SessionResponse(BaseModel):
     risk_warnings: list = []
     final_output: str = ""
     human_approval: Optional[str] = None
+    review: Optional[dict] = None
     error: str = ""
-
-
-# 生命周期
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    global app_graph_async
-
-    # 修正：无论 SQLite 还是 Postgres，都初始化异步图
-    app_graph_async = await build_graph_async()
-    logger.info("[lifespan] 异步图初始化完成")
-
-    yield
-
-    # ─── 关闭时清理 ───
-    # 异步图
-    if app_graph_async and hasattr(app_graph_async, "checkpointer"):
-        cp = app_graph_async.checkpointer
-        if hasattr(cp, "conn") and hasattr(cp.conn, "close"):
-            await cp.conn.close()  # aiosqlite 连接需要 await close
-            logger.info("[lifespan] 异步 checkpointer 连接已关闭")
-
-
-app = FastAPI(title="交互式小说创作系统", lifespan=lifespan)
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 
 # 辅助函数
 
-def _build_initial_state(user_request: str) -> NovelState:
-    """构建初始状态"""
-    return {
-        "user_request": user_request,
-        "world_setting": "",
-        "characters": [],
-        "rules": "",
-        "setting_confirmed": False,
-        "story_segments": [],
-        "current_segment": "",
-        "plot_version": 0,
-        "segment_history": [],
-        "current_options": [],
-        "user_choices": [],
-        "current_turn": 0,
-        "awaiting_user": False,
-        "critique": "",
-        "critique_score": 0,
-        "risk_warnings": [],
-        "final_output": "",
-        "memory": create_initial_memory([]),
-        "messages": [],
-        "human_approval": None,
-        "current_phase": "init",
-        "iteration_count": 0,
-        "max_internal_iterations": 3,
-    }
+
+# 人工审核相关的 interrupt 类型：只有这些才会驱动前端弹出审核面板
+REVIEW_KINDS = ("setting_confirm", "setting_review", "segment_review")
 
 
-def _state_to_response(state: dict, session_id: str) -> SessionResponse:
+def _interrupt_payload(value):
+    """把单个 interrupt 条目转成 dict 载荷（拿不到 dict 时返回 None）。"""
+    if isinstance(value, dict):
+        return value
+    inner = getattr(value, "value", None)
+    return inner if isinstance(inner, dict) else None
+
+
+def _first_interrupt(interrupts):
+    """从 interrupt 集合里取第一个 dict 载荷。"""
+    if interrupts is None:
+        return None
+    if not isinstance(interrupts, (list, tuple)):
+        interrupts = [interrupts]
+    for item in interrupts:
+        payload = _interrupt_payload(item)
+        if payload is not None:
+            return payload
+    return None
+
+
+def _extract_interrupt(snapshot):
+    """从 LangGraph 状态快照 / ainvoke 结果中取出 interrupt 载荷。
+
+    兼容三种形态：
+    1. snapshot.interrupts（新版直接暴露）
+    2. snapshot.tasks[*].interrupts[*]（Interrupt 对象用 .value 取载荷）
+    3. ainvoke 返回的 state dict 里的 "__interrupt__"
+    取不到时返回 None，不抛异常。
+    """
+    if snapshot is None:
+        return None
+    if isinstance(snapshot, dict):
+        return _first_interrupt(snapshot.get("__interrupt__"))
+
+    found = _first_interrupt(getattr(snapshot, "interrupts", None))
+    if found is not None:
+        return found
+
+    task_interrupts = [
+        item
+        for task in (getattr(snapshot, "tasks", None) or ())
+        for item in (getattr(task, "interrupts", None) or ())
+    ]
+    return _first_interrupt(task_interrupts)
+
+
+def _state_to_response(
+    state: dict,
+    session_id: str,
+    interrupt: dict = None,
+) -> SessionResponse:
     """将 LangGraph 返回的内部状态（dict）裁剪/映射为对外暴露的 SessionResponse。
-    只挑选前端需要的字段，避免把 messages 等大对象直接吐给前端。"""
+    只挑选前端需要的字段，避免把 messages 等大对象直接吐给前端。
+
+    当图暂停在人工审核（世界观确认 / 设定审核 / 剧情审核）时，由 interrupt
+    载荷额外输出 human_approval="pending" 与 review，驱动前端弹出审核面板。
+    """
     phase = state.get("current_phase", "init")
 
     # 阶段到展示名的映射（其余统一视为处理中）
@@ -139,8 +144,19 @@ def _state_to_response(state: dict, session_id: str) -> SessionResponse:
         "story_progressing": "story_progressing",
         "completed": "completed",
         "done": "done",
+        "review_pending": "story_progressing",  # 等审核时仍属剧情推进
     }
     display_phase = phase_map.get(phase, "processing")
+
+    human_approval = state.get("human_approval")
+    review = None
+    # interrupt 是最新一次的挂起载荷；state["pending_review"] 用于刷新页面后的兜底
+    if isinstance(interrupt, dict) and interrupt.get("kind") in REVIEW_KINDS:
+        review = interrupt
+    elif isinstance(state.get("pending_review"), dict) and state["pending_review"].get("kind") in REVIEW_KINDS:
+        review = state["pending_review"]
+    if review is not None:
+        human_approval = "pending"
 
     return SessionResponse(
         session_id=session_id,
@@ -154,22 +170,28 @@ def _state_to_response(state: dict, session_id: str) -> SessionResponse:
         critique=state.get("critique", ""),
         risk_warnings=state.get("risk_warnings", []),
         final_output=state.get("final_output", ""),
-        human_approval=state.get("human_approval"),
+        human_approval=human_approval,
+        review=review,
         error=state.get("error", ""),
     )
 
 
-async def _run_graph(graph, graph_input, config) -> dict:
-    """执行图并返回最终状态（兼容 interrupt 暂停底层）。
-    当图中调用 interrupt() 时，LangGraph 会抛出 GraphInterrupt 异常并暂停，
-    此时图状态已 checkpoint 到 SQLite；我们捕获异常后读取已保存的状态返回前端，
-    让前端渲染「等待用户」面板，而不是让请求直接报错。"""
+async def _run_graph(graph, graph_input, config):
+    """执行图并返回 (状态值, interrupt 载荷)。
+
+    当图中调用 interrupt()（等待用户选择 / 人工审核）时 LangGraph 会暂停：
+    - 部分版本直接抛 GraphInterrupt，此时状态已 checkpoint，读取快照返回；
+    - 部分版本不抛异常，而是把 __interrupt__ 放进返回的 state 里。
+    两条路径都解析出 interrupt 载荷，交给上层渲染审核面板。
+    """
     try:
-        return await graph.ainvoke(graph_input, config)  # 正常跑完
+        result = await graph.ainvoke(graph_input, config)
     except GraphInterrupt:
         # 图在中断处暂停，读取已 checkpoint 的状态返回
         snap = await graph.aget_state(config)
-        return snap.values
+        return snap.values, _extract_interrupt(snap)
+
+    return result, _extract_interrupt(result)
 
 
 def _save_meta(session_id: str, state: dict, title: Optional[str] = None):
@@ -248,9 +270,11 @@ def _build_initial_state(user_request: str) -> NovelState:
         "critique_score": 0,
         "risk_warnings": [],
         "final_output": "",
+        "error": "",
         "memory": create_initial_memory([]),
         "messages": [],
         "human_approval": None,
+        "pending_review": None,
         "current_phase": "init",
         "iteration_count": 0,
         "max_internal_iterations": 3,
@@ -272,10 +296,10 @@ async def create_session(req: CreateSessionRequest):
 
     try:
         logger.info(f"[create_session] 新建会话 {session_id}，user_request={req.user_request!r}")
-        result = await _run_graph(graph, initial_state, config)
+        result, interrupt_payload = await _run_graph(graph, initial_state, config)
         logger.info(f"[create_session] 会话 {session_id} 启动完成，phase={result.get('current_phase')}")
         _save_meta(session_id, result, title=req.user_request[:20])  # 第一条记录带 title
-        return _state_to_response(result, session_id)
+        return _state_to_response(result, session_id, interrupt_payload)
     except Exception as e:
         logger.exception(f"[create_session] 会话 {session_id} 启动失败：{e}")
         raise HTTPException(status_code=500, detail=f"启动失败：{str(e)}")
@@ -288,6 +312,11 @@ async def send_action(session_id: str, req: ActionRequest):
     config = {"configurable": {"thread_id": session_id}}
     graph = app_graph_async
 
+    if session_id in _running_sessions:
+        logger.warning(f"[send_action] 会话 {session_id} 正在执行中，拒绝重复请求")
+        raise HTTPException(status_code=409, detail="该会话正在生成中，请稍候再试")
+
+    _running_sessions.add(session_id)
     try:
         # 将用户操作转换为输入
         user_input = req.action
@@ -297,13 +326,15 @@ async def send_action(session_id: str, req: ActionRequest):
         logger.info(f"[send_action] 会话 {session_id} 收到操作 action={req.action!r} payload={req.payload!r} -> user_input={user_input!r}")
 
         # 用 Command(resume=...) 恢复被中断的图并继续执行
-        result = await _run_graph(graph, Command(resume=user_input), config)
+        result, interrupt_payload = await _run_graph(graph, Command(resume=user_input), config)
         logger.info(f"[send_action] 会话 {session_id} 执行完成，phase={result.get('current_phase')}")
         _save_meta(session_id, result)  # 更新进度快照（done 时自动存长期记忆）
-        return _state_to_response(result, session_id)
+        return _state_to_response(result, session_id, interrupt_payload)
     except Exception as e:
         logger.exception(f"[send_action] 会话 {session_id} 执行失败：{e}")
         raise HTTPException(status_code=500, detail=f"执行失败：{str(e)}")
+    finally:
+        _running_sessions.discard(session_id)
 
 
 @app.get("/api/sessions/{session_id}", response_model=SessionResponse)
@@ -317,7 +348,7 @@ async def get_session(session_id: str):
         if state is None:
             logger.warning(f"[get_session] 会话 {session_id} 不存在")
             raise HTTPException(status_code=404, detail="会话不存在")
-        return _state_to_response(state.values, session_id)
+        return _state_to_response(state.values, session_id, _extract_interrupt(state))
     except HTTPException:
         raise
     except Exception as e:
@@ -348,13 +379,6 @@ async def delete_session(session_id: str):
     return None
 
 
-@app.post("/api/sessions/{session_id}/resume", response_model=SessionResponse)
-async def resume_session(session_id: str):
-    """基于已完成的长期记忆续写新会话
-
-    从长期记忆恢复世界观、角色、规则、记忆状态，清空前情进度，
-    生成新 session_id 并以 story_progressing 阶段启动图。
-    """
 @app.get("/api/sessions/{session_id}/stream")
 async def stream_session(session_id: str, request: Request, action: str = Query("")):
     """SSE 流式输出 - 逐节点/逐 token 推进图执行结果
@@ -387,6 +411,14 @@ async def stream_session(session_id: str, request: Request, action: str = Query(
 
     async def event_generator():
         from langgraph.types import Command
+
+        if session_id in _running_sessions:
+            logger.warning(f"[stream_session] 会话 {session_id} 正在执行中，拒绝并发流")
+            yield format_sse_event("error", {"error": "该会话正在生成中，请稍候再试"})
+            yield format_sse_event("done", {"message": "stream complete"})
+            return
+
+        _running_sessions.add(session_id)
         try:
             # 使用 astream_events 流式执行，将用户输入恢复给被中断的图
             # （action 经 Command(resume=action) 传入，supervisor 的 interrupt 处即可取到）
@@ -404,13 +436,18 @@ async def stream_session(session_id: str, request: Request, action: str = Query(
             # 流结束后发送完整状态快照（异步获取）
             state = await graph.aget_state(config)
             _save_meta(session_id, state.values)  # 复用同一套进度记录写入
-            final_resp = _state_to_response(state.values, session_id)
+            # 停在人工审核时，先补发 interrupt 事件，再发最终快照
+            interrupt_payload = _extract_interrupt(state)
+            if interrupt_payload and interrupt_payload.get("kind") in REVIEW_KINDS:
+                yield format_sse_event("interrupt", interrupt_payload)
+            final_resp = _state_to_response(state.values, session_id, interrupt_payload)
             yield format_sse_event("final", final_resp.model_dump())
 
         except Exception as e:
             logger.exception(f"[stream_session] 会话 {session_id} 流式执行失败：{e}")
             yield format_sse_event("error", {"error": str(e)})
         finally:
+            _running_sessions.discard(session_id)
             yield format_sse_event("done", {"message": "stream complete"})
 
     return StreamingResponse(
@@ -465,13 +502,19 @@ async def resume_session(session_id: str):
 
     try:
         logger.info(f"[resume_session] 从记忆 {session_id} 续写为新会话 {new_session_id}")
-        result = await _run_graph(graph, initial_state, config)
+        result, interrupt_payload = await _run_graph(graph, initial_state, config)
         logger.info(f"[resume_session] 会话 {new_session_id} 启动完成，phase={result.get('current_phase')}")
         _save_meta(new_session_id, result, title=memory.get("title", ""))  # 续写记录带原标题
-        return _state_to_response(result, new_session_id)
+        return _state_to_response(result, new_session_id, interrupt_payload)
     except Exception as e:
         logger.exception(f"[resume_session] 会话 {new_session_id} 启动失败：{e}")
         raise HTTPException(status_code=500, detail=f"续写失败：{str(e)}")
+
+
+@app.get("/api/usage")
+async def get_usage():
+    """查看 LLM token 用量（按节点汇总 + 最近调用明细），用于对账与优化。"""
+    return usage.summarize_usage()
 
 
 @app.get("/api/memories")

@@ -60,6 +60,7 @@ class NovelState(TypedDict):
 
     # 输出
     final_output: str
+    error: str  # 致命错误提示（例如世界观构建反复失败），供前端明确告知用户
 
     # 记忆
     memory: MemoryState    # 记忆状态
@@ -69,6 +70,7 @@ class NovelState(TypedDict):
 
     # 人工审核（Human-in-the-Loop）
     human_approval: Optional[Literal["pending", "approved", "rejected"]]#记录用户批准/驳回，驱动打回或放行
+    pending_review: Optional[dict]  # 待用户审核的载荷（critic 算好后落库，review_gate 只负责 interrupt）
 
     # 控制
     current_phase: str #

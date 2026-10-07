@@ -3,7 +3,7 @@
 # 解析用户输入（理解意图）、
 # 管理小说生成状态（回溯、生成全文、选项选择）、
 # 以及进行节点路由（决定下一步由哪一个 Agent/节点执行）。
-import json
+
 import re
 from typing import Optional
 
@@ -14,6 +14,9 @@ from src.graph.state import NovelState
 from src.utils.llm import llm_call
 from src.utils.config import TEMPERATURE_CRITIC, MAX_BACKTRACK_STEPS
 from src.prompts.supervisor_prompt import ROUTE_PROMPT
+# 重新生成 / 驳回重写都用同一套「丢弃当前片段」的逻辑，避免两处实现不一致
+from src.agents.reviewer import _rollback_last_segment
+from src.utils.json_parse import parse_json_response
 from src.utils.logger import setup_logger
 
 logger = setup_logger("supervisor")
@@ -26,7 +29,12 @@ COMMON_RULES = [
     (r"确认|可以|就这样|没问题|很好", {"action": "free_input", "selected_option": None}),
 ]
 
-
+# LangGraph 官方有 langgraph.prebuilt.create_supervisor，
+# 它会自动生成一个 LLM 驱动的 supervisor，用 tool-calling 把子 agent 当成"工具"来调度。
+# 这里没有用官方的预制 supervisor，而是自己写了一个更轻量的版本，主要是为了：
+# 1. 避免每次都调用 LLM 来解析用户输入，节省成本（尤其是免费额度有限的情况下）；
+# 2. 让用户输入的解析逻辑更可控，方便自定义规则和多级降级策略；
+# 3. 让 supervisor 的路由逻辑更清晰，便于调试和维护。
 def parse_user_input(user_input: str, phase: str) -> dict:
     """解析用户输入，采用多级降级策略"""
     user_input = user_input.strip()
@@ -34,6 +42,8 @@ def parse_user_input(user_input: str, phase: str) -> dict:
     # 特殊指令（优先级最高）
     if user_input in ("生成全文", "结束"):
         return {"action": "generate_full", "selected_option": None}
+    if user_input in ("重新生成剧情", "重新生成", "重写这段", "重写剧情"):
+        return {"action": "regenerate", "selected_option": None}
     if user_input in ("回到上一步", "回溯"):
         return {"action": "backtrack", "selected_option": None}
 
@@ -60,14 +70,12 @@ def parse_user_input(user_input: str, phase: str) -> dict:
         user_prompt=f"用户输入：{user_input}\n当前阶段：{phase}",
         temperature=TEMPERATURE_CRITIC,
         max_tokens=256,
+        node="supervisor",
     )
     # 最后一道结构化解析尝试，失败就降级为自由输入，保证函数永远返回一个可用的路由结果，不会崩溃
-    try:
-        match = re.search(r"\{.*\}", response, re.DOTALL)
-        if match:
-            return json.loads(match.group())
-    except (json.JSONDecodeError, KeyError):
-        pass
+    data = parse_json_response(response, logger)
+    if data.get("action"):
+        return data
 
     return {"action": "free_input", "selected_option": None}
 
@@ -113,16 +121,52 @@ def _get_resume_input(state: NovelState) -> Optional[str]:
     return None
 
 
+def handle_regenerate(state: NovelState) -> dict:
+    """重新生成剧情：丢弃当前这段，让 story_driver 用同一轮次重写一遍。
+
+    与「回退」的区别：回退是退回上一段、让用户重新选择；
+    重新生成是原地重写，轮次和段落数都不变，只是把这一段换成新写的。
+    """
+    rollback = _rollback_last_segment(state)
+    if not rollback:
+        # 还没有任何剧情可重写（首段尚未生成时）
+        logger.info("[handle_regenerate] 没有可重写的片段，忽略该指令")
+        return {"current_phase": "story_progressing", "awaiting_user": False}
+
+    user_choices = list(state.get("user_choices", []))
+    user_choices.append({
+        "turn_id": state.get("current_turn", 0),
+        "choice_type": "regenerate",
+        "content": "重新生成剧情",
+        "selected_option": None,
+    })
+
+    logger.info(f"[handle_regenerate] 重写第 {state.get('current_turn', 0)} 段剧情")
+
+    updates = dict(rollback)
+    updates.update({
+        "user_choices": user_choices,
+        "awaiting_user": False,
+        "current_phase": "story_progressing",
+        "iteration_count": 0,
+        "current_options": [],
+    })
+    return updates
+
+
 def _apply_user_choice(state: NovelState, user_input: str) -> dict:
     """解析用户输入并更新选择记录"""
     phase = state.get("current_phase", "story_progressing")  # 取出当前所处的阶段，缺省当作剧情推进中
     parsed = parse_user_input(user_input, phase)  # 把用户输入字符串解析成结构化指令（含 action 等字段）
 
-    choice_type = parsed["action"]  # 取出解析后的动作类型，用于后续分支判断
+    choice_type = parsed.get("action") or "free_input"  # 取出解析后的动作类型，缺字段时兜底为自由输入
     selected_option = parsed.get("selected_option")  # 取出被选中的选项（A/B/C 等），可能没有则为 None
 
     if choice_type == "backtrack":  # 若用户要求回溯
         return handle_backtrack(state)  # 交给回溯处理函数，直接回退历史并短路返回
+
+    if choice_type == "regenerate":  # 若用户要求重新生成当前这段
+        return handle_regenerate(state)  # 丢弃当前片段，让 story_driver 重写同一轮
 
     if choice_type == "generate_full":  # 若用户要求生成全文（整合输出）
         return {"current_phase": "completed"}  # 仅把阶段置为已完成，让路由去整合节点，不做普通选择记录
@@ -141,6 +185,7 @@ def _apply_user_choice(state: NovelState, user_input: str) -> dict:
         "user_choices": user_choices,  # 更新后的选择历史
         "awaiting_user": False,  # 已收到并处理输入，不再等待用户
         "current_phase": "story_progressing",  # 保持剧情推进中，路由到 story_driver 生成下一段
+        "iteration_count": 0,  # 新一轮剧情开始，重置本轮内部审查计数
     }
 
 
@@ -162,9 +207,42 @@ def supervisor_node(state: NovelState) -> dict:
         return {}
 
     elif phase == "world_building":
-        # critic 已通过设定审查，进入剧情推进
-        updates["setting_confirmed"] = True
-        updates["current_phase"] = "story_progressing"
+        # 世界观已构建完成，停下来等用户确认（Human-in-the-Loop）
+        if not state.get("world_setting"):
+            # 尚未构建世界观：交回条件路由进入 world_builder
+            logger.info("[supervisor_node] world_building 但无世界观，移交路由构建")
+            return {}
+
+        review_data = {
+            "kind": "setting_confirm",
+            "question": "世界观设定已生成，请确认后进入剧情创作。",
+            "world_setting": state.get("world_setting", ""),
+            "characters": state.get("characters", []),
+            "rules": state.get("rules", ""),
+            "score": state.get("critique_score", 0),
+            "issues": [],
+            "suggestion": state.get("critique", ""),
+            "options": [
+                {"id": "approved", "text": "批准，使用这个设定"},
+                {"id": "rejected", "text": "驳回，重新生成设定"},
+            ],
+        }
+        logger.info("[supervisor_node] 世界观待确认，interrupt 等待用户审核")
+        human_feedback = interrupt(review_data)
+
+        if str(human_feedback).strip() == "approved":
+            updates["setting_confirmed"] = True
+            updates["current_phase"] = "story_progressing"
+            updates["human_approval"] = "approved"
+            updates["iteration_count"] = 0
+        else:
+            # 驳回：清空世界观，让条件路由把流程打回 world_builder 重做
+            updates["setting_confirmed"] = False
+            updates["current_phase"] = "world_building"
+            updates["world_setting"] = ""
+            updates["human_approval"] = "rejected"
+            updates["critique"] = f"用户驳回设定，反馈：{human_feedback}"
+            updates["iteration_count"] = state.get("iteration_count", 0) + 1
         return updates
 
     elif phase == "story_progressing":
@@ -191,6 +269,7 @@ def supervisor_node(state: NovelState) -> dict:
         ) or "无选项"
 
         user_input = interrupt({
+            "kind": "choice",
             "message": "请做出选择或自由输入",
             "options": options,
             "hint": options_text,
@@ -209,14 +288,27 @@ def supervisor_node(state: NovelState) -> dict:
 def critic_route(state: NovelState) -> str:
     """critic 节点后的条件路由"""
     phase = state.get("current_phase", "story_progressing")
-    segment = state.get("current_segment", "")
-    is_setting_review = not segment and bool(state.get("world_setting", ""))
 
-    if is_setting_review:
-        # 设定审查：未通过则打回 world_builder，通过则进入剧情
+    # 审核挂起：交给 review_gate 去 interrupt（critic 已算完，不再重复调模型）
+    if phase == "review_pending":
+        return "review_gate"
+
+    segment = state.get("current_segment", "")
+    has_world = bool(state.get("world_setting", ""))
+    is_setting_review = not segment and has_world
+
+    # 没有剧情也没有世界观：世界观构建失败，打回重做
+    # （达到重试上限时 critic_node 会把阶段置为 done，交给 supervisor 收尾）
+    if not segment and not has_world:
         if phase == "critic_loop":
             return "world_builder"
-        return "story_driver"
+        return "supervisor"
+
+    if is_setting_review:
+        # 设定审查：未通过则打回 world_builder；通过则交回 supervisor 等用户确认
+        if phase == "critic_loop":
+            return "world_builder"
+        return "supervisor"
 
     # 剧情审查：未通过则打回 story_driver，通过则返回 supervisor 等待用户
     if phase == "critic_loop":
@@ -232,6 +324,10 @@ def supervisor_route(state: NovelState) -> str:
                 f"setting_confirmed={state.get('setting_confirmed')} "
                 f"awaiting_user={state.get('awaiting_user')} "
                 f"has_world={bool(state.get('world_setting'))}")
+
+    if phase == "review_pending":
+        # 兜底：只应由 critic → review_gate 处理，这里避免落回 supervisor 造成空转
+        return "review_gate"
 
     if phase == "init":
         return "world_builder"

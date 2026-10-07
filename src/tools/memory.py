@@ -6,6 +6,9 @@
 
 from typing import TypedDict, List
 
+from src.utils.config import MEMORY_CONTEXT_MAX_CHARS
+from src.utils.prompt_utils import truncate_text
+
 
 # ─── 记忆类型定义 ───────────────────────────────────
 # 角色记忆
@@ -39,12 +42,14 @@ class MemoryState(TypedDict):
 
 
 # ─── 记忆管理函数 ───────────────────────────────────
-def build_memory_context(memory: MemoryState, current_turn: int = None) -> str:
+def build_memory_context(memory: MemoryState, current_turn: int = None,
+                         max_chars: int = MEMORY_CONTEXT_MAX_CHARS) -> str:
     """构建记忆摘要文本，用于注入 Agent 的 Prompt
 
     当提供 current_turn 时，启用滑动窗口裁剪：
     - 角色：仅保留最近 5 轮内出现过的
     - 伏笔：仅保留最近 10 条待回收伏笔
+    最后按 max_chars 截断，避免记忆越长、每轮 prompt 越大。
     """
     MEMORY_WINDOW = 5
     MAX_FORES = 10
@@ -88,7 +93,7 @@ def build_memory_context(memory: MemoryState, current_turn: int = None) -> str:
             parts.append(f"  {i}. {event}")
         parts.append("")
 
-    return "\n".join(parts)
+    return truncate_text("\n".join(parts), max_chars)
 
 
 def apply_updates(memory: MemoryState, updates: dict, turn: int) -> MemoryState:

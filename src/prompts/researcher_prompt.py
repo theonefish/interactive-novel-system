@@ -6,6 +6,8 @@ WORLD_BUILDER_PROMPT = """你是一位资深世界观构建师，擅长从用户
 
 {search_context}
 
+{revision_feedback}
+
 请生成以下内容（JSON 格式）：
 
 1. world_setting: 世界观设定（200-300字，包含时代背景、核心矛盾、独特设定）
