@@ -2,7 +2,7 @@
   <aside class="session-sidebar">
     <!-- 顶部新建按钮 -->
     <div class="sidebar-header">
-      <el-button class="create-btn" @click="emit('create')">
+      <el-button class="create-btn" :disabled="busy" @click="emit('create')">
         <el-icon><Plus /></el-icon>
         <span>新建创作</span>
       </el-button>
@@ -15,7 +15,7 @@
           v-for="s in sessions"
           :key="s.session_id"
           :class="['session-card', { active: s.session_id === currentSessionId }]"
-          @click="emit('select', s.session_id)"
+          @click="selectSession(s.session_id)"
         >
           <div class="card-main">
             <div class="card-title" :title="s.title">{{ s.title || '未命名创作' }}</div>
@@ -40,7 +40,9 @@
                 class="resume-btn"
                 size="small"
                 type="primary"
-                @click.stop="emit('resume', s.session_id)"
+                :loading="busy"
+                :disabled="busy"
+                @click.stop="resumeSession(s.session_id)"
               >
                 <el-icon><EditPen /></el-icon>
                 <span>续写</span>
@@ -116,12 +118,25 @@
 import { ref } from 'vue'
 import { Plus, MoreFilled, Edit, Delete, EditPen } from '@element-plus/icons-vue'
 
-defineProps({
+const props = defineProps({
   sessions: { type: Array, default: () => [] },
+  // 有请求在途时（生成 / 续写 / 切换会话）禁用侧栏操作，避免重复提交造出重复会话
+  busy: { type: Boolean, default: false },
   currentSessionId: { type: String, default: '' },
 })
 
 const emit = defineEmits(['select', 'create', 'rename', 'delete', 'resume'])
+
+// 等待期间屏蔽点击（后端也有并发闸门兜底）
+function selectSession(id) {
+  if (props.busy) return
+  emit('select', id)
+}
+
+function resumeSession(id) {
+  if (props.busy) return
+  emit('resume', id)
+}
 
 const renamingId = ref('')
 const renameValue = ref('')

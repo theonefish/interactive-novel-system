@@ -2,7 +2,8 @@
 
 from src.utils.prompt_utils import format_characters, take_recent_segments, truncate_text
 from src.utils.ttl_cache import TTLCache
-from src.utils.usage import extract_usage, last_calls, record_usage, reset_usage, summarize_usage
+from src.utils.usage import (extract_usage, last_calls, normalize_usage, record_usage,
+                             reset_usage, summarize_usage)
 from src.prompts.writer_prompt import STORY_DRIVER_PROMPT
 from src.prompts.reviewer_prompt import CRITIC_PROMPT
 
@@ -76,13 +77,29 @@ class _FakeResponse:
 
 def test_extract_usage_prefers_langchain_metadata():
     resp = _FakeResponse(
-        usage_metadata={"input_tokens": 100, "output_tokens": 40, "total_tokens": 140},
-        response_metadata={"token_usage": {"prompt_cache_hit_tokens": 64,
-                                           "completion_tokens_details": {"reasoning_tokens": 12}}},
+        usage_metadata={"input_tokens": 100, "output_tokens": 40, "total_tokens": 140,
+                        "input_token_details": {"cache_read": 64},
+                        "output_token_details": {"reasoning": 12}},
     )
     usage = extract_usage(resp)
     assert usage["input"] == 100 and usage["output"] == 40 and usage["total"] == 140
     assert usage["cached_input"] == 64 and usage["reasoning"] == 12
+
+
+def test_normalize_usage_reads_cache_and_reasoning_details():
+    """缓存命中/推理 token 的正确来源是 input/output_token_details（以前读错字段，永远是 0）。"""
+    usage = normalize_usage({"input_tokens": 900, "output_tokens": 300, "total_tokens": 1200,
+                             "input_token_details": {"cache_read": 768},
+                             "output_token_details": {"reasoning": 128}})
+    assert (usage["input"], usage["output"], usage["cached_input"], usage["reasoning"]) == (900, 300, 768, 128)
+
+
+def test_normalize_usage_falls_back_to_raw_provider_fields():
+    usage = normalize_usage(None, {"prompt_tokens": 30, "completion_tokens": 10,
+                                   "prompt_cache_hit_tokens": 16,
+                                   "completion_tokens_details": {"reasoning_tokens": 4}})
+    assert (usage["input"], usage["output"], usage["total"]) == (30, 10, 40)
+    assert usage["cached_input"] == 16 and usage["reasoning"] == 4
 
 
 def test_extract_usage_falls_back_to_raw_fields():
@@ -109,3 +126,4 @@ def test_record_and_summarize_usage():
     assert len(last_calls()) == 3
     reset_usage()
     assert summarize_usage()["overall"]["calls"] == 0
+

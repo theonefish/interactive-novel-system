@@ -1519,3 +1519,36 @@ RuntimeError: <asyncio.locks.Lock object at 0x000001ED858D0C20 [locked]> is boun
 [2026-10-07 21:18:46] [WARNING] [server] [server.py:416] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
 [2026-10-07 21:20:47] [WARNING] [server] [server.py:316] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
 [2026-10-07 21:20:47] [WARNING] [server] [server.py:416] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-07 21:23:25] [INFO] [server] [server.py:226] [lifespan] 异步图初始化完成
+[2026-10-07 21:25:24] [INFO] [server] [server.py:504] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 54f4b2a0-117a-4d3a-978d-0bad6aa8fcb0
+[2026-10-07 21:25:25] [INFO] [server] [server.py:504] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 94fb28e0-ce59-444e-b572-6c5a12bc2b3d
+[2026-10-07 21:25:26] [INFO] [server] [server.py:504] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 9d41f86e-6c25-4d6c-8e6d-837eae703bbc
+[2026-10-07 21:25:28] [INFO] [server] [server.py:504] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 33d30931-8d17-466f-9930-9271b49ca3ab
+[2026-10-07 21:25:28] [INFO] [server] [server.py:504] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 76cd3e07-4f05-4dd9-88ba-2779bd4ed879
+[2026-10-07 21:25:28] [INFO] [server] [server.py:504] [resume_session] 从记忆 0b0f0027-95e1-4395-9030-659a191d5635 续写为新会话 8a5e9abd-0623-4f75-b1ae-cf1a49bbdff8
+[2026-10-07 21:25:39] [INFO] [server] [server.py:506] [resume_session] 会话 94fb28e0-ce59-444e-b572-6c5a12bc2b3d 启动完成，phase=story_progressing
+[2026-10-07 21:25:43] [INFO] [server] [server.py:506] [resume_session] 会话 54f4b2a0-117a-4d3a-978d-0bad6aa8fcb0 启动完成，phase=story_progressing
+[2026-10-07 21:25:50] [INFO] [server] [server.py:506] [resume_session] 会话 9d41f86e-6c25-4d6c-8e6d-837eae703bbc 启动完成，phase=story_progressing
+[2026-10-07 21:26:03] [INFO] [server] [server.py:506] [resume_session] 会话 8a5e9abd-0623-4f75-b1ae-cf1a49bbdff8 启动完成，phase=story_progressing
+[2026-10-07 21:26:25] [INFO] [server] [server.py:506] [resume_session] 会话 33d30931-8d17-466f-9930-9271b49ca3ab 启动完成，phase=story_progressing
+[2026-10-07 21:27:32] [INFO] [server] [server.py:506] [resume_session] 会话 76cd3e07-4f05-4dd9-88ba-2779bd4ed879 启动完成，phase=story_progressing
+[2026-10-07 21:27:32] [INFO] [server] [server.py:236] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-08 16:25:15] [WARNING] [server] [server.py:320] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-08 16:25:15] [WARNING] [server] [server.py:420] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-08 16:26:36] [WARNING] [server] [server.py:320] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-08 16:26:36] [WARNING] [server] [server.py:420] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-08 16:26:36] [WARNING] [server] [server.py:477] [resume_session] 记忆 busy-memory 正在续写中，拒绝重复请求
+[2026-10-08 16:27:51] [WARNING] [server] [server.py:320] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-08 16:27:51] [WARNING] [server] [server.py:420] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-08 16:27:51] [WARNING] [server] [server.py:477] [resume_session] 记忆 busy-memory 正在续写中，拒绝重复请求
+[2026-10-08 16:28:21] [WARNING] [server] [server.py:320] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-08 16:28:21] [WARNING] [server] [server.py:420] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-08 16:28:21] [WARNING] [server] [server.py:477] [resume_session] 记忆 busy-memory 正在续写中，拒绝重复请求
+[2026-10-08 16:31:08] [WARNING] [server] [server.py:322] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-08 16:31:08] [WARNING] [server] [server.py:422] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-08 16:31:08] [WARNING] [server] [server.py:479] [resume_session] 记忆 busy-memory 正在续写中，拒绝重复请求
+[2026-10-08 16:33:15] [INFO] [server] [server.py:232] [lifespan] 异步图初始化完成
+[2026-10-08 16:33:16] [INFO] [server] [server.py:242] [lifespan] 异步 checkpointer 连接已关闭
+[2026-10-08 16:33:48] [WARNING] [server] [server.py:322] [send_action] 会话 busy-sid 正在执行中，拒绝重复请求
+[2026-10-08 16:33:48] [WARNING] [server] [server.py:422] [stream_session] 会话 busy-sid 正在执行中，拒绝并发流
+[2026-10-08 16:33:48] [WARNING] [server] [server.py:479] [resume_session] 记忆 busy-memory 正在续写中，拒绝重复请求

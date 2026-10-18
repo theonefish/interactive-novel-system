@@ -453,3 +453,148 @@ def test_build_stable_query_ignores_volatile_context():
     b = build_stable_query("赛博朋克侦探", "新港，义体记忆可交易")
     assert a == b and "赛博朋克侦探" in a
 
+
+# ─── 续写重复提交防护 ────────────────────────────────────────────
+
+def test_resume_rejects_duplicate_while_in_flight():
+    """同一份记忆并发续写必须 409（连点会造出多个重复会话 + 多次生成）。"""
+    from fastapi.testclient import TestClient
+
+    server._resuming_memories.add("busy-memory")
+    try:
+        r = TestClient(server.app).post("/api/sessions/busy-memory/resume", json={})
+        assert r.status_code == 409, r.text[:200]
+        assert "正在续写中" in r.json()["detail"]
+    finally:
+        server._resuming_memories.discard("busy-memory")
+
+
+def test_resume_guard_is_released_after_failure():
+    """闸门必须在 finally 里释放，否则记忆会被永久锁住。"""
+    import inspect
+
+    src = inspect.getsource(server.resume_session)
+    assert "_resuming_memories.add(session_id)" in src
+    assert "finally:" in src and "_resuming_memories.discard(session_id)" in src
+
+
+def test_frontend_sidebar_is_debounced_while_busy():
+    root = pathlib.Path(__file__).resolve().parent.parent / "frontend" / "src"
+    sidebar = (root / "components" / "SessionSidebar.vue").read_text(encoding="utf-8")
+    app = (root / "App.vue").read_text(encoding="utf-8")
+
+    assert "busy: { type: Boolean, default: false }" in sidebar
+    assert ':disabled="busy"' in sidebar          # 新建按钮
+    assert ':loading="busy"' in sidebar           # 续写按钮
+    assert "function resumeSession" in sidebar and "if (props.busy) return" in sidebar
+    assert "function selectSession" in sidebar
+    assert ':busy="isWaiting"' in app             # App 把等待状态传进侧栏
+
+
+# ─── 流式用量：只取最后一个分片，不做求和 ────────────────────────
+
+def test_llm_call_takes_last_chunk_usage_not_the_sum(monkeypatch):
+    """核心回归：每个分片都带 usage 时，只能记「最后一次」的用量，不能求和。
+
+    （SiliconFlow 流式下每个分片都带 usage，LangChain 会把它们加起来 → 曾放大几百倍）
+    """
+    from src.utils import llm as llm_module
+    from src.utils import usage as usage_module
+
+    class _Chunk:
+        def __init__(self, content="", usage_metadata=None):
+            self.content = content
+            self.usage_metadata = usage_metadata
+
+    class _FakeChat:
+        def stream(self, messages):
+            # 模拟：每个分片都报同一份（累计）用量
+            for i in range(300):
+                yield _Chunk("字", {"input_tokens": 2000, "output_tokens": 0, "total_tokens": 2000})
+            yield _Chunk("", {"input_tokens": 2000, "output_tokens": 700, "total_tokens": 2700})
+
+    monkeypatch.setattr(llm_module, "_build_chat", lambda *a, **k: _FakeChat())
+    usage_module.reset_usage()
+
+    text = llm_module.llm_call("sys", "user", node="story_driver")
+
+    assert text == "字" * 300
+    calls = usage_module.last_calls()
+    assert len(calls) == 1
+    assert calls[0]["input"] == 2000, calls[0]      # 不是 2000*301
+    assert calls[0]["output"] == 700
+    assert calls[0]["node"] == "story_driver"
+    usage_module.reset_usage()
+
+
+# ─── 回溯上限按「次数」而不是「段数」 ────────────────────────────
+
+def test_backtrack_still_works_after_many_segments():
+    """6 段剧情时仍然可以回退（老实现用 len(segment_history) 判断，5 段后永久失效）。"""
+    history = [{"turn": i, "segment": f"第{i}段", "options": []} for i in range(1, 7)]
+    state = _state(
+        story_segments=[h["segment"] for h in history],
+        segment_history=history,
+        current_segment="第6段",
+        current_turn=6,
+    )
+
+    updates = supervisor.handle_backtrack(state)
+
+    assert updates["current_turn"] == 5
+    assert updates["current_segment"] == "第5段"
+    assert len(updates["story_segments"]) == 5
+
+
+def test_backtrack_stops_after_max_backtracks():
+    history = [{"turn": i, "segment": f"第{i}段", "options": []} for i in range(1, 7)]
+    state = _state(
+        story_segments=[h["segment"] for h in history],
+        segment_history=history,
+        current_segment="第6段",
+        current_turn=6,
+        user_choices=[{"turn_id": i, "choice_type": "backtrack",
+                       "content": "回到上一步", "selected_option": None} for i in range(5)],
+    )
+
+    updates = supervisor.handle_backtrack(state)
+
+    assert updates == {"current_phase": "story_progressing"}   # 已达上限，不回退
+
+
+# ─── 上传文件名净化 ──────────────────────────────────────────────
+
+def test_safe_upload_name_strips_paths():
+    assert server._safe_upload_name("../../evil.txt") == "evil.txt"
+    assert server._safe_upload_name("a/b/c.md") == "c.md"
+    assert server._safe_upload_name("..\\..\\win.pdf") == "win.pdf"
+    assert server._safe_upload_name("..") == ""
+    assert server._safe_upload_name("") == ""
+    assert server._safe_upload_name("正常文件.txt") == "正常文件.txt"
+
+
+def test_knowledge_save_path_stays_inside_base():
+    import inspect
+
+    path = server._knowledge_save_path("ok.txt")
+    assert path.parent == server.KNOWLEDGE_BASE_DIR.resolve()
+    # 端到端守卫：上传处理必须用净化后的名字与受控路径
+    src = inspect.getsource(server.upload_knowledge_file)
+    assert "_safe_upload_name(file.filename" in src
+    assert "save_path = _knowledge_save_path(filename)" in src
+
+
+# ─── 段落计数 ────────────────────────────────────────────────────
+
+def test_response_exposes_segment_count():
+    state = _state(story_segments=["第一段", "第二段", "第三段"])
+    resp = server._state_to_response(state, "sid")
+    assert resp.segment_count == 3
+
+
+def test_frontend_uses_server_segment_count():
+    app = pathlib.Path(__file__).resolve().parent.parent / "frontend" / "src" / "App.vue"
+    src = app.read_text(encoding="utf-8")
+    assert "typeof data.segment_count === 'number'" in src
+    assert "currentSegmentCount.value = data.segment_count" in src
+

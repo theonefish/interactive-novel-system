@@ -19,26 +19,41 @@ _totals = defaultdict(lambda: {"calls": 0, "input": 0, "output": 0,
 _recent = []
 
 
-def extract_usage(response) -> dict:
-    """从 LangChain 的 AIMessage 里取出 token 用量（不同供应商字段不同，缺失按 0 处理）。"""
+def normalize_usage(meta=None, raw=None) -> dict:
+    """把用量归一成统一字段（不同供应商/不同 LangChain 形态都能吃）。
+
+    - LangChain 的 UsageMetadata：input_tokens / output_tokens / total_tokens，
+      缓存命中在 input_token_details.cache_read，推理 token 在 output_token_details.reasoning；
+    - 供应商原始 token_usage（非流式时才有）：prompt_tokens / completion_tokens /
+      prompt_cache_hit_tokens / completion_tokens_details.reasoning_tokens。
+    """
     usage = {"input": 0, "output": 0, "total": 0, "cached_input": 0, "reasoning": 0}
 
-    meta = getattr(response, "usage_metadata", None) or {}
     if isinstance(meta, dict):
         usage["input"] = int(meta.get("input_tokens") or 0)
         usage["output"] = int(meta.get("output_tokens") or 0)
-        usage["total"] = int(meta.get("total_tokens") or (usage["input"] + usage["output"]))
+        usage["total"] = int(meta.get("total_tokens") or 0)
+        in_details = meta.get("input_token_details") or {}
+        out_details = meta.get("output_token_details") or {}
+        usage["cached_input"] = int(in_details.get("cache_read") or 0)
+        usage["reasoning"] = int(out_details.get("reasoning") or 0)
 
-    raw = (getattr(response, "response_metadata", None) or {}).get("token_usage") or {}
     if isinstance(raw, dict):
-        usage["cached_input"] = int(raw.get("prompt_cache_hit_tokens") or 0)
-        details = raw.get("completion_tokens_details") or {}
-        usage["reasoning"] = int(details.get("reasoning_tokens") or 0)
+        usage["cached_input"] = usage["cached_input"] or int(raw.get("prompt_cache_hit_tokens") or 0)
+        raw_details = raw.get("completion_tokens_details") or {}
+        usage["reasoning"] = usage["reasoning"] or int(raw_details.get("reasoning_tokens") or 0)
         usage["input"] = usage["input"] or int(raw.get("prompt_tokens") or 0)
         usage["output"] = usage["output"] or int(raw.get("completion_tokens") or 0)
 
     usage["total"] = usage["total"] or (usage["input"] + usage["output"])
     return usage
+
+
+def extract_usage(response) -> dict:
+    """从 LangChain 的 AIMessage 里取出 token 用量（聚合消息场景）。"""
+    meta = getattr(response, "usage_metadata", None) or {}
+    raw = (getattr(response, "response_metadata", None) or {}).get("token_usage")
+    return normalize_usage(meta, raw)
 
 
 def _append_log_line(line: str) -> None:

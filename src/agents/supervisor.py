@@ -80,13 +80,20 @@ def parse_user_input(user_input: str, phase: str) -> dict:
     return {"action": "free_input", "selected_option": None}
 
 
+def _backtrack_count(state: NovelState) -> int:
+    """用户累计回溯过几次（用于限制次数，而不是用历史段数）。"""
+    return sum(1 for c in (state.get("user_choices") or [])
+               if c.get("choice_type") == "backtrack")
+
+
 def handle_backtrack(state: NovelState) -> dict:
     """处理回溯请求"""
     segment_history = state.get("segment_history", [])
-    # 无历史、首轮、或已达回溯上限时，保持剧情推进、不回溯
+    # 无历史、首轮、或已达回溯次数上限时，保持剧情推进、不回溯
+    # 注意：上限用的是「回溯过几次」，不是历史段数 —— 否则剧情一多就再也回退不了
     if (not segment_history
             or state.get("current_turn", 0) <= 1
-            or len(segment_history) >= MAX_BACKTRACK_STEPS):
+            or _backtrack_count(state) >= MAX_BACKTRACK_STEPS):
         return {"current_phase": "story_progressing"}
 
     # 弹出最后一段并恢复状态

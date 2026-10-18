@@ -7,3 +7,7 @@ __pycache__/
 .trae/
 node_modules/
 frontend/dist/
+.pytest_cache/
+*.log
+*.db-shm
+*.db-wal

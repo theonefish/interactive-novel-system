@@ -38,6 +38,7 @@
       <SessionSidebar
         v-show="!sidebarCollapsed"
         :sessions="sessions"
+        :busy="isWaiting"
         :current-session-id="sessionId"
         @select="onSelectSession"
         @create="onCreate"
@@ -670,8 +671,9 @@ function applyResponse(data) {
   if (data.rules) worldSetting.value.rules = data.rules
   if (data.segment) {
     messages.value.push({ type: 'system', turn: data.turn, text: data.segment })
-    currentSegmentCount.value += 1
   }
+  // 段落计数以服务端为准（刷新/回退/重新生成后都能对上）
+  if (typeof data.segment_count === 'number') currentSegmentCount.value = data.segment_count
   if (data.turn != null) currentTurn.value = data.turn
   options.value = data.options?.length ? data.options : []
   if (data.final_output) {

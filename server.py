@@ -37,6 +37,10 @@ app_graph_async = None
 # 单事件循环内「判断 + 加入」之间没有 await，因此用普通 set 即可。
 _running_sessions: set = set()
 
+# 正在续写的「来源记忆」：同一份长期记忆同时只允许一次续写。
+# 连点「续写」会各自生成新的 session_id，按 session_id 挡不住，必须按来源记忆挡。
+_resuming_memories: set = set()
+
 
 # 请求/响应模型（Pydantic，用于接口入参校验与出参序列化）
 
@@ -66,6 +70,7 @@ class SessionResponse(BaseModel):
     critique: str = ""
     risk_warnings: list = []
     final_output: str = ""
+    segment_count: int = 0  # 已生成的剧情段数（前端顶部计数用，刷新后也能对上）
     human_approval: Optional[str] = None
     review: Optional[dict] = None
     error: str = ""
@@ -170,6 +175,7 @@ def _state_to_response(
         critique=state.get("critique", ""),
         risk_warnings=state.get("risk_warnings", []),
         final_output=state.get("final_output", ""),
+        segment_count=len(state.get("story_segments") or []),
         human_approval=human_approval,
         review=review,
         error=state.get("error", ""),
@@ -468,9 +474,16 @@ async def resume_session(session_id: str):
     从长期记忆恢复世界观、角色、规则、记忆状态，清空前情进度，
     生成新 session_id 并以 story_progressing 阶段启动图。
     """
+    # 并发闸门放在最前：同一份记忆同时在续写时直接拒绝（连点会造出多个重复会话）
+    if session_id in _resuming_memories:
+        logger.warning(f"[resume_session] 记忆 {session_id} 正在续写中，拒绝重复请求")
+        raise HTTPException(status_code=409, detail="该会话正在续写中，请稍候再试")
+
     memory = long_term_memory.get_long_term_memory(session_id)
     if memory is None:
         raise HTTPException(status_code=404, detail="长期记忆不存在")
+
+    _resuming_memories.add(session_id)
 
     new_session_id = str(uuid.uuid4())
     config = {"configurable": {"thread_id": new_session_id}}
@@ -509,6 +522,8 @@ async def resume_session(session_id: str):
     except Exception as e:
         logger.exception(f"[resume_session] 会话 {new_session_id} 启动失败：{e}")
         raise HTTPException(status_code=500, detail=f"续写失败：{str(e)}")
+    finally:
+        _resuming_memories.discard(session_id)
 
 
 @app.get("/api/usage")
@@ -537,6 +552,25 @@ async def get_memory(memory_id: str):
 # 与 document_util.create_index_from_dir 的批量入库目录保持一致。
 
 KNOWLEDGE_BASE_DIR = Path(__file__).resolve().parent / "knowledge_base"
+
+
+def _safe_upload_name(filename: str) -> str:
+    """把上传文件名净化成纯文件名（丢掉任何目录部分）。
+
+    浏览器/脚本可能传来 "../../evil.txt" 这类名字，直接拼路径会写到
+    knowledge_base/ 之外，甚至覆盖项目文件。
+    """
+    name = Path(str(filename or "").replace("\\", "/")).name.strip()
+    return "" if name in ("", ".", "..") else name
+
+
+def _knowledge_save_path(filename: str) -> Path:
+    """把净化后的文件名映射到 knowledge_base 内的路径；越界直接 400。"""
+    base = KNOWLEDGE_BASE_DIR.resolve()
+    save_path = (base / filename).resolve()
+    if not save_path.is_relative_to(base):
+        raise HTTPException(status_code=400, detail="文件名不合法")
+    return save_path
 
 
 def _normalize_text_bytes(content: bytes) -> bytes:
@@ -583,8 +617,10 @@ async def upload_knowledge_file(file: UploadFile = File(...)):
     """
     from src.tools.document_util import SUPPORTED_FORMATS
 
-    # 1. 校验文件格式
-    filename = file.filename or "unnamed"
+    # 1. 校验文件名与格式（文件名先净化，去掉任何路径部分）
+    filename = _safe_upload_name(file.filename or "")
+    if not filename:
+        raise HTTPException(status_code=400, detail="文件名不合法")
     suffix = Path(filename).suffix.lower()
     if suffix not in SUPPORTED_FORMATS:
         raise HTTPException(
@@ -599,7 +635,7 @@ async def upload_knowledge_file(file: UploadFile = File(...)):
 
     # 3. 保存到知识库目录
     KNOWLEDGE_BASE_DIR.mkdir(parents=True, exist_ok=True)
-    save_path = KNOWLEDGE_BASE_DIR / filename
+    save_path = _knowledge_save_path(filename)
     save_path.write_bytes(content)
 
     # 4. 解析 + 入库（丢线程池执行，不阻塞服务）
@@ -625,7 +661,6 @@ async def upload_knowledge_file(file: UploadFile = File(...)):
         "message": f"已入库 {chunk_count} 个片段，AI 创作时将自动作为参考",
     }
 
-
 @app.get("/api/knowledge/files")
 async def list_knowledge_files():
     """列出知识库目录中已上传的参考文件（前端上传区展示用）。"""
@@ -650,6 +685,7 @@ except Exception:
 
 # 启动入口：直接用 uvicorn 拉起 FastAPI（生产可改用 gunicorn + uvicorn worker）。
 # 端口 8001 需与前端 API 基址一致。
+
 
 if __name__ == "__main__":
     import uvicorn

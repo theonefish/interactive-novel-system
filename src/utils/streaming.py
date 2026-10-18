@@ -7,6 +7,27 @@
 import json
 from typing import AsyncGenerator, Dict, Any
 
+# 图里真实存在的节点名（用来过滤嵌套 runnable 产生的事件）
+GRAPH_NODES = frozenset({
+    "supervisor", "world_builder", "story_driver", "critic", "review_gate", "integrator",
+})
+
+
+def _graph_node(event: Dict[str, Any]) -> str:
+    """判断事件属于哪个图节点；不是图节点事件时返回空串。
+
+    astream_events 也会为嵌套 runnable（LangGraph、RunnableSequence、ChatOpenAI…）
+    发 on_chain_start/end，只看 event["name"] 会把前端状态提示带偏，
+    所以优先用 metadata 里的 langgraph_node。
+    """
+    metadata = event.get("metadata") or {}
+    node = metadata.get("langgraph_node") or ""
+    if node:
+        return node
+    name = event.get("name") or ""
+    return name if name in GRAPH_NODES else ""
+
+
 
 def _json_safe(obj: Any) -> Any: # 防止任意对象破坏 SSE
     """将不可 JSON 序列化的对象转为字符串"""
@@ -42,17 +63,22 @@ async def transform_graph_events(
     current_node = None
     async for event in async_gen:
         event_kind = event.get("event", "")
-        name = event.get("name", "")
+        node = _graph_node(event)
         data = event.get("data", {})
 
         if event_kind == "on_chain_start":
-            current_node = name
+            # 只上报图节点，嵌套 runnable 直接忽略
+            if not node:
+                continue
+            current_node = node
             yield format_sse_event("node_start", {
-                "node": name,
+                "node": node,
                 "input": data.get("input"),
             })
 
         elif event_kind == "on_chain_end":
+            if not node:
+                continue
             output = data.get("output", {})
             if not isinstance(output, dict):
                 output = {}
@@ -65,7 +91,7 @@ async def transform_graph_events(
                 if k in output
             }
             yield format_sse_event("node_end", {
-                "node": name,
+                "node": node,
                 "output": filtered,
             })
 
@@ -73,13 +99,13 @@ async def transform_graph_events(
             chunk = data.get("chunk")
             if chunk and hasattr(chunk, "content") and chunk.content:
                 yield format_sse_event("token", {
-                    "node": current_node,
+                    "node": node or current_node,
                     "content": chunk.content,
                 })
         # 节点运行时报错兜底
         elif event_kind == "on_chain_error":
             yield format_sse_event("error", {
-                "node": name,
+                "node": node or event.get("name", ""),
                 "error": str(data.get("error", "")),
             })
 
